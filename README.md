@@ -1,16 +1,16 @@
 # Balance
 
 A device event log, read end to end: what the phone recorded, what it computed,
-and what it said out loud. One scrolling page, thirteen acts, two profiles.
+and what it said out loud. One scrolling page, twelve acts, two profiles.
 
-**Live:** _not published yet_ · run it locally with the commands below.
+**Live:** <https://frankllonch.github.io/scrolldowndashboard-balance/>
 
 ## Run it
 
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -e ".[dev]"
-.venv/bin/python -m pytest        # 120 tests
+.venv/bin/python -m pytest        # 122 tests
 .venv/bin/python build.py         # writes docs/
 .venv/bin/python -m http.server -d docs 8000
 ```
@@ -25,11 +25,11 @@ the page.
 | `balance/events.py` | screen reconstruction, pickups, time attribution |
 | `balance/metrics.py` | the daily and weekly frames |
 | `balance/score.py` | the 0 to 100 index, five weighted components |
-| `balance/intelligence.py` | alerts, the silence budget, nudges, reinforcements |
+| `balance/intelligence/` | alerts, the silence budget, nudges, reinforcements |
 | `render/acts/` | one module per act of the page |
 | `render/payload.py` | everything the browser gets, resolved at build time |
-| `copytext/en.py` | every user-visible string |
-| `site/` | `index.html`, `style.css`, `app.js`, hand-written, no build step |
+| `copytext/strings/` | every user-visible string |
+| `site/` | `index.html`, `css/`, `app.js`, hand-written, no build step |
 
 `tests/test_intelligence.py::test_the_guardian_payload_contains_no_apps_or_domains`
 and `tests/test_payload.py::test_payload_guardian_section_has_no_app_domain_or_category`

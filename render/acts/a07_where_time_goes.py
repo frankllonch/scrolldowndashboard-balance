@@ -7,7 +7,7 @@ from .. import html
 
 def build(ctx) -> str:
     apps, sites = ctx.bundle["apps"], ctx.bundle["sites"]
-    df, user = ctx.df, ctx.user
+    df = ctx.df
     top3 = apps.minutes.head(3).sum() / apps.minutes.sum() * 100
     summary = ctx.profile["summary"]
     return (
@@ -46,7 +46,7 @@ def reading(ctx, apps, sites, top3: float) -> str:
                             distract=df.distract_share.mean() * 100,
                             first=week("distract_share", 1) * 100,
                             last=week("distract_share", 4) * 100), "good")
-                + f'<p class="caption">'
+                + '<p class="caption">'
                 + t("time.caption.chrome", opens=chrome.opens.iloc[0],
                     minutes=chrome.minutes.iloc[0]) + "</p>")
     reference = ctx.bundles["A"]
@@ -57,7 +57,7 @@ def reading(ctx, apps, sites, top3: float) -> str:
                         distract=df.distract_share.mean() * 100,
                         distract_a=reference["df"].distract_share.mean() * 100),
                       "warn")
-            + f'<p class="caption">'
+            + '<p class="caption">'
             + t("time.caption.blocked_absent", names=names, through=through,
                 attempts=attempts)
             + "</p>")

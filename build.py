@@ -49,13 +49,13 @@ def vendor_plotly() -> Path:
 
 
 def copy_frontend() -> list[Path]:
-    out = []
-    for name in ("style.css", "app.js"):
-        src = SITE / name
-        if src.exists():
-            shutil.copyfile(src, DOCS / name)
-            out.append(DOCS / name)
-    return out
+    """One stylesheet out of many. The sections exist so the source is
+    readable; the page still gets one file and one request."""
+    sections = sorted((SITE / "css").glob("*.css"))
+    css = DOCS / "style.css"
+    css.write_text("\n".join(p.read_text().rstrip("\n") for p in sections) + "\n")
+    shutil.copyfile(SITE / "app.js", DOCS / "app.js")
+    return [css, DOCS / "app.js"]
 
 
 def main() -> int:

@@ -17,7 +17,7 @@ def slider(weeks: list[dict], current: dict) -> str:
         f'<output for="week-slider" data-slot="week.label">{current["label"]}'
         "</output>"
         f'<input type="range" id="week-slider" list="week-ticks" '
-        f'min="{min(numbers)}" max="{max(numbers)}" step="1" '
+        f'min="{min(numbers)}" max="{max(numbers)}" step="any" '
         f'value="{current["week"]}">'
         f'<datalist id="week-ticks">{ticks}</datalist></div>'
     )

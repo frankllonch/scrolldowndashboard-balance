@@ -4,18 +4,22 @@ The event file is the system of record. Everything else is a pure function of
 it, computed at build time, so the browser never sees an event.
 
 ```
-data/*.json          the log · immutable
+data/*.json              the log · immutable
   │
-  ├─ balance/events.py        layer 0 · screen, pickups, time attribution
-  ├─ balance/metrics.py       layer 1 · daily_frame(), weekly_frame()
-  ├─ balance/score.py         layer 2 · the 0 to 100 index
-  └─ balance/intelligence.py  layer 3 · alerts, nudges, reinforcements
+  ├─ balance/events.py     layer 0 · screen, pickups, time attribution
+  ├─ balance/windows.py             day, night and waking windows
+  ├─ balance/metrics.py    layer 1 · daily_frame(), weekly_frame()
+  ├─ balance/score.py      layer 2 · the 0 to 100 index
+  └─ balance/intelligence/ layer 3 · signals, alerts, nudge, positives, replay
        │
-       ├─ balance/run.py      adapter · CLI
-       └─ render/             adapter · figures, acts, payload
+       ├─ balance/run.py   adapter · CLI
+       └─ render/          adapter · figures/, acts/, payload, states, summary
             │
             └─ build.py  →  docs/  →  GitHub Pages
 ```
+
+No module is longer than 350 lines; where a concern outgrew that it became a
+package whose `__init__.py` re-exports the same names, so no caller changed.
 
 No layer imports plotly, and none of them imports `render/`. The CLI and the
 page are two readers of the same core.
@@ -55,11 +59,12 @@ page are two readers of the same core.
 `copytext/en.py`. Nothing else knows the column exists.
 
 **Add an alert rule.** Write `_your_rule(df) -> list[Signal]` in
-`intelligence.py` and register it in `evaluate_alerts`. The silence budget in
+`intelligence/alerts.py`, put its thresholds in `intelligence/signals.py`, and
+register it in `RULES`. The silence budget in
 `_decide` applies to it automatically; give it an honest `actionability` or it
 will crowd out something that deserves the slot.
 
-**Add a reinforcement.** Same shape, in `evaluate_positives`. One a week reaches
+**Add a reinforcement.** Same shape, in `intelligence/positives.py`. One a week reaches
 the user at most.
 
 **Change the index weights.** `COMPONENTS` in `score.py`. The weights must sum
@@ -70,12 +75,13 @@ number rather than a silent drift.
 **Add an act to the page.** Write `render/acts/aNN_name.py` with a
 `build(ctx) -> str`, register it in `render/acts/__init__.py`, add a
 `<section>` and its `<!--act:NN-->` marker to `site/index.html`, and put its
-strings in `copytext/en.py`. Acts in part 2 render once per profile.
+strings in the right part of `copytext/strings/`. Acts in part 2 render once
+per profile.
 
-**Add a figure.** A builder in `render/figures.py`, a key in
-`render/payload.py`, and a `html.chart("key")` mount in the act. Selection-
-dependent figures ship once and are re-pointed in the browser unless their data
-actually changes.
+**Add a figure.** A builder in the right family under `render/figures/`,
+exported from its `__init__.py`, a key in `render/payload.py`, and a
+`html.chart("key")` mount in the act. Selection-dependent figures ship once and
+are re-pointed in the browser unless their data actually changes.
 
 ## Known limits
 

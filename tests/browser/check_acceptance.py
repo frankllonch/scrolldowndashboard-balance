@@ -5,6 +5,7 @@ page did while being driven.
 """
 import pathlib
 import sys
+
 from playwright.sync_api import sync_playwright
 
 URL = "http://127.0.0.1:8533/"
@@ -40,28 +41,28 @@ def walk_every_act(page, tag):
                              behavior: 'instant'}});
         }}""")
         page.wait_for_timeout(260)
-        state = page.evaluate(f"""(id) => {{
+        state = page.evaluate("""(id) => {
             const el = document.getElementById(id);
             const vw = document.documentElement.clientWidth;
             const faded = [], wide = [];
             el.querySelectorAll('.act-head, .act-body > *, .kpi, .hero-number,'
-                              + ' .chart, .note, .lede, .fork-card').forEach(n => {{
+                              + ' .chart, .note, .lede, .fork-card').forEach(n => {
                 const r = n.getBoundingClientRect();
                 if (r.bottom <= 0 || r.top >= window.innerHeight * 0.4) return;
-                if (parseFloat(getComputedStyle(n).opacity) < 0.99) {{
+                if (parseFloat(getComputedStyle(n).opacity) < 0.99) {
                     faded.push(n.className);
-                }}
-            }});
-            el.querySelectorAll('*').forEach(n => {{
+                }
+            });
+            el.querySelectorAll('*').forEach(n => {
                 if (n.closest('.scroller, .js-plotly-plot')) return;
                 const r = n.getBoundingClientRect();
                 if (r.width && (r.right > vw + 1 || r.left < -1)) wide.push(n.tagName);
-            }});
-            return {{faded, wide: wide.slice(0, 3),
+            });
+            return {faded, wide: wide.slice(0, 3),
                      text: el.innerText.trim().length,
                      plots: el.querySelectorAll('.js-plotly-plot').length,
-                     charts: el.querySelectorAll('.chart').length}};
-        }}""", act)
+                     charts: el.querySelectorAll('.chart').length};
+        }""", act)
         if state["faded"]:
             unreadable.append(f"{act}: {state['faded'][:2]}")
         if state["wide"]:

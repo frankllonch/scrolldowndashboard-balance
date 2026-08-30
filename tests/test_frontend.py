@@ -10,7 +10,9 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = (ROOT / "site" / "style.css").read_text()
+#: The built sheet, which is what the browser gets. The sections it is
+#: concatenated from live in site/css/.
+CSS = (ROOT / "docs" / "style.css").read_text()
 
 #: What the reveal animation is applied to. If any of these is hidden by a
 #: plain rule, the page depends on animation to be readable.

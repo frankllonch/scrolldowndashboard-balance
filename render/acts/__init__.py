@@ -10,9 +10,18 @@ from dataclasses import dataclass
 from typing import Callable
 
 from . import (
-    a01_cover, a02_two_people, a03_choose, a04_the_week, a05_a_day,
-    a06_the_night, a07_where_time_goes, a08_what_stopped, a09_what_said,
-    a10_the_finding, a11_the_control, a12_under_the_hood,
+    a01_cover,
+    a02_two_people,
+    a03_choose,
+    a04_the_week,
+    a05_a_day,
+    a06_the_night,
+    a07_where_time_goes,
+    a08_what_stopped,
+    a09_what_said,
+    a10_the_finding,
+    a11_the_control,
+    a12_under_the_hood,
 )
 
 

@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var CONFIG = { displayModeBar: false, responsive: true };
+  var CONFIG = { displayModeBar: false, responsive: false };
   var PART_TWO = ["04", "05", "06", "07", "08", "09"];
   var root = document.documentElement;
   var payload = null;
@@ -22,9 +22,9 @@
   function esc(v) {
     return String(v).replace(/[&<>"]/g, function (c) { return ESCAPES[c]; });
   }
-  function span(cls, text) { return '<span class="' + cls + '">' + text + "</span>"; }
   /* Structure. Mirrors render/html.py: tag names and classes, never words. */
 
+  function span(cls, text) { return '<span class="' + cls + '">' + text + "</span>"; }
   function kpis(items) {
     return '<div class="kpis">' + items.map(function (k) {
       return '<div class="kpi">' + span("kpi-label", k.label) +
@@ -71,7 +71,6 @@
     return mount.dataset.scope === "shared"
       ? payload.figures[key] : current().figures[key];
   }
-
   function draw(mount) {
     var fig = figureFor(mount);
     if (!fig) { return Promise.resolve(); }
@@ -94,7 +93,8 @@
     fill("week.days_title", heading(week.days_title));
     fill("week.table", table(week.table));
     fill("week.emitted_title", heading(week.emitted_title));
-    if (week.emissions.rows.length) { fill("week.emissions", table(week.emissions)); }
+    fill("week.emissions", week.emissions.rows.length ? table(week.emissions)
+      : '<p class="caption">' + current().ui.emitted_none + "</p>");
     fill("week.held", week.held.length
       ? heading(week.held_title) + pairs(week.held) : "");
 
@@ -115,7 +115,6 @@
       });
     }
   }
-
   function dayCards(day) {
     var ui = current().ui;
     var gap = '<div class="empty">' + ui.empty + "</div>";
@@ -129,7 +128,6 @@
     return '<div class="grid cols-' + blocks.length + '">' + blocks.join("") +
       "</div>";
   }
-
   function applyDay(index) {
     var day = current().days[index];
     if (!day) { return; }
@@ -145,13 +143,11 @@
   /* Where the reader is, as an act plus how far into it, so the switch can
      put them back after part two changes height. */
   function anchor() {
-    var acts = $$(".act");
-    for (var i = acts.length - 1; i >= 0; i--) {
-      if (acts[i].offsetTop <= window.scrollY + 1) {
-        return { act: acts[i], into: window.scrollY - acts[i].offsetTop };
-      }
-    }
-    return { act: acts[0], into: window.scrollY };
+    var above = $$(".act").filter(function (a) {
+      return a.offsetTop <= window.scrollY + 1;
+    });
+    var el = above[above.length - 1] || $(".act");
+    return { act: el, into: window.scrollY - el.offsetTop };
   }
   function slider(id) { return document.getElementById(id + "-slider"); }
   function applyProfile(user, keepPlace) {
@@ -173,8 +169,11 @@
     if (who) { who.textContent = user; }
     bindSliders();
     Object.keys(held).forEach(function (kind) {
+      /* Through the input event, not around it: the handler remembers which
+         index it last drew, and setting the value behind its back would leave
+         that memory stale and swallow the next drag back to it. */
       slider(kind).value = held[kind];
-      (kind === "week" ? applyWeek : applyDay)(+held[kind]);
+      slider(kind).dispatchEvent(new Event("input"));
     });
     return drawn.then(function () {
       if (mark) {
@@ -187,52 +186,58 @@
   /* The surface travels with the reader: whichever act holds the middle of
      the viewport owns the page's tokens. Plot grids are not CSS, so they are
      re-pointed from the stylesheet's own --grid rather than a second list. */
+  /* Every figure was built with its own surface, grid included. The night is
+     the exception: it borrows figures drawn for the dark ground and dims them,
+     so act 06 is the only one that needs re-pointing, in or out. */
   function paintSurface(id, force) {
     if (id === surface && !force) { return; }
-    var left = surface;
     surface = id;
     root.dataset.surface = "a" + id;
     var colour = getComputedStyle(root).getPropertyValue("--grid").trim();
     var grid = { "xaxis.gridcolor": colour, "yaxis.gridcolor": colour };
-    /* The act being left is repainted too. Only the night dims its grid, and
-       without this it would keep the dim once the reader had moved on. */
-    [id, left].forEach(function (which) {
-      if (!act(which)) { return; }
-      $$(".chart", act(which)).forEach(function (m) {
-        if (m.data) { Plotly.relayout(m, grid); }
-      });
+    $$(".chart", act("06")).forEach(function (m) {
+      if (m.data) { Plotly.relayout(m, grid); }
     });
-  }
-
-  function actAtMiddle() {
-    var middle = window.innerHeight / 2, found = null;
-    $$(".act").forEach(function (el) {
-      var box = el.getBoundingClientRect();
-      if (!el.hidden && box.top <= middle && box.bottom >= middle) { found = el.id.slice(4); }
-    });
-    return found;
   }
 
   function onScroll() {
     var doc = root.scrollHeight - window.innerHeight;
     $("#progress-bar").style.width =
       (doc > 0 ? (window.scrollY / doc) * 100 : 0) + "%";
-
-    /* The pill is only true where it does something. Part one has the fork
-       and part three reads both profiles at once, so it belongs to part two. */
-    var pill = document.getElementById("profile-pill");
-    var owned = actAtMiddle();
-    pill.hidden = !owned || PART_TWO.indexOf(owned) < 0;
-
-    if (owned) { paintSurface(owned); }
   }
 
+  /* iOS fires resize every time the URL bar slides, which is most of a scroll.
+     Plotly's own responsive handler would re-lay out twenty-six plots on each
+     one, so it is off and this takes its place: only a change of width is a
+     resize worth acting on. */
+  var pageWidth = window.innerWidth, resizing = null;
+  function onResize() {
+    if (window.innerWidth === pageWidth) { return; }
+    pageWidth = window.innerWidth;
+    clearTimeout(resizing);
+    resizing = setTimeout(function () {
+      /* Not Plots.resize: it drops the authored height and switches the plot
+         to autosize, making every act taller. Only width changes on a
+         rotation, and it is the card's content box. */
+      $$(".js-plotly-plot").forEach(function (el) {
+        var pad = getComputedStyle(el);
+        Plotly.relayout(el, { width: el.clientWidth -
+          parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight) });
+      });
+    }, 160);
+  }
   function watchActs() {
     var links = {}, active = null;
     $$("[data-rail]").forEach(function (a) { links[a.dataset.rail] = a; });
     var watcher = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        var link = entry.isIntersecting && links[entry.target.id.slice(4)];
+        if (!entry.isIntersecting) { return; }
+        var id = entry.target.id.slice(4);
+        paintSurface(id);
+        /* The pill is only true where it does something: part one has the
+           fork, part three reads both profiles at once. */
+        document.getElementById("profile-pill").hidden = PART_TWO.indexOf(id) < 0;
+        var link = links[id];
         if (!link || link === active) { return; }
         if (active) { active.removeAttribute("aria-current"); }
         active = link;
@@ -241,15 +246,44 @@
     }, { rootMargin: "-45% 0px -45% 0px" });
     $$(".act").forEach(function (a) { watcher.observe(a); });
   }
+  function readout(kind, index) {
+    var state = kind === "week"
+      ? current().weeks.filter(function (w) { return w.week === index; })[0]
+      : current().days[index];
+    return state ? state.label : "";
+  }
 
+  /* The weeks and the days are discrete, the thumb is not: it slides freely
+     and the reading follows the nearest real one. The label is what the eye
+     tracks, so it moves every frame; rebuilding the panel underneath costs
+     far more than a frame allows, so that waits for the drag to settle. On
+     release the thumb lands on a whole step, and so do the arrow keys. */
   function bindSliders() {
     ["week", "day"].forEach(function (kind) {
       var input = slider(kind);
-      if (input) {
-        input.oninput = function () {
-          (kind === "week" ? applyWeek : applyDay)(parseInt(this.value, 10));
-        };
-      }
+      if (!input) { return; }
+      var apply = kind === "week" ? applyWeek : applyDay;
+      var shown = Math.round(+input.value), settling = null;
+      input.oninput = function () {
+        var index = Math.round(+this.value);
+        if (index === shown) { return; }
+        shown = index;
+        fill(kind + ".label", readout(kind, index));
+        clearTimeout(settling);
+        settling = setTimeout(function () { apply(index); }, 90);
+      };
+      input.onchange = function () {
+        this.value = Math.round(+this.value);
+        clearTimeout(settling);
+        apply(Math.round(+this.value));
+      };
+      input.onkeydown = function (event) {
+        var by = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1 }[event.key];
+        if (!by) { return; }
+        event.preventDefault();
+        this.value = Math.round(+this.value) + by;
+        this.dispatchEvent(new Event("input"));
+      };
     });
   }
 
@@ -290,7 +324,7 @@
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
   }
 
   fetch("payload.json")

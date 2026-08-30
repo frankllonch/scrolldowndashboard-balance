@@ -59,7 +59,7 @@ def coverage(ctx) -> str:
          for u in users]
         + [{"label": t("hood.kpi.attributed", user=u),
             "value": f"{summaries[u]['attributed_pct']:.0f} %"} for u in users])
-    return strip + f'<p class="caption">' + t(
+    return strip + '<p class="caption">' + t(
         "hood.coverage.caption", a=summaries["A"]["attributed_pct"],
         b=summaries["B"]["attributed_pct"]) + "</p>"
 

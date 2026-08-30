@@ -59,7 +59,6 @@ body {
 }
 
 /* ---------------------------------------------------------------- chrome */
-
 .progress {
   position: fixed; inset: 0 0 auto 0; height: 2px;
   background: var(--rule-2); z-index: 60;
@@ -67,7 +66,7 @@ body {
 .progress span { display: block; height: 100%; width: 0; background: var(--accent); }
 
 .rail {
-  position: fixed; top: 0; left: 0; width: var(--rail); height: 100vh;
+  position: fixed; top: 0; left: 0; width: var(--rail); height: 100vh; height: 100svh;
   padding: 3rem 1.4rem; overflow-y: auto; z-index: 50;
   border-right: 1px solid var(--rule-2);
 }
@@ -101,7 +100,6 @@ body {
 }
 
 /* ------------------------------------------------------------------ acts */
-
 main { margin-left: var(--rail); }
 
 .act {
@@ -164,7 +162,6 @@ h3.sub {
 .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* --------------------------------------------------------- numbers, KPIs */
-
 .stat { border-left: 2px solid var(--rule); padding-left: 1rem; }
 .stat-value {
   display: block; font-family: var(--mono); font-size: clamp(2rem, 4vw, 3rem);
@@ -219,7 +216,6 @@ h3.sub {
 }
 
 /* ------------------------------------------------------------- the fork */
-
 .fork { display: grid; gap: 1.6rem; grid-template-columns: repeat(2, 1fr); }
 .fork-card {
   display: block; width: 100%; text-align: left; cursor: pointer;
@@ -253,6 +249,7 @@ h3.sub {
 /* ---------------------------------------------------------------- charts */
 
 .chart {
+  max-width: 100%; overflow: hidden;
   margin: 1.6rem 0 0 0; background: var(--card);
   border: 1.5px solid var(--rule); padding: .5rem .6rem;
   min-height: 340px;
@@ -370,7 +367,7 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 
 /* ----------------------------------------------------------------- cover */
 
-.cover { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; }
+.cover { min-height: 88vh; min-height: 88svh; display: flex; flex-direction: column; justify-content: center; }
 .cover .act-title { font-size: clamp(2.6rem, 8vw, 6rem); border-bottom: 0; }
 .cover .grid { margin-top: 3rem; }
 .scroll-cue {
@@ -379,8 +376,7 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 }
 .scroll-cue::after { content: " ↓"; }
 
-.fork-act { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; }
-
+.fork-act { min-height: 88vh; min-height: 88svh; display: flex; flex-direction: column; justify-content: center; }
 /* =======================================================================
    Anything sitting on the card surface reads against the card, not the page.
    Redefining the tokens here rather than restating them on each rule.
@@ -457,11 +453,13 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 
 .vignette {
   position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
+  /* Its own layer: a fixed gradient repainting on every scroll frame is
+     what makes a page feel heavy on a phone. */
+  will-change: opacity;
   background: radial-gradient(ellipse 80% 60% at 50% 42%,
               rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .82) 100%);
 }
 :root[data-surface="a06"] .vignette { opacity: 1; }
-
 /* =======================================================================
    Motion · every rule below is an enhancement on content that is already
    visible. Nothing here makes anything appear.
@@ -529,7 +527,6 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
     .kpi:nth-child(7) { animation-range: entry 18% entry 54%; }
   }
 }
-
 /* =======================================================================
    Below 900px the rail goes; the progress bar and the pill stay.
    ======================================================================= */
@@ -551,7 +548,12 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
   .act-head { margin-bottom: 1.6rem; }
 
   /* Side-by-side is what pushed the page to 620px at 375. */
-  .grid.cols-2, .grid.cols-3, .grid.cols-4, .fork { grid-template-columns: 1fr; }
+  /* minmax(0, 1fr), never a bare 1fr: a bare track has an auto minimum, so a
+     chart that renders a few pixels too wide pushes the column out and the
+     page with it. */
+  .grid.cols-2, .grid.cols-3, .grid.cols-4, .fork {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .grid { gap: 1rem; }
 
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -582,7 +584,7 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
   .fork-stats .stat-label { font-size: .56rem; letter-spacing: .06em; }
   .fork-cta { margin-top: 1rem; }
 
-  .cover { min-height: 84vh; }
+  .cover { min-height: 84vh; min-height: 84svh; }
   .cover .grid { margin-top: 2rem; }
   .scroll-cue { margin-top: 2.4rem; }
 

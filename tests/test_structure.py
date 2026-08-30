@@ -10,10 +10,12 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-#: Files whose size is part of the design, not an accident.
+#: Files whose size is part of the design, not an accident. app.js was held at
+#: 300 until the sliders became continuous; the ceiling is now the 350 that
+#: applies to every file in the repo.
 BUDGETS = {
     "build.py": 80,
-    "site/app.js": 300,
+    "site/app.js": 350,
     "site/index.html": 200,
     "README.md": 60,
     "ARCHITECTURE.md": 120,

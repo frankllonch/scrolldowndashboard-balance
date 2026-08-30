@@ -22,7 +22,7 @@ def slider(days: list[dict], current: dict) -> str:
             f'<output for="day-slider" data-slot="day.label">'
             f'{current["label"]}</output>'
             f'<input type="range" id="day-slider" list="day-ticks" min="0" '
-            f'max="{len(days) - 1}" step="1" value="{index}">'
+            f'max="{len(days) - 1}" step="any" value="{index}">'
             f'<datalist id="day-ticks">{ticks}</datalist></div>')
 
 

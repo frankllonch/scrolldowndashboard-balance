@@ -126,8 +126,7 @@ def test_no_imperatives_in_user_or_guardian_copy():
 
 def test_the_engine_does_not_command_either(tl_a, tl_b, df_a, df_b):
     """The same rule for the text the rules themselves generate."""
-    from balance.intelligence import (evaluate_alerts, evaluate_positives,
-                                      replay_nudge)
+    from balance.intelligence import evaluate_alerts, evaluate_positives, replay_nudge
     offenders = []
     for user, timeline, frame in (("A", tl_a, df_a), ("B", tl_b, df_b)):
         signals = evaluate_alerts(frame) + evaluate_positives(frame, user == "B")

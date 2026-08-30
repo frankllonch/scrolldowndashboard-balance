@@ -8,7 +8,10 @@ install:            ## create the environment and install everything
 	uv pip install --python $(VENV)/python -e ".[dev]"
 	$(VENV)/python -m playwright install chromium
 
-test:               ## the whole suite
+lint:               ## unused imports, undefined names, import order
+	$(VENV)/ruff check .
+
+test: lint          ## lint, then the whole suite
 	$(VENV)/python -m pytest
 
 build:              ## run the pipeline and write docs/

@@ -22,8 +22,13 @@ from pathlib import Path
 
 from .events import load
 from .intelligence import (
-    emissions, evaluate_alerts, evaluate_positives, guardian_digest,
-    month_replay, nudge_summary, replay_nudge,
+    emissions,
+    evaluate_alerts,
+    evaluate_positives,
+    guardian_digest,
+    month_replay,
+    nudge_summary,
+    replay_nudge,
 )
 from .metrics import blocks_frame, daily_frame, totals, weekly_frame
 from .score import add_score

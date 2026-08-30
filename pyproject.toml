@@ -12,10 +12,29 @@ dependencies = [
 [project.optional-dependencies]
 # `balance/` needs neither: the CLI runs on pandas alone. Plotly is a build
 # dependency of the page, and playwright drives the built page in a browser.
-dev = ["pytest>=8", "playwright>=1.50"]
+dev = ["pytest>=8", "playwright>=1.50", "ruff>=0.6"]
 
 [project.scripts]
 balance = "balance.run:main"
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs", "data"]
+
+[tool.ruff.lint]
+# Correctness and import hygiene. Formatting is not enforced: the code is
+# hand-laid out and a formatter would fight the tables in copytext/.
+select = ["F", "E9", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# The catalogue and the registries re-export on purpose.
+"**/__init__.py" = ["F401"]
+# Carried from the source repo with only their import paths changed, so their
+# import order is left as it was rather than churned for style.
+"tests/test_data_contract.py" = ["I001"]
+"tests/test_events.py" = ["I001"]
+"tests/test_intelligence.py" = ["I001"]
+"tests/test_metrics.py" = ["I001"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

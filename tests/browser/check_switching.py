@@ -1,5 +1,6 @@
 """Switching deep inside part two, and whether the sliders carry over."""
 from playwright.sync_api import sync_playwright
+
 URL = "http://127.0.0.1:8533/"
 ok, bad = [], []
 def check(n, c, d=""):

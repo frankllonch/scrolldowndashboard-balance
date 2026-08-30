@@ -1,5 +1,6 @@
 """375x812. Every claim measured in the browser rather than reasoned about."""
 import pathlib
+
 from playwright.sync_api import sync_playwright
 
 URL = "http://127.0.0.1:8533/"

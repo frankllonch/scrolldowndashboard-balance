@@ -115,8 +115,19 @@ SURFACES = {
     ),
 }
 
-#: Which surface the figures are being built for.
+#: Which surface the figures are being built for, and the names `use()`
+#: rebinds. Declared here so a reader can see what a builder is reaching for
+#: when it says `theme.CARD`.
 MODE = "dark"
+CARD = INK = INK_2 = MUTED = RULE = GRID = DIM = LOST = ""
+GOOD = WARN = SERIOUS = ""
+HEAT: list = []
+SEQUENTIAL: list = []
+CATEGORICAL: list = []
+USER_COLOR: dict = {}
+
+#: The names above, in the order a surface defines them.
+SURFACE_NAMES = tuple(SURFACES["dark"])
 
 
 def use(mode: str) -> None:
