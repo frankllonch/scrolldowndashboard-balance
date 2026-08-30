@@ -34,10 +34,17 @@ event type are `null`.
 
 ## Categories
 
+The vocabulary in the files:
+
 ```
 ADULT · GAMBLING · SOCIAL_MEDIA · MESSAGING · GAMING
 ENTERTAINMENT · NEWS · SHOPPING · OTHER
 ```
+
+`OTHER` covers a third of user A's attributed time and a fifth of user B's,
+so `balance/taxonomy.py` assigns six more on read: `CALLS`, `NAVIGATION`,
+`PRODUCTIVITY`, `LEARNING`, `AI_TOOLS`, `REFERENCE`. The files are never
+edited, and a label the stream did assert always wins.
 
 `ADULT` and `GAMBLING` are treated as sensitive throughout the codebase
 (`SENSITIVE` in `balance/events.py`); they are the only ones that can justify

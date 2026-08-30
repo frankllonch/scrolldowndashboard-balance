@@ -16,6 +16,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 
+from .taxonomy import refine
+
 # ---------------------------------------------------------------------------
 # Schema vocabulary
 # ---------------------------------------------------------------------------
@@ -30,6 +32,10 @@ BLOCK = "BLOCK"
 CATEGORIES = [
     "ADULT", "GAMBLING", "SOCIAL_MEDIA", "MESSAGING", "GAMING",
     "ENTERTAINMENT", "NEWS", "SHOPPING", "OTHER",
+    # Not in the files. `taxonomy.py` assigns these on read, to the apps and
+    # domains the stream left as OTHER.
+    "CALLS", "NAVIGATION", "PRODUCTIVITY", "AI_TOOLS", "REFERENCE",
+    "LEARNING",
 ]
 
 #: "Sensitive" categories: the only ones that can justify notifying a
@@ -305,7 +311,9 @@ def _usages(events: list[dict], intervals: list[Interval],
             open_ev = {
                 "kind": "app" if t == APP_FOREGROUND else "site",
                 "key": e["package_name"] if t == APP_FOREGROUND else e["url_domain"],
-                "category": e["category"] or "OTHER",
+                "category": refine(
+                    e["package_name"] if t == APP_FOREGROUND else e["url_domain"],
+                    e["category"]),
                 "ts": ts,
                 "limit": min(iv.end_ms, ts + MAX_FOREGROUND_S * 1000),
             }

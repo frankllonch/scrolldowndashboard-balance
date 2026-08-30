@@ -102,3 +102,35 @@ def test_payload_guardian_section_has_no_app_domain_or_category(payload):
 
     for category in CATEGORIES:
         assert category.lower() not in outbound, f"{category} named to a guardian"
+
+
+def test_the_refined_categories_change_nothing_that_is_scored(payload):
+    """`taxonomy.py` fills a gap in the vocabulary. It may not move a figure.
+
+    Nothing it assigns belongs to DISTRACTING, and it only ever reclassifies
+    OTHER, so the index and everything built on it stay where they were.
+    """
+    from balance.events import DISTRACTING
+    from balance.taxonomy import REFINED
+
+    assert not set(REFINED.values()) & DISTRACTING, \
+        "a refined category entered the distraction share"
+
+    # the published index, asserted in tests/test_data_contract.py too
+    assert round(payload["profiles"]["A"]["summary"]["score_mean"]) == 83
+    assert round(payload["profiles"]["B"]["summary"]["score_mean"]) == 48
+
+
+def test_other_is_no_longer_most_of_the_day(payload):
+    """The point of the exercise: OTHER was 53% of A's time and 38% of B's."""
+    from collections import defaultdict
+
+    from balance.events import load
+
+    for user, path in (("A", "data/events_user_a.json"),
+                       ("B", "data/events_user_b.json")):
+        minutes = defaultdict(float)
+        for usage in load(ROOT / path, user).usages:
+            minutes[usage.category] += usage.seconds / 60
+        share = minutes["OTHER"] / sum(minutes.values())
+        assert share < 0.02, f"user {user}: OTHER is still {share:.0%}"

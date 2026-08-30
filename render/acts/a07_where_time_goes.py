@@ -54,6 +54,7 @@ def reading(ctx, apps, sites, top3: float) -> str:
     return (html.note(t("time.note.b", apps=len(apps),
                         apps_a=len(reference["apps"]), top3=top3,
                         messaging=apps[apps.category == "MESSAGING"].minutes.sum(),
+                        messaging_apps=len(apps[apps.category == "MESSAGING"]),
                         distract=df.distract_share.mean() * 100,
                         distract_a=reference["df"].distract_share.mean() * 100),
                       "warn")

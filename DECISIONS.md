@@ -81,6 +81,18 @@ notifying the sensitive spike; app and domain rankings for the guardian, which
 is the flashiest part of the analysis and the one that breaks the privacy line;
 and screen-time nudges, which interrupt without changing anything.
 
+## `OTHER` is a gap, not a category
+
+The stream labels a third of user A's attributed time and a fifth of user B's
+`OTHER`: Gmail, Maps, the dialer, the calendar, ChatGPT, Wikipedia. That is
+not a finding about their behaviour, it is a hole in the vocabulary.
+`taxonomy.py` assigns six more categories on read, which drops `OTHER` to
+0.4 % and 0.8 %, leaving only the browser container, whose time is reassigned
+to the domain anyway.
+It only ever moves something out of `OTHER`, and nothing it assigns is in
+`DISTRACTING`, so no published figure moves: the CLI output is still
+byte-identical. The files are never edited.
+
 ## The copy package is `copytext`, not `copy`
 
 A top-level `copy/` package shadows the stdlib module of that name, and the

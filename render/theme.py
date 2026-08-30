@@ -47,14 +47,24 @@ SERIOUS = "#ec835a"
 CRITICAL = "#e5484d"
 
 #: Colour per content category: follows the entity, not its position.
+#: Fixed order, never by rank, so a stack keeps its shape between profiles.
+#: Reaching people, then leisure, then getting things done, then the two the
+#: filter cares about. Every pair is at least ΔE 19 apart on the card and no
+#: colour is under 3.7:1 against it.
 CATEGORY_COLOR = {
     "SOCIAL_MEDIA":  "#3987e5",
     "MESSAGING":     "#199e70",
+    "CALLS":         "#2aa5a5",
     "ENTERTAINMENT": "#c98500",
+    "NEWS":          "#d55181",
     "SHOPPING":      "#008300",
     "GAMING":        "#9085e9",
+    "NAVIGATION":    "#4f9fd4",
+    "PRODUCTIVITY":  "#7d8fa8",
+    "LEARNING":      "#86b83f",
+    "AI_TOOLS":      "#b06ad0",
+    "REFERENCE":     "#a8894f",
     "ADULT":         "#e66767",
-    "NEWS":          "#d55181",
     "GAMBLING":      "#d95926",
     "OTHER":         "#55555c",     # deliberately neutral: it is the catch-all
 }

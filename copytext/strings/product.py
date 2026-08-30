@@ -183,8 +183,8 @@ STRINGS: dict[str, str] = {
     ),
     "time.note.b": (
         "{apps} apps against A's {apps_a}, with the top three holding only "
-        "{top3:.0f} %, and {messaging:,.0f} min of messaging split across "
-        "three apps at once. Distraction sits at {distract:.0f} % against A's "
+        "{top3:.0f} %, and {messaging:,.0f} min of reaching people across "
+        "{messaging_apps} apps. Distraction sits at {distract:.0f} % against A's "
         "{distract_a:.0f} %. What this profile spends time on is ordinary; "
         "how much, and when, is not."
     ),

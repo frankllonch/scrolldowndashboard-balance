@@ -169,11 +169,12 @@
     if (who) { who.textContent = user; }
     bindSliders();
     Object.keys(held).forEach(function (kind) {
-      /* Through the input event, not around it: the handler remembers which
-         index it last drew, and setting the value behind its back would leave
-         that memory stale and swallow the next drag back to it. */
+      /* Through the events, not around them: input so the handler updates the
+         index it remembers drawing, change so it draws now rather than after
+         the debounce, which would land after the reader had been put back. */
       slider(kind).value = held[kind];
       slider(kind).dispatchEvent(new Event("input"));
+      slider(kind).dispatchEvent(new Event("change"));
     });
     return drawn.then(function () {
       if (mark) {
@@ -258,23 +259,29 @@
      tracks, so it moves every frame; rebuilding the panel underneath costs
      far more than a frame allows, so that waits for the drag to settle. On
      release the thumb lands on a whole step, and so do the arrow keys. */
+  /* pending panel updates, by slider. Held out here so re-binding after a
+     profile switch can cancel one, instead of letting it land afterwards and
+     move the reader who had just been put back in place. */
+  var settling = {};
+
   function bindSliders() {
     ["week", "day"].forEach(function (kind) {
       var input = slider(kind);
       if (!input) { return; }
       var apply = kind === "week" ? applyWeek : applyDay;
-      var shown = Math.round(+input.value), settling = null;
+      var shown = Math.round(+input.value);
+      clearTimeout(settling[kind]);
       input.oninput = function () {
         var index = Math.round(+this.value);
         if (index === shown) { return; }
         shown = index;
         fill(kind + ".label", readout(kind, index));
-        clearTimeout(settling);
-        settling = setTimeout(function () { apply(index); }, 90);
+        clearTimeout(settling[kind]);
+        settling[kind] = setTimeout(function () { apply(index); }, 90);
       };
       input.onchange = function () {
         this.value = Math.round(+this.value);
-        clearTimeout(settling);
+        clearTimeout(settling[kind]);
         apply(Math.round(+this.value));
       };
       input.onkeydown = function (event) {
