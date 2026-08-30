@@ -41,11 +41,7 @@ def _frame(fig, h=340, legend=True, **kw):
 
 def compare_line(frames: dict[str, pd.DataFrame], col: str, title: str,
                  unit: str = "", smooth: int = 7, h: int = 340) -> go.Figure:
-    """One smoothed line per user, with the raw daily point behind it.
-
-    The smoothing is what you read; the daily point sits behind at low opacity
-    so the real variance is not hidden.
-    """
+    """One smoothed line per user, with the raw daily point behind it."""
     fig = go.Figure()
     for user, df in frames.items():
         c = USER_COLOR[user]
@@ -72,11 +68,7 @@ def compare_line(frames: dict[str, pd.DataFrame], col: str, title: str,
 def daily_bars_vs_baseline(df: pd.DataFrame, col: str, baseline: str,
                            title: str, unit: str, user: str,
                            h: int = 320) -> go.Figure:
-    """A daily bar against the personal 14-day rolling median.
-
-    This is how a number comes to mean something: not "2 h of screen", but "2 h,
-    half an hour less than normal for you".
-    """
+    """A daily bar against this user's own 14-day rolling median."""
     c = USER_COLOR[user]
     over = (df[col] > df[baseline]).fillna(False)
 
@@ -108,9 +100,8 @@ def daily_bars_vs_baseline(df: pd.DataFrame, col: str, baseline: str,
 def day_span(df: pd.DataFrame, user: str, h: int = 340) -> go.Figure:
     """From the first unlock to the last screen-off, day by day.
 
-    The axis starts at 04:00 so the small hours sit *at the top* (24 to 28)
-    instead of dropping to the floor of the chart. The bar is the day with the
-    phone; what spills over the top is what is eating into the night.
+    The axis runs past 24 so the small hours sit at the top rather than
+    dropping to the floor: what spills over the top is eating into the night.
     """
     c = USER_COLOR[user]
     start = df["first_pickup_h"]
@@ -335,22 +326,15 @@ def score_breakdown(contrib: pd.DataFrame, user: str, h: int = 300) -> go.Figure
 # Month walkthrough
 # ---------------------------------------------------------------------------
 
-#: (column, label, unit, colour slot, dash pattern, rules that read it)
+#: (column, unit, colour slot, dash pattern, rules that read it)
 #:
-#: Every series is expressed as a percentage of its own maximum for the period,
-#: which is what puts seven different magnitudes on one axis. It is not a
-#: disguised second scale; it is a single scale with a declared transform, and
-#: the real value with its unit travels in the tooltip. It divides by the
-#: maximum rather than rescaling min-max because zero has to stay zero: for
-#: user A, "zero late-night minutes" is the data, and min-max would paint it
-#: halfway up.
+#: Divided by the maximum rather than rescaled min-max because zero has to stay
+#: zero: for user A, "no late-night minutes" is the finding, and min-max would
+#: paint it halfway up the axis.
 #:
-#: The dash pattern is not decorative. Validating the palette against the dark
-#: surface leaves the worst adjacent pair (green ↔ yellow) at ΔE 10.3, inside
-#: the floor band for protan colour blindness, where the rule is that a
-#: secondary encoding is required. With seven overlapping series and a legend
-#: only, the stroke is that encoding: each series is distinguishable even when
-#: the colour does not land.
+#: The dash pattern is a second encoding, not decoration. The worst adjacent
+#: pair in this palette sits at ΔE 10.3 on this surface, which is inside the
+#: floor band for protan colour blindness.
 TRACKED = [
     ("night_min", "min", 0, "solid", "night_drift · night_streak"),
     ("night_end_min", "min", 1, "dash", "night_drift"),
@@ -384,16 +368,10 @@ def _derive_tracked(df: pd.DataFrame) -> pd.DataFrame:
 def tracked_series(df: pd.DataFrame, user: str, cursor,
                    nudge_days: set, alert_days: dict, positive_days: dict,
                    h: int = 560):
-    """Every watched variable on one axis, switchable from the legend.
+    """Every watched variable on one axis, each as a share of its own maximum.
 
-    Each series runs as a percentage of its own maximum for the period, which is
-    what allows them to be compared without a second Y axis. What you read is
-    the shape and the coincidence in time, not the level; the level is in the
-    tooltip and in the weekly summary.
-
-    Below zero sits an event rail with what the phone emitted each day. It
-    switches on and off from the legend too, and it shares the time axis with
-    the data that explains it.
+    Below zero, an event rail sharing the time axis with the data that
+    explains it.
     """
     d = _derive_tracked(df)
     fig = go.Figure()
@@ -485,8 +463,8 @@ def week_evolution(w: pd.DataFrame, col: str, label: str, unit: str,
                    user: str, sel: int, h: int = 260) -> go.Figure:
     """One magnitude week by week, with the selected week highlighted.
 
-    Short weeks are hollow and labelled: a two-day week averaged next to a
-    seven-day one reads as a drop that never happened.
+    Short weeks carry a mark: a two-day week averaged next to a seven-day one
+    reads as a drop that never happened.
     """
     c = USER_COLOR[user]
     labels = [t("label.week_partial" if p else "label.week", week=i)
@@ -537,11 +515,7 @@ def week_days(df: pd.DataFrame, week: int, col: str, label: str, unit: str,
 
 
 def week_components(w: pd.DataFrame, sel: int, h: int = 320) -> go.Figure:
-    """The five index components, week by week.
-
-    This is where you see which part of the index moves and which stays put,
-    which is the question that follows "the index went down".
-    """
+    """The five index components, week by week."""
     from balance.score import COMPONENTS
     fig = go.Figure()
     labels = [t("label.week", week=i) for i in w.index]

@@ -1,50 +1,10 @@
 """
-Layer 0 · raw events → clean structures.
+Layer 0 · raw events to clean structures.
 
-Everything we know about the stream lives here. The rest of the code never
-touches a single event again: it consumes `Timeline`.
-
-Non-obvious decisions, documented because the data is NOT clean:
-
-1. **`SCREEN_ON` / `SCREEN_OFF` overlap.** `user_a` has 77 `SCREEN_ON` events
-   fired while the screen was already on, and `user_b` has 411, balanced later
-   by consecutive `SCREEN_OFF`. There is only one screen, so the question is
-   which OFF closes which ON, and the data does not say.
-
-   The answer is that **it does not matter**: whatever the pairing, the union of
-   the intervals is the same, and "the screen was on" is exactly that union. It
-   is modelled with a **depth counter** (ON adds, OFF subtracts; on while
-   depth > 0), which returns that union without having to pick a pairing.
-
-   Picking one does change the result, and in both directions. Over `user_a`:
-
-   | Strategy | Hours | Against the union |
-   |---|---|---|
-   | Union (depth counter) | 61.1 | — |
-   | LIFO stack | 64.9 | +6 % · counts the overlap twice |
-   | FIFO queue | 56.7 | −7 % · loses the trailing stretch |
-   | Restart the clock on every ON | 53.0 | −13 % |
-
-   Over `user_b`, where there are 411 overlaps, the spread runs from 93.4 h to
-   155.1 h against 131.1 for the union.
-
-2. A `SCREEN_ON` is a **glance** unless a `USER_PRESENT` shows up before the
-   next ON/OFF: that is a **real pickup**.
-   In `user_a`: 573 pickups and 133 glances over 706 `SCREEN_ON`.
-   In `user_b`: 1,349 and 131 over 1,480.
-
-3. App, URL and block events fired while the screen is off **generate no usage
-   time**. In these two files that case never occurs once; the guard is there
-   because a real device does emit events with the screen off (background
-   music, sync, network-level blocks) and without it one app would swallow the
-   whole day.
-
-4. Screen stretches crossing midnight are split at the local day boundary, so
-   that "screen time for the day" adds up to exactly that day.
-
-5. Anomalies that do show up: 4 duplicate `USER_PRESENT` inside a single
-   stretch in `user_a` and 6 in `user_b`. They are recorded in
-   `Timeline.anomalies` rather than dropped silently.
+Everything known about the stream lives here; the rest of the code
+consumes `Timeline` and never touches an event again. The screen is a
+depth counter, days and nights cut at different hours, and truncated days
+leave every view: DECISIONS.md says why for each.
 """
 
 from __future__ import annotations

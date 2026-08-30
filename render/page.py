@@ -51,8 +51,11 @@ def render(payload: dict, bundles: dict) -> str:
             body = act.builder(Context(payload, bundles))
         html = html.replace(f"<!--act:{act.id}-->", section(act, body))
 
+    # The default profile's part two is already in the document, so the page
+    # keeps that copy rather than downloading it a second time.
     for user, acts in per_profile.items():
-        payload["profiles"][user]["acts"] = acts
+        payload["profiles"][user]["acts"] = {} if user == default else acts
+    payload["meta"]["default_profile"] = default
 
     return (html
             .replace("<!--title-->", t("site.page_title"))

@@ -1,179 +1,85 @@
 # Architecture
 
-A document for whoever has to **change** this, not for whoever has to assess it.
-The product reasoning and the findings are in [`README.md`](README.md); the
-shape of the input files is in [`INPUT_FORMAT.md`](INPUT_FORMAT.md).
-
----
-
-## 1 · The idea in one sentence
-
-The event file is the **system of record**: immutable, the single source of
-truth. Everything else (screen stretches, daily metrics, index, alerts) is
-**derived data**: a pure, deterministic function of that log. Nothing is half
-stored, nothing depends on the execution clock, and deleting any derivative and
-recomputing it returns exactly the same thing.
-
-Two rules follow, and neither is worth breaking:
-
-1. **One derivation, one owner.** If two places compute the same thing, sooner
-   or later they disagree. `daily_frame` assigns the week; nobody else
-   recomputes it.
-2. **A core with no framework.** `events`, `metrics`, `score` and `intelligence`
-   import neither Streamlit nor Plotly. The dashboard and the CLI are adapters,
-   which is why they can be tested separately and cannot drift apart.
-
----
-
-## 2 · Layers
+The event file is the system of record. Everything else is a pure function of
+it, computed at build time, so the browser never sees an event.
 
 ```
-data/*.json          event log · system of record · immutable
+data/*.json          the log · immutable
+  │
+  ├─ balance/events.py        layer 0 · screen, pickups, time attribution
+  ├─ balance/metrics.py       layer 1 · daily_frame(), weekly_frame()
+  ├─ balance/score.py         layer 2 · the 0 to 100 index
+  └─ balance/intelligence.py  layer 3 · alerts, nudges, reinforcements
        │
-       ▼
-balance/events.py    LAYER 0 · reconstruction
-                     · screen state machine (depth counter)
-                     · pickups against glances
-                     · time attribution to app and to domain
-                     → Timeline(intervals, usages, blocks, anomalies)
-       │
-       ▼
-balance/metrics.py   LAYER 1 · aggregation
-                     · daily_frame(): one row per day, ~65 columns
-                     · weekly_frame(): one row per week, with changes
-                     · totals(), category_daily(), hourly_heat(), blocks_frame()
-       │
-       ▼
-balance/score.py     LAYER 2 · 0 to 100 index
-                     · five weighted components + breakdown
-       │
-       ▼
-balance/intelligence.py  LAYER 3 · decision
-                     · guardian alert rules with a silence budget
-                     · reinforcement rules (user and guardian) with a weekly quota
-                     · night nudge + replay over history
-                     · month_replay(): system state day by day
-       │
-       ├──────────────┬──────────────────────────
-       ▼              ▼
-balance/run.py    app.py + balance/charts.py + balance/theme.py
-CLI               Streamlit dashboard
+       ├─ balance/run.py      adapter · CLI
+       └─ render/             adapter · figures, acts, payload
+            │
+            └─ build.py  →  docs/  →  GitHub Pages
 ```
 
-`charts.py` and `theme.py` are pure presentation: they receive frames already
-computed and decide nothing.
+No layer imports plotly, and none of them imports `render/`. The CLI and the
+page are two readers of the same core.
 
----
+## Invariants
 
-## 3 · Invariants
+| Invariant | Where it holds | If it breaks |
+|---|---|---|
+| The screen is the union of its stretches | `events.py`, depth counter | screen time moves ±13 % |
+| A day cuts at midnight, a night at 23:00 | `metrics.py` | one night lands in two rows |
+| First unlock is the first from 06:00 | `metrics.py` | night tails read as mornings |
+| Truncated days leave every view | `metrics.py`, `daily_frame` | totals stop matching |
+| Browser time belongs to the domain | `events.py` | Chrome tops every ranking |
+| At most 2 guardian alerts per 30 days | `intelligence.py`, `_decide` | the channel burns out |
+| No app, domain or category reaches a guardian | `intelligence.py`, payload | the privacy line is gone |
+| Numbers come from the frames, never from copy | `copytext/`, `render/` | a copy edit moves a figure |
 
-The tests pin them; if you touch the code and one falls, that is a product
-decision, not a detail to fix quietly.
+## From event to metric
 
-| Invariant | Where it is tested |
+| Metric | How it is derived |
 |---|---|
-| Every `SCREEN_ON` ends up classified as pickup or glance, none lost or duplicated | `test_metrics.py` |
-| A day's screen time is the exact sum of its stretches | `test_metrics.py` |
-| Waking screen time + waking offline = the waking window | `test_metrics.py` |
-| Blocks by type sum to the total | `test_data_contract.py` |
-| The index sits in [0, 100] and its weights sum to 1 | `test_score.py` |
-| Making an input worse never raises the index | `test_score.py` |
-| Blocks do **not** affect the index | `test_score.py` |
-| The guardian payload contains no apps, domains or categories | `test_intelligence.py` |
-| The walkthrough only uses information prior to each date | `test_intelligence.py` |
-| Loading the same file twice gives the same frame | `test_metrics.py` |
-| CLI and dashboard compute the same thing | `test_cli.py` |
+| Screen time | Union of on-to-off intervals, split at midnight |
+| Real pickup | A screen-on with an unlock before the next one |
+| Glance | A screen-on with no unlock |
+| Time per app | Foreground to the next change or screen off, capped at 45 min |
+| Time per domain | The same, with the time moved off the browser |
+| Night band | 23:00 to 06:00 the next morning |
+| Longest disconnection | Longest screen-free gap between 07:00 and 23:00 |
+| App switch | A move between two different apps, reset daily |
+| Distraction share | Social, entertainment and gaming over attributed time |
+| Your normal | Rolling median of this user's last 14 days |
 
----
+## How to make the likely changes
 
-## 4 · Decisions that look arbitrary and are not
+**Add a daily metric.** Compute it per day in `daily_frame()`, aggregate it in
+`weekly_frame()` if it belongs in the weekly panel, and add its label to
+`copytext/en.py`. Nothing else knows the column exists.
 
-Each one is commented where it lives, and each one has a test.
+**Add an alert rule.** Write `_your_rule(df) -> list[Signal]` in
+`intelligence.py` and register it in `evaluate_alerts`. The silence budget in
+`_decide` applies to it automatically; give it an honest `actionability` or it
+will crowd out something that deserves the slot.
 
-- **Depth counter for the screen.** The log overlaps sessions and does not say
-  which OFF closes which ON. The union of stretches does not depend on that
-  choice; any pairing does, and it deviates in both directions.
-- **Two day conventions.** The calendar day cuts at midnight; the night runs
-  23:00 to 06:00 the next day, because sleep does not cut at midnight.
-- **Hour axis shifted to 04:00.** The small hours are expressed as 24 to 28.
-  Without it, the mean "time of last screen" *drops* when someone goes to bed
-  later.
-- **Truncated days out.** A day the file only partly covers does not enter
-  averages, rankings or charts, but its events do count towards the previous
-  day's night.
-- **App switches reset every day**, or the first app of the morning counts as a
-  switch from the last one of the night.
-- **Time bands are labelled by upper bound.** Hour 3 is early morning, not
-  morning. The list was off by one at one point and the test now pins it.
+**Add a reinforcement.** Same shape, in `evaluate_positives`. One a week reaches
+the user at most.
 
----
+**Change the index weights.** `COMPONENTS` in `score.py`. The weights must sum
+to 1; `tests/test_score.py` asserts it, and `tests/test_data_contract.py`
+asserts the published figures, so a weight change will show up as a failing
+number rather than a silent drift.
 
-## 5 · How to make the likely changes
+**Add an act to the page.** Write `render/acts/aNN_name.py` with a
+`build(ctx) -> str`, register it in `render/acts/__init__.py`, add a
+`<section>` and its `<!--act:NN-->` marker to `site/index.html`, and put its
+strings in `copytext/en.py`. Acts in part 2 render once per profile.
 
-### Add a daily metric
+**Add a figure.** A builder in `render/figures.py`, a key in
+`render/payload.py`, and a `html.chart("key")` mount in the act. Selection-
+dependent figures ship once and are re-pointed in the browser unless their data
+actually changes.
 
-In `metrics.py`, inside the `rows.append({...})` of `daily_frame`. If it is
-derivable from columns that already exist, compute it in `add_score` or in the
-layer that uses it: `daily_frame` walks events and should keep only what that
-walk needs.
+## Known limits
 
-### Add an alert rule
-
-1. Write `_my_rule(df) -> list[Signal]` in `intelligence.py`.
-2. Add it to `RULES`.
-3. Set `actionability` with judgement: below 0.5 it is never notified, it goes
-   to the weekly summary. That is the lever deciding what deserves an
-   interruption.
-4. Add the test pinning the date it fires and the one it does not.
-
-### Add a reinforcement rule
-
-The same, but in `POSITIVE_RULES`, returning through the `_pos(...)` helper.
-Three conditions before writing it:
-
-- it compares against the user's **own history**, not a fixed threshold;
-- it demands margin (10 % on records, 20 to 30 % on weekly aggregates);
-- the text describes, it does not recommend. A test catches imperatives.
-
-### Change the index weights
-
-`COMPONENTS` in `score.py`. The bounding and monotonicity tests do not depend on
-the calibration, so they will keep passing; the ones in
-`test_data_contract.py` citing concrete figures will not, and that is
-deliberate: if a recalibration changes what the dashboard claims, the test says
-so before the reader does.
-
-### Add a profile
-
-`PROFILES` in `run.py` and `HAS_GUARDIAN` in `app.py`. In production this would
-come from the account; today they are two constants because there are two files.
-
----
-
-## 6 · Known limits
-
-- **One month of data.** The weekly rules need 2 to 3 weeks of reference, so the
-  first two weeks of any new profile generate nothing.
-- **The drift detector uses a rolling reference**, so it stops firing once the
-  new behaviour becomes the normal one. That is right for alerting once, but its
-  silence does not mean "resolved".
-- **The small hours of the first day** of the period belong to a night that
-  predates the data and are counted in no row.
-- **Attribution coverage does not reach 100 %** (86 % in A, 67 % in B): the rest
-  is lock screen, home screen and notifications.
-- **Everything fits in memory.** With 11,488 events that is plenty; with a year
-  of a million users, `daily_frame` would become a per-day incremental aggregate
-  on the device, which is where it should live anyway.
-
----
-
-## 7 · Commands
-
-```bash
-make install    # environment + dependencies
-make test       # 94 tests
-make run        # console analysis
-make json       # the same analysis as JSON
-make csv        # daily and weekly frames into out/
-make dash       # dashboard at http://localhost:8501
-```
+The night band is fixed at 23:00 to 06:00 for everyone, which is wrong for a
+shift worker. The baseline is a 14-day median, so the first fortnight of any
+file has nothing to compare against. Both profiles are one month; nothing here
+has seen a second month, a holiday, or a device change.

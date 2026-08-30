@@ -50,10 +50,31 @@ def reading(ctx, apps, sites, top3: float) -> str:
                 + t("time.caption.chrome", opens=chrome.opens.iloc[0],
                     minutes=chrome.minutes.iloc[0]) + "</p>")
     reference = ctx.bundles["A"]
+    names, through, attempts = most_blocked(ctx, apps)
     return (html.note(t("time.note.b", apps=len(apps),
                         apps_a=len(reference["apps"]), top3=top3,
                         messaging=apps[apps.category == "MESSAGING"].minutes.sum(),
                         distract=df.distract_share.mean() * 100,
                         distract_a=reference["df"].distract_share.mean() * 100),
                       "warn")
-            + f'<p class="caption">{t("time.caption.blocked_absent")}</p>')
+            + f'<p class="caption">'
+            + t("time.caption.blocked_absent", names=names, through=through,
+                attempts=attempts)
+            + "</p>")
+
+
+def most_blocked(ctx, apps) -> tuple[str, str, str]:
+    """The two apps the filter stopped most, and how little got through.
+
+    An app the filter stopped every time never enters the usage frame, so the
+    package name is the fallback for its label.
+    """
+    blocked = ctx.bundle["blocks"]
+    top = (blocked[blocked["block_type"] == "APP"]["target"]
+           .value_counts().head(2))
+    labels = dict(zip(apps["key"], apps["label"]))
+    opens = dict(zip(apps["key"], apps["opens"]))
+    joined = lambda values: " and ".join(str(v) for v in values)  # noqa: E731
+    return (joined(labels.get(k, k) for k in top.index),
+            joined(f"{opens.get(k, 0):.0f}" for k in top.index),
+            joined(top.values))

@@ -7,24 +7,23 @@ from ..fmt import maybe
 
 
 def strip(summary: dict) -> str:
-    user = summary["user"]
     night_first = summary["night_first_week"]
     night_last = summary["night_last_week"]
     return html.kpis([
-        {"label": t("night.kpi.first_week", user=user),
+        {"label": t("night.kpi.first_week"),
          "value": f"{night_first:.0f} {t('unit.min')}"},
-        {"label": t("night.kpi.last_week", user=user),
+        {"label": t("night.kpi.last_week"),
          "value": f"{night_last:.0f} {t('unit.min')}",
          "delta": t("delta.times", n=summary["night_multiple"])},
-        {"label": t("night.kpi.last_screen_first", user=user),
+        {"label": t("night.kpi.last_screen_first"),
          "value": summary["last_screen_first_week"]},
-        {"label": t("night.kpi.last_screen_last", user=user),
+        {"label": t("night.kpi.last_screen_last"),
          "value": summary["last_screen_last_week"],
          "delta": shift(summary["last_screen_shift_min"])},
-        {"label": t("night.kpi.first_unlock", user=user),
+        {"label": t("night.kpi.first_unlock"),
          "value": summary["wake_last_week"],
          "delta": t("delta.minutes", n=summary["wake_shift_min"])},
-        {"label": t("night.kpi.sleep_window", user=user),
+        {"label": t("night.kpi.sleep_window"),
          "value": maybe(summary["sleep_last_week"], ".1f", t("unit.hours")),
          "delta": shift(sleep_change(summary))},
     ])

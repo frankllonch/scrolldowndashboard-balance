@@ -51,7 +51,16 @@ def build(ctx) -> str:
         + html.slot("week.emitted_title",
                     f'<h3 class="sub">{current["emitted_title"]}</h3>')
         + html.slot("week.emissions", emissions(current))
+        + html.slot("week.held", held(current))
     )
+
+
+def held(week: dict) -> str:
+    """A signal the engine recorded and chose not to send is still a signal."""
+    if not week["held"]:
+        return ""
+    return (f'<h3 class="sub">{week["held_title"]}</h3>'
+            + html.pairs(week["held"]))
 
 
 def emissions(week: dict) -> str:

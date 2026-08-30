@@ -19,10 +19,9 @@
   function act(id) { return document.getElementById("act-" + id); }
   function profile() { return root.dataset.profile; }
   function current() { return payload.profiles[profile()]; }
+  var ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
   function esc(v) {
-    return String(v).replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
+    return String(v).replace(/[&<>"]/g, function (c) { return ESCAPES[c]; });
   }
   function span(cls, text) { return '<span class="' + cls + '">' + text + "</span>"; }
 
@@ -37,15 +36,13 @@
   }
 
   function table(spec) {
-    var head = spec.columns.map(function (c) { return "<th>" + c + "</th>"; });
-    var body = spec.rows.map(function (row) {
-      return "<tr>" + row.map(function (v) { return "<td>" + esc(v) + "</td>"; })
-        .join("") + "</tr>";
-    });
-    return '<div class="scroller"><table><thead><tr>' + head.join("") +
-      "</tr></thead><tbody>" + body.join("") + "</tbody></table></div>";
+    return '<div class="scroller"><table><thead><tr>' +
+      spec.columns.map(function (c) { return "<th>" + c + "</th>"; }).join("") +
+      "</tr></thead><tbody>" + spec.rows.map(function (row) {
+        return "<tr>" + row.map(function (v) {
+          return "<td>" + esc(v) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div>";
   }
-
   function pairs(rows) {
     return rows.map(function (r) {
       return '<div class="pair"><span>' + esc(r[0]) + "</span><span>" +
@@ -60,15 +57,12 @@
       card.headline + '</p><p class="phone-p">' + card.body + "</p>" +
       pairs(card.rows) + card.ctas.map(function (c) {
         return '<div class="phone-cta' + (c.ghost ? " ghost" : "") + '">' +
-          c.label + "</div>";
-      }).join("") + "</div></div>";
+          c.label + "</div>"; }).join("") + "</div></div>";
   }
-
   function channel(label, inner) {
     return '<div class="channel"><p class="eyebrow">' + label + "</p>" + inner +
       "</div>";
   }
-
   function fill(name, html) {
     var target = $('[data-slot="' + name + '"]');
     if (target) { target.innerHTML = html; }
@@ -103,6 +97,8 @@
     fill("week.table", table(week.table));
     fill("week.emitted_title", heading(week.emitted_title));
     if (week.emissions.rows.length) { fill("week.emissions", table(week.emissions)); }
+    fill("week.held", week.held.length
+      ? heading(week.held_title) + pairs(week.held) : "");
 
     $$("[data-figure-week]", act("04")).forEach(function (mount) {
       mount.dataset.figure = mount.dataset.figureWeek + "." + number;
@@ -159,7 +155,6 @@
     }
     return { act: acts[0], into: window.scrollY };
   }
-
   function markSeen(user) {
     seen[user] = true;
     var unread = payload.meta.profiles.filter(function (u) { return !seen[u]; });
@@ -169,7 +164,6 @@
     var done = $('[data-slot="other.seen"]');
     if (done) { done.hidden = unread.length > 0; }
   }
-
   function slider(id) { return document.getElementById(id + "-slider"); }
 
   function applyProfile(user, keepPlace) {
@@ -258,6 +252,12 @@
 
   function start(data) {
     payload = data;
+    /* Part two for the profile the document was built with is already here.
+       Keep it, so the payload never carries the same markup twice. */
+    var built = payload.meta.default_profile;
+    PART_TWO.forEach(function (id) {
+      payload.profiles[built].acts[id] = $(".act-body", act(id)).innerHTML;
+    });
     var asked = new URLSearchParams(location.search).get("profile");
     var chosen = payload.profiles[asked] ? asked : null;
 

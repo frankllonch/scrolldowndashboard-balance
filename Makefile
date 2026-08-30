@@ -1,14 +1,21 @@
 # Shortcuts. Everything works the same typing the commands by hand.
 VENV := .venv/bin
 
-.PHONY: install test run json csv dash clean
+.PHONY: install test build serve run json csv clean
 
 install:            ## create the environment and install everything
 	uv venv --python 3.12 .venv
-	uv pip install --python $(VENV)/python -e ".[dashboard,dev]"
+	uv pip install --python $(VENV)/python -e ".[dev]"
+	$(VENV)/python -m playwright install chromium
 
-test:               ## 94 tests: layers 0 to 4, CLI and data contract
+test:               ## the whole suite
 	$(VENV)/python -m pytest
+
+build:              ## run the pipeline and write docs/
+	$(VENV)/python build.py
+
+serve: build        ## build, then serve the page
+	$(VENV)/python -m http.server -d docs 8000
 
 run:                ## console analysis of both profiles
 	$(VENV)/python -m balance.run
@@ -19,8 +26,8 @@ json:               ## the same analysis as JSON
 csv:                ## dump the daily and weekly frames into out/
 	$(VENV)/python -m balance.run --csv out
 
-dash:               ## dashboard
-	$(VENV)/streamlit run app.py
-
 clean:
 	rm -rf .pytest_cache out **/__pycache__
+
+browser:            ## drive the built page in Chromium and report
+	@for f in tests/browser/check_*.py; do echo "--- $$f"; $(VENV)/python $$f; done

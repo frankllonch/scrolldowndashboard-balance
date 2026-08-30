@@ -8,9 +8,8 @@ function of that log.
     events  →  metrics  →  score  →  intelligence
      layer 0    layer 1    layer 2      layer 3
 
-None of those four layers imports Streamlit or Plotly. `run.py` (CLI) and
-`app.py` (dashboard) are two adapters over the same core; `render/` holds the
-figures and the payload the static site reads.
+None of those four layers imports plotly. `run.py` (CLI) and `render/` (the
+page) are two adapters over the same core.
 
 See `ARCHITECTURE.md` for the full map and for how to make the usual changes.
 """

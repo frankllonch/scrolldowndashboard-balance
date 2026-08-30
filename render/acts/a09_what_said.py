@@ -89,6 +89,9 @@ def nudge(ctx) -> str:
          t("engine.nudge.row.after_value",
            minutes=ns["minutes at stake after the nudge"],
            pct=ns["share of night total"] * 100)],
+        [t("engine.nudge.row.per_night"),
+         t("engine.nudge.row.per_night_value",
+           minutes=ns["minutes at stake per nudged night"])],
     ]
     from_clock = t("fmt.clock", h=23 + NUDGE_AFTER_MIN // 60,
                    m=NUDGE_AFTER_MIN % 60)

@@ -1,19 +1,14 @@
 """
-CLI: the same engine as the dashboard, without the dashboard.
+CLI: the same engine as the page, without the page.
 
     python -m balance.run                    # both profiles, text
     python -m balance.run --user B           # B only
     python -m balance.run --format json      # to pipe into jq
     python -m balance.run --csv out/         # daily and weekly frames
 
-It exists for two reasons. The first is verification: if the only place the
-results can be seen is a user interface, there is no way to tell an engine that
-computes from a screen with hand-written numbers. The second is operational:
-this is the natural entry point for a nightly cron or an ingestion job, without
-dragging Streamlit along as a dependency.
-
-No compute layer in `balance/` imports Streamlit or Plotly, so this module runs
-on pandas and little else.
+If the only place the results can be read is a user interface, there is no way
+to tell an engine that computes from a screen with hand-written numbers. This
+is also the entry point a nightly job would use: it runs on pandas alone.
 """
 
 from __future__ import annotations

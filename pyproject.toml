@@ -6,13 +6,13 @@ requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.2",
     "numpy>=1.26",
+    "plotly>=5.20",
 ]
 
 [project.optional-dependencies]
-# The dashboard is an adapter over `balance/`, not part of the core: everything
-# (CLI, tests, cron) can be computed without installing it.
-dashboard = ["streamlit>=1.40", "plotly>=5.20"]
-dev = ["pytest>=8"]
+# `balance/` needs neither: the CLI runs on pandas alone. Plotly is a build
+# dependency of the page, and playwright drives the built page in a browser.
+dev = ["pytest>=8", "playwright>=1.50"]
 
 [project.scripts]
 balance = "balance.run:main"

@@ -378,6 +378,7 @@ def week_states(user: str, bundle: dict) -> list[dict]:
             "table": week_table(w, cur, prev, week),
             "emitted_title": t("week.emitted.title", week=week),
             "emissions": week_emissions(bundle, days),
+            "held_title": t("week.recorded.title"),
             "held": [[x.headline, x.reason.split(".")[0]] for x in held],
             # what the browser re-points rather than re-downloads
             "evolution_colors": [colour if i == week else DIM for i in w.index],

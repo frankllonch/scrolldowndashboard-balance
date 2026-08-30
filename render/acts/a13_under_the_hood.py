@@ -7,19 +7,23 @@ from copytext import t
 
 from .. import html
 
+#: (name, type, the events that carry it)
 FIELDS = [
-    ("id", "int", "id"),
-    ("event_type", "str", "event_type"),
-    ("timestamp_millis", "int", "timestamp"),
-    ("package_name", "str|null", "package"),
-    ("url_domain", "str|null", "domain"),
-    ("category", "str|null", "category"),
-    ("block_type", "str|null", "block_type"),
-    ("is_keyguard_locked", "bool|null", "keyguard"),
+    ("id", "int", "all"),
+    ("event_type", "str", "all"),
+    ("timestamp_millis", "int", "all"),
+    ("package_name", "str|null", "APP_FOREGROUND, BLOCK"),
+    ("url_domain", "str|null", "URL_VISIT, BLOCK"),
+    ("category", "str|null", "APP_FOREGROUND, URL_VISIT, BLOCK"),
+    ("block_type", "str|null", "BLOCK"),
+    ("is_keyguard_locked", "bool|null", "SCREEN_ON, USER_PRESENT"),
 ]
 
-DERIVATIONS = ("screen_time", "pickup", "glance", "app_time", "domain_time",
-               "night", "offline", "switch", "distract", "baseline")
+ANOMALIES = ("overlap", "truncated", "midnight_start", "crossing", "duplicates")
+
+#: The four a reader needs to read the charts. The rest are in
+#: ARCHITECTURE.md rather than repeated here.
+DERIVATIONS = ("screen_time", "pickup", "glance", "night", "baseline")
 
 
 def stream(ctx) -> str:
@@ -35,17 +39,15 @@ def stream(ctx) -> str:
 
 
 def fields() -> str:
-    return html.table(
-        [t("table.col.field"), t("table.col.field_type"),
-         t("table.col.what_it_is"), t("table.col.what_we_use")],
-        [[name, kind, t(f"field.{key}.is"), t(f"field.{key}.use")]
-         for name, kind, key in FIELDS])
+    return html.table([t("table.col.field"), t("table.col.field_type"),
+                       t("table.col.on_events")], [list(f) for f in FIELDS])
 
 
 def derivations() -> str:
-    return html.table(
-        [t("table.col.metric"), t("table.col.how_derived")],
-        [[t(f"derive.{k}"), t(f"derive.{k}.how")] for k in DERIVATIONS])
+    return (html.table([t("table.col.metric"), t("table.col.how_derived")],
+                       [[t(f"derive.{k}"), t(f"derive.{k}.how")]
+                        for k in DERIVATIONS])
+            + f'<p class="caption">{t("hood.derivations.footnote")}</p>')
 
 
 def coverage(ctx) -> str:
@@ -74,11 +76,17 @@ def index(ctx) -> str:
 
 
 def anomalies(ctx) -> str:
+    """Five things the stream does that the metrics would get wrong."""
     key = "duplicate USER_PRESENT in stretch"
-    return html.note(t("hood.anomalies.body",
-                       screen_a=ctx.payload["profiles"]["A"]["summary"]["screen_h"],
-                       dup_a=ctx.bundles["A"]["anomalies"][key],
-                       dup_b=ctx.bundles["B"]["anomalies"][key]))
+    numbers = dict(screen_a=ctx.payload["profiles"]["A"]["summary"]["screen_h"],
+                   dup_a=ctx.bundles["A"]["anomalies"][key],
+                   dup_b=ctx.bundles["B"]["anomalies"][key])
+
+    rows = [[t(f"anomaly.{k}", **numbers), t(f"anomaly.{k}.fix", **numbers)]
+            for k in ANOMALIES]
+    return (html.table([t("table.col.in_the_stream"), t("table.col.handled")],
+                       rows)
+            + f'<p class="caption">{t("hood.anomalies.footnote")}</p>')
 
 
 def build(ctx) -> str:
