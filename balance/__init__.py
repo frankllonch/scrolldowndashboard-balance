@@ -9,8 +9,8 @@ function of that log.
      layer 0    layer 1    layer 2      layer 3
 
 None of those four layers imports Streamlit or Plotly. `run.py` (CLI) and
-`app.py` (dashboard) are two adapters over the same core, and `charts.py` and
-`theme.py` are pure presentation.
+`app.py` (dashboard) are two adapters over the same core; `render/` holds the
+figures and the payload the static site reads.
 
 See `ARCHITECTURE.md` for the full map and for how to make the usual changes.
 """

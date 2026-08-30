@@ -249,7 +249,7 @@ def test_the_decision_vocabulary_is_the_one_the_charts_expect():
     an empty list and nothing failed.
     """
     from balance.intelligence import Signal
-    import balance.charts as charts
+    import render.figures as charts
     import inspect
 
     source = inspect.getsource(charts.tracked_series)

@@ -14,7 +14,7 @@ from collections import Counter
 import pandas as pd
 import streamlit as st
 
-from balance import charts, theme
+from render import figures, theme
 from balance.events import SENSITIVE, load
 from balance.metrics import (
     blocks_frame, category_daily, daily_frame, hourly_heat, totals, weekly_frame,
@@ -220,7 +220,7 @@ with TABS[0]:
         ])
 
     st.markdown("### " + t("overview.score.title"))
-    st.plotly_chart(charts.score_line(F), width="stretch", key="k_score")
+    st.plotly_chart(figures.score_line(F), width="stretch", key="k_score")
     note(t("overview.score.note",
            a_mean=a.score.mean(), a_min=a.score.min(), a_max=a.score.max(),
            b_first=wk(b, "score", 1), b_last=wk(b, "score", 4),
@@ -232,17 +232,17 @@ with TABS[0]:
     st.markdown("### " + t("overview.moves.title"))
     g1, g2 = st.columns(2)
     with g1:
-        st.plotly_chart(charts.compare_line(F, "screen_min",
+        st.plotly_chart(figures.compare_line(F, "screen_min",
                         t("chart.screen_per_day"), t("unit.minutes")),
                         width="stretch", key="k_screen")
-        st.plotly_chart(charts.compare_line(F, "pickups",
+        st.plotly_chart(figures.compare_line(F, "pickups",
                         t("chart.pickups_per_day"), t("unit.unlocks")),
                         width="stretch", key="k_pickups")
     with g2:
-        st.plotly_chart(charts.compare_line(F, "night_min",
+        st.plotly_chart(figures.compare_line(F, "night_min",
                         t("chart.night_per_day"), t("unit.minutes")),
                         width="stretch", key="k_night")
-        st.plotly_chart(charts.compare_line(F, "blocks",
+        st.plotly_chart(figures.compare_line(F, "blocks",
                         t("chart.blocks_per_day"), t("unit.blocks")),
                         width="stretch", key="k_blocks")
 
@@ -326,32 +326,32 @@ with TABS[1]:
     st.markdown("")
     g1, g2 = st.columns(2)
     with g1:
-        st.plotly_chart(charts.week_evolution(
+        st.plotly_chart(figures.week_evolution(
             w, "screen_min", t("chart.week.screen"), t("unit.min"), who, sel),
             width="stretch", key=f"we_screen_{who}")
-        st.plotly_chart(charts.week_evolution(
+        st.plotly_chart(figures.week_evolution(
             w, "night_min", t("chart.week.night"), t("unit.min"), who, sel),
             width="stretch", key=f"we_night_{who}")
     with g2:
-        st.plotly_chart(charts.week_evolution(
+        st.plotly_chart(figures.week_evolution(
             w, "pickups", t("chart.week.pickups"), "", who, sel),
             width="stretch", key=f"we_pick_{who}")
-        st.plotly_chart(charts.week_evolution(
+        st.plotly_chart(figures.week_evolution(
             w, "blocks", t("chart.week.blocks"), "", who, sel),
             width="stretch", key=f"we_blocks_{who}")
     st.caption(t("week.partial_footnote"))
 
-    st.plotly_chart(charts.week_components(w, sel), width="stretch",
+    st.plotly_chart(figures.week_components(w, sel), width="stretch",
                     key=f"we_comp_{who}")
 
     st.markdown("#### " + t("week.days.title", week=sel))
     c1, c2 = st.columns(2)
     with c1:
-        st.plotly_chart(charts.week_days(
+        st.plotly_chart(figures.week_days(
             d, sel, "screen_min", t("chart.week_days.screen", week=sel),
             t("unit.min"), who), width="stretch", key=f"wd_screen_{who}")
     with c2:
-        st.plotly_chart(charts.week_days(
+        st.plotly_chart(figures.week_days(
             d, sel, "night_min", t("chart.week_days.night", week=sel),
             t("unit.min"), who), width="stretch", key=f"wd_night_{who}")
 
@@ -442,12 +442,12 @@ with TABS[2]:
     st.markdown("")
     c1, c2 = st.columns(2)
     with c1:
-        st.plotly_chart(charts.daily_bars_vs_baseline(
+        st.plotly_chart(figures.daily_bars_vs_baseline(
             d, "screen_min", "screen_min_baseline",
             t("chart.day.screen", user=who), t("unit.minutes"), who),
             width="stretch", key="k_bar_screen")
     with c2:
-        st.plotly_chart(charts.daily_bars_vs_baseline(
+        st.plotly_chart(figures.daily_bars_vs_baseline(
             d, "pickups", "pickups_baseline",
             t("chart.day.pickups", user=who), t("unit.unlocks"), who),
             width="stretch", key="k_bar_pickups")
@@ -455,10 +455,10 @@ with TABS[2]:
 
     c3, c4 = st.columns(2)
     with c3:
-        st.plotly_chart(charts.hour_heat(U[who]["heat"], who),
+        st.plotly_chart(figures.hour_heat(U[who]["heat"], who),
                         width="stretch", key="k_heat")
     with c4:
-        st.plotly_chart(charts.day_span(d, who), width="stretch", key="k_span")
+        st.plotly_chart(figures.day_span(d, who), width="stretch", key="k_span")
 
     wknd = d.groupby("is_weekend")[["screen_min", "pickups", "night_min"]].mean()
     diff = wknd.loc[True, "screen_min"] - wknd.loc[False, "screen_min"]
@@ -529,7 +529,7 @@ with TABS[3]:
     ])
 
     st.markdown("")
-    st.plotly_chart(charts.night_drift(F), width="stretch", key="k_nightdrift")
+    st.plotly_chart(figures.night_drift(F), width="stretch", key="k_nightdrift")
 
     note(t("night.note.drift", end_first=clock_e1, end_last=clock_e4,
            end_shift=(e4 - e1) * 60, wake_first=clock_f1, wake_last=clock_f4,
@@ -541,9 +541,9 @@ with TABS[3]:
 
     c1, c2 = st.columns(2)
     with c1:
-        st.plotly_chart(charts.day_span(b, "B"), width="stretch", key="k_span_night")
+        st.plotly_chart(figures.day_span(b, "B"), width="stretch", key="k_span_night")
     with c2:
-        st.plotly_chart(charts.compare_line(F, "night_pickups",
+        st.plotly_chart(figures.compare_line(F, "night_pickups",
                         t("chart.night_pickups"), t("unit.unlocks"), 5),
                         width="stretch", key="k_nightpick")
 
@@ -583,15 +583,15 @@ with TABS[4]:
     st.markdown("")
     c1, c2 = st.columns(2)
     with c1:
-        st.plotly_chart(charts.top_bars(apps, t("chart.time.apps", user=who)),
+        st.plotly_chart(figures.top_bars(apps, t("chart.time.apps", user=who)),
                         width="stretch", key="k_apps")
     with c2:
-        st.plotly_chart(charts.top_bars(sites, t("chart.time.domains", user=who)),
+        st.plotly_chart(figures.top_bars(sites, t("chart.time.domains", user=who)),
                         width="stretch", key="k_sites")
 
     st.caption(t("time.colour.caption"))
 
-    st.plotly_chart(charts.category_area(
+    st.plotly_chart(figures.category_area(
         U[who]["cats"], t("chart.time.categories", user=who)),
         width="stretch", key="k_cats")
 
@@ -657,11 +657,11 @@ with TABS[5]:
         st.markdown("")
         c1, c2 = st.columns([3, 2])
         with c1:
-            st.plotly_chart(charts.blocks_daily(
+            st.plotly_chart(figures.blocks_daily(
                 bf, t("chart.blocks.daily", user=who)),
                 width="stretch", key="k_blocks_daily")
         with c2:
-            st.plotly_chart(charts.blocks_by_hour(
+            st.plotly_chart(figures.blocks_by_hour(
                 bf, t("chart.blocks.hour", user=who)),
                 width="stretch", key="k_blocks_hour")
 
@@ -732,7 +732,7 @@ with TABS[6]:
             positive_days[r["day"]] = True
 
     st.plotly_chart(
-        charts.tracked_series(F[who], who, cursor, nudge_days, alert_days,
+        figures.tracked_series(F[who], who, cursor, nudge_days, alert_days,
                               positive_days),
         width="stretch", key=f"k_tracked_{who}")
 
@@ -1042,6 +1042,6 @@ with TABS[7]:
     c1, c2 = st.columns(2)
     for col, u in ((c1, "A"), (c2, "B")):
         mean_row = F[u].mean(numeric_only=True)
-        col.plotly_chart(charts.score_breakdown(contributions(mean_row), u),
+        col.plotly_chart(figures.score_breakdown(contributions(mean_row), u),
                          width="stretch", key=f"k_breakdown_{u}")
     note(t("hood.index.note"))
