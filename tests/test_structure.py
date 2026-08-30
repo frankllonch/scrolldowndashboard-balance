@@ -28,8 +28,9 @@ def lines(path: Path) -> int:
 
 def test_no_act_exceeds_its_line_budget():
     """An act over 120 lines is doing two things."""
+    from render.acts import ACTS
     acts = sorted(ROOT.glob("render/acts/a*.py"))
-    assert len(acts) == 13, [p.name for p in acts]
+    assert len(acts) == len(ACTS), "a module and the registry disagree"
     over = {p.name: lines(p) for p in acts if lines(p) > ACT_BUDGET}
     assert not over, over
 
@@ -61,7 +62,7 @@ def test_the_act_registry_is_ordered_and_unique():
     ids = [a.id for a in ACTS]
     assert ids == sorted(ids), "acts are out of order"
     assert len(set(ids)) == len(ids), "duplicate act id"
-    assert ids == [f"{i:02d}" for i in range(1, 14)], ids
+    assert ids == [f"{i:02d}" for i in range(1, len(ACTS) + 1)], ids
 
     parts = [a.part for a in ACTS]
     assert parts == sorted(parts), "the three parts are interleaved"

@@ -21,6 +21,14 @@
   --user-a:  #199e70;
   --user-b:  #d95926;
 
+  /* The card has its own set of tokens because it is its own surface: the
+     figures are drawn against it, not against the page. Acts 01 to 04
+     override these to the light ground; from act 05 they are these. */
+  --card-ink:   #f1eee8;
+  --card-ink-2: #a3a09a;
+  --card-muted: #6b6862;
+  --card-rule:  #2b2b31;
+
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   --sans: Inter, system-ui, -apple-system, sans-serif;
 
@@ -87,7 +95,10 @@ body {
   text-transform: uppercase; padding: .5rem .9rem;
 }
 .pill:hover { border-color: var(--accent); }
-.pill .who { color: var(--accent); font-weight: 600; }
+.pill .who {
+  color: var(--card-ink); font-weight: 600;
+  border-bottom: 2px solid var(--accent); padding-bottom: 1px;
+}
 
 /* ------------------------------------------------------------------ acts */
 
@@ -175,6 +186,10 @@ h3.sub {
   display: flex; flex-direction: column; justify-content: center;
 }
 .kpi:first-child { margin-left: 0; }
+.kpi:hover, .chart:hover, details:hover, .scroller:hover, .phone:hover {
+  border-color: var(--accent);
+}
+.kpi:hover { position: relative; z-index: 3; }
 .kpi-label {
   font-family: var(--mono); font-size: .62rem; letter-spacing: .07em;
   text-transform: uppercase; color: var(--ink-2); line-height: 1.25;
@@ -200,7 +215,7 @@ h3.sub {
 .hero-sub {
   font-family: var(--mono); font-size: .66rem; letter-spacing: .1em;
   text-transform: uppercase; color: var(--muted); margin: .9rem 0 0 0;
-  max-width: 34ch;
+  max-width: 40ch; line-height: 1.5;
 }
 
 /* ------------------------------------------------------------- the fork */
@@ -238,9 +253,11 @@ h3.sub {
 /* ---------------------------------------------------------------- charts */
 
 .chart {
-  margin: 0; background: var(--card); border: 1.5px solid var(--rule);
-  padding: .5rem .6rem; min-height: 340px;
+  margin: 1.6rem 0 0 0; background: var(--card);
+  border: 1.5px solid var(--rule); padding: .5rem .6rem;
+  min-height: 340px;
 }
+.grid .chart { margin: 0; }
 .chart.tall { min-height: 560px; }
 .grid .chart { min-height: 320px; }
 
@@ -304,8 +321,11 @@ tbody tr:last-child td { border-bottom: 0; }
 
 /* --------------------------------------------------------------- sliders */
 
+/* Label and value on the left, track filling the rest: the profile pill is
+   pinned top right, and a track passing under it costs nothing while a value
+   passing under it is unreadable. */
 .slider {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+  display: grid; grid-template-columns: auto auto 1fr; align-items: center;
   gap: 1rem; margin: 1.6rem 0 0 0;
   border: 1.5px solid var(--rule); background: var(--card); padding: .9rem 1.2rem;
 }
@@ -313,8 +333,8 @@ tbody tr:last-child td { border-bottom: 0; }
   font-family: var(--mono); font-size: .68rem; letter-spacing: .08em;
   text-transform: uppercase;
 }
-.slider label { color: var(--muted); }
-.slider output { color: var(--ink); font-weight: 600; text-align: right; }
+.slider label { color: var(--ink-2); }
+.slider output { color: var(--ink); font-weight: 600; min-width: 9ch; }
 .slider input[type="range"] {
   -webkit-appearance: none; appearance: none; width: 100%;
   height: 44px; background: transparent; cursor: pointer;
@@ -362,20 +382,77 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 .fork-act { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; }
 
 /* =======================================================================
-   The night · act 06 is the only act that changes the surface.
+   Anything sitting on the card surface reads against the card, not the page.
+   Redefining the tokens here rather than restating them on each rule.
+   ======================================================================= */
+
+.kpi, .note, .chart, .scroller, .phone, .empty, details, .fork-card,
+.pill, .slider, table {
+  --ink: var(--card-ink);
+  --ink-2: var(--card-ink-2);
+  --muted: var(--card-muted);
+  --rule: var(--card-rule);
+  --rule-2: color-mix(in srgb, var(--card-rule) 55%, var(--card));
+  color: var(--card-ink);
+}
+
+/* =======================================================================
+   The surface travels: paper at the cover, black at the night, and the
+   editorial near-black for the analysis. One accent per act, all of them
+   off the Balance palette and none of them loud.
+   ======================================================================= */
+
+:root[data-surface="a01"] { --bg:#f5f2ec; --ink:#15151a; --ink-2:#4c4841; --muted:#7d786e; --rule:#cbc4b6; --rule-2:#e2dcd2; --accent:#7a6a52; --grid:#d5cfc3; }
+:root[data-surface="a02"] { --bg:#ece8df; --ink:#15151a; --ink-2:#4a4841; --muted:#79746b; --rule:#c4bdaf; --rule-2:#dcd6cb; --accent:#4a6b8a; --grid:#cdc7ba; }
+:root[data-surface="a03"] { --bg:#ded9ce; --ink:#15151a; --ink-2:#474540; --muted: #706c64; --rule:#b8b1a3; --rule-2:#cfc9bd; --accent:#586b50; --grid:#c4bdaf; }
+:root[data-surface="a04"] { --bg:#a29d94; --ink: #0b0b10; --ink-2:#2d2b27; --muted:#403e39; --rule:#87827a; --rule-2:#948f87; --accent:#3d566d; --grid:#bab4a8; }
+:root[data-surface="a05"] { --bg:#514f4a; --ink: #f5f2ec; --ink-2:#d5d1c9; --muted:#b3aea5; --rule:#6b6862; --rule-2:#5d5a55; --accent:#c2ae8c; }
+:root[data-surface="a06"] { --bg:#000000; --ink:#e8dfd0; --ink-2:#9a9184; --muted:#6f685c; --rule:#2a2720; --rule-2:#1b1913; --accent:#fab219; --grid:#141410; }
+:root[data-surface="a07"] { --bg:#0e0d12; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #716e68; --rule:#2c2934; --rule-2:#201e26; --accent:#8f85b0; }
+:root[data-surface="a08"] { --bg:#120f0e; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #716e68; --rule:#332b28; --rule-2:#241f1d; --accent:#b5806f; }
+:root[data-surface="a09"] { --bg:#0b0e12; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #716e68; --rule:#262c33; --rule-2:#1b1f24; --accent:#7095b5; }
+:root[data-surface="a10"] { --bg:#0a0a0b; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #6f6c66; --rule:#2b2b31; --rule-2:#1e1e23; --accent:#e8e4da; }
+:root[data-surface="a11"] { --bg:#0a0a0b; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #6f6c66; --rule:#2b2b31; --rule-2:#1e1e23; --accent:#9aa08f; }
+:root[data-surface="a12"] { --bg:#0a0a0b; --ink:#f1eee8; --ink-2:#a3a09a; --muted: #6f6c66; --rule:#2b2b31; --rule-2:#1e1e23; --accent:#8a8782; }
+
+/* =======================================================================
+   The night · act 06 is the only act that also drops a vignette.
    A mood change, not a brightness change: the room gets darker and warmer.
    ======================================================================= */
 
-:root[data-night="on"] {
-  --bg:      #000000;
-  --panel:   #080806;
-  --card:    #0c0b09;
-  --rule:    #2a2720;
-  --rule-2:  #1b1913;
-  --ink:     #e8dfd0;
-  --ink-2:   #9a9184;
-  --accent:  #fab219;
-  --grid:    #141410;
+/* The clear section. Acts 01 to 04 sit on paper, so their cards are a clear
+   grey and their figures were drawn for it: see LIGHT_FIGURES in
+   render/payload.py, and SURFACES in render/theme.py for the values. */
+:root[data-surface="a01"], :root[data-surface="a02"],
+:root[data-surface="a03"], :root[data-surface="a04"] {
+  --card:       #e4e0d8;
+  --card-ink:   #17171b;
+  --card-ink-2: #4a4740;
+  --card-muted: #6f6b62;
+  --card-rule:  #b6afa1;
+}
+:root[data-surface="a01"] { --card: #eae6df; }
+:root[data-surface="a03"] { --card: #e8e4dc; }
+:root[data-surface="a04"] { --card: #cdc8bd; --card-rule: #a49d90; }
+
+/* Act 05 sits between the paper and the night, and so does its card: see
+   the "dusk" entry in SURFACES, render/theme.py. */
+:root[data-surface="a05"] { --card: #1b1a18; --grid: #242220; }
+:root[data-surface="a05"] .kpi, :root[data-surface="a05"] .note,
+:root[data-surface="a05"] .chart, :root[data-surface="a05"] .scroller,
+:root[data-surface="a05"] .phone, :root[data-surface="a05"] details,
+:root[data-surface="a05"] .slider, :root[data-surface="a05"] .pill {
+  --card-ink: #ece7dd; --card-ink-2: #a8a29a; --card-muted: #7d766c;
+  --card-rule: #35322d;
+  color: #ece7dd;
+}
+
+:root[data-surface="a06"] { --panel: #080806; --card: #0c0b09; }
+:root[data-surface="a06"] .kpi, :root[data-surface="a06"] .note,
+:root[data-surface="a06"] .chart, :root[data-surface="a06"] .scroller,
+:root[data-surface="a06"] .phone, :root[data-surface="a06"] details {
+  --card-ink: #e8dfd0; --card-ink-2: #9a9184; --card-rule: #2a2720;
+  color: #e8dfd0;
 }
 
 .vignette {
@@ -383,7 +460,7 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
   background: radial-gradient(ellipse 80% 60% at 50% 42%,
               rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .82) 100%);
 }
-:root[data-night="on"] .vignette { opacity: 1; }
+:root[data-surface="a06"] .vignette { opacity: 1; }
 
 /* =======================================================================
    Motion · every rule below is an enhancement on content that is already
@@ -413,6 +490,9 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
   body { transition: background-color .6s ease, color .6s ease; }
   .vignette { transition: opacity .6s ease; }
   .rail a { transition: color .25s ease; }
+  .kpi, .chart, details, .scroller, .phone {
+    transition: border-color .16s ease;
+  }
 
   @supports (animation-timeline: view()) {
     .act-head,
@@ -508,7 +588,7 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 
   /* The slider label sits over the track so the track keeps the width. */
   .slider {
-    grid-template-columns: 1fr auto; padding: .7rem .9rem; gap: .4rem 1rem;
+    grid-template-columns: auto 1fr; padding: .7rem .9rem; gap: .4rem 1rem;
   }
   .slider input[type="range"] { grid-column: 1 / -1; grid-row: 2; }
 

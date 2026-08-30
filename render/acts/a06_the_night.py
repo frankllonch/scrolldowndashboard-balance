@@ -64,7 +64,7 @@ def build(ctx) -> str:
         strip(ctx.profile["summary"])
         + html.chart("night_drift", "shared")
         + reading(ctx)
-        + html.grid(html.chart("day_span"),
+        + html.grid(html.chart("day_span.night"),
                     html.chart("compare.night_pickups", "shared"))
         + html.note(t("night.weight.body", night=ctx.df.night_min.mean(),
                       screen=ctx.df.screen_min.mean()))

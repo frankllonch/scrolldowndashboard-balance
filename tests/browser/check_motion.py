@@ -1,4 +1,4 @@
-"""Phase 5: motion, rail, night. Checked in the browser, both motion modes."""
+"""Motion, the rail and the surfaces, checked in both motion modes."""
 from playwright.sync_api import sync_playwright
 
 URL = "http://127.0.0.1:8533/"
@@ -74,7 +74,7 @@ with sync_playwright() as p:
         const cs = getComputedStyle(document.documentElement);
         return {bg: cs.getPropertyValue('--bg').trim(), ink: cs.getPropertyValue('--ink').trim(),
                 accent: cs.getPropertyValue('--accent').trim(), grid: cs.getPropertyValue('--grid').trim(),
-                night: document.documentElement.dataset.night,
+                surface: document.documentElement.dataset.surface,
                 vignette: getComputedStyle(document.querySelector('.vignette')).opacity};
     }""")
     page.evaluate("""() => { const a=document.getElementById('act-06');
@@ -86,7 +86,7 @@ with sync_playwright() as p:
         const chart = document.querySelector('#act-06 .chart');
         return {bg: cs.getPropertyValue('--bg').trim(), ink: cs.getPropertyValue('--ink').trim(),
                 accent: cs.getPropertyValue('--accent').trim(), grid: cs.getPropertyValue('--grid').trim(),
-                night: document.documentElement.dataset.night,
+                surface: document.documentElement.dataset.surface,
                 vignette: getComputedStyle(document.querySelector('.vignette')).opacity,
                 body: getComputedStyle(document.body).backgroundColor,
                 chartGrid: chart.layout.xaxis.gridcolor};
@@ -106,25 +106,24 @@ with sync_playwright() as p:
         window.scrollTo({top:a.offsetTop + 200, behavior:'instant'}); }""")
     page.wait_for_timeout(1200)
     out = page.evaluate("""() => ({
-        night: document.documentElement.dataset.night,
+        surface: document.documentElement.dataset.surface,
         bg: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
         vignette: getComputedStyle(document.querySelector('.vignette')).opacity,
         chartGrid: document.querySelector('#act-06 .chart').layout.xaxis.gridcolor})""")
     check("night: restores on exit",
-          out["night"] == "off" and out["bg"] == "#0a0a0b" and float(out["vignette"]) < 0.1,
-          out)
+          out["surface"] == "a08" and float(out["vignette"]) < 0.1, out)
     check("night: plot grid restores", out["chartGrid"] == "#1c1c21", out["chartGrid"])
 
     trans = page.evaluate("getComputedStyle(document.body).transitionDuration")
     check("night transitions when motion is welcome", "0.6s" in trans, trans)
 
     # everything readable, all acts
-    for i in range(1, 14):
+    for i in range(1, 13):
         page.evaluate(f"""() => {{ const a=document.getElementById('act-{i:02d}');
             window.scrollTo({{top:a.offsetTop + 60, behavior:'instant'}}); }}""")
         page.wait_for_timeout(150)
     seen_total = 0
-    for i in range(1, 14):
+    for i in range(1, 13):
         page.evaluate(f"""() => {{ const a=document.getElementById('act-{i:02d}');
             document.querySelectorAll('details').forEach(d => d.open = true);
             window.scrollTo({{top:a.offsetTop + 60, behavior:'instant'}}); }}""")
@@ -158,7 +157,7 @@ with sync_playwright() as p:
     rep = visible_report(page)
     check("reduced motion: everything visible at the top", not rep["bad"], rep)
     quiet_total, quiet_bad = 0, []
-    for i in range(1, 14):
+    for i in range(1, 13):
         page.evaluate(f"""() => {{ const a=document.getElementById('act-{i:02d}');
             document.querySelectorAll('details').forEach(d => d.open = true);
             window.scrollTo({{top:a.offsetTop + 60, behavior:'instant'}}); }}""")
@@ -175,7 +174,7 @@ with sync_playwright() as p:
                          behavior:'instant'}); }""")
     page.wait_for_timeout(400)
     check("reduced motion: night still applies",
-          page.evaluate("document.documentElement.dataset.night") == "on")
+          page.evaluate("document.documentElement.dataset.surface") == "a06")
     b.close()
 
 print("PASS:"); [print("  ✓", x) for x in ok]

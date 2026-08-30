@@ -68,8 +68,8 @@ STRINGS: dict[str, str] = {
     "week.kpi.screen": "Screen / day",
     "week.kpi.pickups": "Unlocks / day",
     "week.kpi.night": "Late night / night",
-    "week.kpi.offline": "Longest disconnection",
-    "week.kpi.best_offline": "Best stretch",
+    "week.kpi.offline": "Longest break / day",
+    "week.kpi.best_offline": "Best break this week",
     "week.kpi.blocks": "Blocks / day",
     "week.kpi.score": "Index",
     "chart.week.screen": "Screen per day, by week",
@@ -84,7 +84,7 @@ STRINGS: dict[str, str] = {
     "table.col.previous_week": "Previous week",
     "table.col.period_median": "Period median",
     "row.night_per_night": "Late night per night",
-    "row.longest_offline": "Longest disconnection",
+    "row.longest_offline": "Longest break",
     "row.distinct_apps": "Distinct apps per day",
     "row.switches_per_hour": "App switches per hour",
     "row.distract_share": "Distraction share",
@@ -107,8 +107,8 @@ STRINGS: dict[str, str] = {
     "day.kpi.pickups.delta": "{glances:.0f} glances",
     "day.kpi.first_pickup": "First unlock",
     "day.kpi.first_pickup.delta": "median {median:.1f} h",
-    "day.kpi.offline": "Longest disconnection",
-    "day.kpi.offline.delta": "best: {best:.1f} h on {when}",
+    "day.kpi.offline": "Longest break",
+    "day.kpi.offline.delta": "best {best:.1f} h, {when}",
     "day.kpi.switches": "App switches / h",
     "day.kpi.switches.delta": "{apps:.0f} distinct apps",
     "chart.day.screen": "User {user} · screen per day",
@@ -167,7 +167,7 @@ STRINGS: dict[str, str] = {
     "time.kpi.domains": "Distinct domains",
     "time.kpi.whole_month": "this month",
     "time.kpi.top3": "Top 3 apps",
-    "time.kpi.top3.delta": "of time spent in apps",
+    "time.kpi.top3.delta": "of app time",
     "time.kpi.distract": "Distraction share",
     "time.kpi.distract.delta": "social + entertainment + games",
     "chart.time.apps": "User {user} · apps by minutes",
@@ -262,7 +262,7 @@ STRINGS: dict[str, str] = {
     "device.row.pickups": "Unlocks",
     "device.row.night": "Late night",
     "device.row.night_end": "Night ended",
-    "device.row.offline": "Longest gap",
+    "device.row.offline": "Longest break",
     "device.row.offline_start": "· started",
     "device.row.distract": "Distraction share",
     "device.row.sensitive": "Sensitive attempts",
@@ -319,7 +319,7 @@ STRINGS: dict[str, str] = {
     "engine.nudge.row.night_minutes": "Night minutes",
     "engine.nudge.row.after": "Minutes after the nudge",
     "engine.nudge.row.after_value": "{minutes:.0f} ({pct:.0f} %)",
-    "engine.nudge.row.per_night": "Per nudged night",
+    "engine.nudge.row.per_night": "Per night",
     "engine.nudge.row.per_night_value": "{minutes:.0f} min",
 
     # -- under the hood -----------------------------------------------------
@@ -373,7 +373,7 @@ STRINGS: dict[str, str] = {
     "derive.domain_time.how": "The same, with the time moved off the browser.",
     "derive.night": "Night band",
     "derive.night.how": "23:00 to 06:00 the next morning. Sleep does not cut at midnight.",
-    "derive.offline": "Longest disconnection",
+    "derive.offline": "Longest break",
     "derive.offline.how": "Longest screen-free gap between 07:00 and 23:00.",
     "derive.switch": "App switch",
     "derive.switch.how": "A move between two different apps. Reset daily.",
@@ -387,7 +387,7 @@ STRINGS: dict[str, str] = {
     "hood.kpi.attributed": "{user} · attributed to app/site",
     "hood.coverage.caption": (
         "The rest is lock screen and notifications. B's {b:.0f} % against A's "
-        "{a:.0f} % is the checking pattern again."
+        "{a:.0f} % is the checking pattern."
     ),
 
     "hood.index.title": "The index",
@@ -454,7 +454,7 @@ STRINGS: dict[str, str] = {
     "tracked.night_min": "Late-night screen",
     "tracked.night_end_min": "Last screen (from 23:00)",
     "tracked.screen_min": "Screen per day",
-    "tracked.longest_offline_h": "Longest disconnection",
+    "tracked.longest_offline_h": "Longest break",
     "tracked.blocks": "Blocks per day",
     "tracked.blocks_sensitive": "Sensitive attempts",
     "tracked.distract_pct": "Distraction share",
@@ -527,14 +527,12 @@ STRINGS: dict[str, str] = {
     "act.08.title": "What the phone stopped",
     "act.09.eyebrow": "Alerts, nudges, reinforcements",
     "act.09.title": "What the phone said",
-    "act.10.eyebrow": "Halfway",
-    "act.10.title": "The other one",
-    "act.11.eyebrow": "The reveal",
-    "act.11.title": "The finding",
-    "act.12.eyebrow": "The negative control",
-    "act.12.title": "What a screen-time rule would have missed",
-    "act.13.eyebrow": "Schema and derivations",
-    "act.13.title": "Under the hood",
+    "act.10.eyebrow": "The reveal",
+    "act.10.title": "The finding",
+    "act.11.eyebrow": "The negative control",
+    "act.11.title": "What a screen-time rule would have missed",
+    "act.12.eyebrow": "Schema and derivations",
+    "act.12.title": "Under the hood",
 
     # -- act 01 · cover -----------------------------------------------------
     "cover.standfirst": (
@@ -567,18 +565,8 @@ STRINGS: dict[str, str] = {
     "fork.stat.nights": "nights with a nudge",
     "fork.cta": "Read this month",
 
-    # -- act 10 · the other one ---------------------------------------------
-    "other.body": (
-        "One profile is half the story. The rules are the same for both."
-    ),
-    "other.cta": "Read user {user}",
-    "other.seen": "Both months read. The analysis follows.",
-
-    # -- act 11 · the finding -----------------------------------------------
-    "finding.lede": (
-        "The index did not fall because B used the phone more. It fell "
-        "because of when."
-    ),
+    # -- act 10 · the finding -----------------------------------------------
+    "finding.lede": "B's index fell as their night-time use rose.",
     "finding.hero.value": "×{multiple:.0f}",
     "finding.hero.label": "late-night screen, week 1 against week 4",
     "finding.sleep.value": "{minutes:.0f} min",
@@ -590,8 +578,8 @@ STRINGS: dict[str, str] = {
         "records zero night minutes over the same thirty days."
     ),
 
-    # -- act 12 · the negative control --------------------------------------
-    "control.lede": "The obvious rule is a cap on screen time.",
+    # -- act 11 · the negative control --------------------------------------
+    "control.lede": "Screen time against the night band.",
     "control.screen.label": "screen time, week 1 to week 4",
     "control.night.label": "late-night screen, same weeks",
     "control.body": (

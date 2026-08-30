@@ -1,4 +1,4 @@
-"""Act 12 · the negative control.
+"""Act 11 · the negative control.
 
 `screen_jump` is real, reads the same frames, and fires on nobody. That is
 the point: the rule that looks obvious would have missed this month.

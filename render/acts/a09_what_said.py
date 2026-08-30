@@ -19,11 +19,11 @@ def slider(days: list[dict], current: dict) -> str:
     index = next(i for i, d in enumerate(days) if d["iso"] == current["iso"])
     return ('<div class="slider" data-slider="day">'
             f'<label for="day-slider">{t("engine.slider.label")}</label>'
+            f'<output for="day-slider" data-slot="day.label">'
+            f'{current["label"]}</output>'
             f'<input type="range" id="day-slider" list="day-ticks" min="0" '
             f'max="{len(days) - 1}" step="1" value="{index}">'
-            f'<datalist id="day-ticks">{ticks}</datalist>'
-            f'<output for="day-slider" data-slot="day.label">'
-            f'{current["label"]}</output></div>')
+            f'<datalist id="day-ticks">{ticks}</datalist></div>')
 
 
 def cards(ctx, day: dict) -> str:

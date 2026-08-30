@@ -22,9 +22,8 @@ from balance.metrics import (
 from balance.score import COMPONENTS, add_score, contributions
 from copytext import t
 
-from . import figures
+from . import figures, theme
 from .fmt import clock, date, hm, ordinal, week_value as wk
-from .theme import USER_COLOR
 
 DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
 
@@ -32,8 +31,18 @@ DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
 #: same, but there is no recipient to notify.
 HAS_GUARDIAN = {"A": False, "B": True}
 
-#: Bar colour of a week that is not the selected one.
-DIM = "#2f2f36"
+#: Which ground each figure is drawn for. Acts 01 to 04 sit on paper, act 05
+#: on the warm olive between paper and night, the rest on near-black.
+LIGHT_FIGURES = {"score_line", "week_components"}
+LIGHT_PREFIXES = ("week_evolution.", "week_days.")
+DUSK_FIGURES = {"hour_heat", "day_span", "daily_bars.screen_min",
+                "daily_bars.pickups"}
+
+
+def surface_for(key: str) -> str:
+    if key in LIGHT_FIGURES or key.startswith(LIGHT_PREFIXES):
+        return "light"
+    return "dusk" if key in DUSK_FIGURES else "dark"
 
 
 # ---------------------------------------------------------------------------
@@ -80,10 +89,10 @@ def compute(user: str) -> dict:
 
 def shared_figures(frames: dict[str, pd.DataFrame]) -> dict:
     """Figures that hold both profiles at once."""
-    out = {
-        "score_line": figures.score_line(frames),
-        "night_drift": figures.night_drift(frames),
-    }
+    theme.use("light")
+    out = {"score_line": figures.score_line(frames)}
+    theme.use("dark")
+    out["night_drift"] = figures.night_drift(frames)
     for user, df in frames.items():
         out[f"score_breakdown.{user}"] = figures.score_breakdown(
             contributions(df.mean(numeric_only=True)), user)
@@ -103,24 +112,9 @@ def profile_figures(user: str, bundle: dict, cursor) -> dict:
     and re-pointed in the browser, except `week_days`, whose data changes."""
     d, w, bf = bundle["df"], bundle["weekly"], bundle["blocks"]
     sel = w.index[-2] if len(w.index) > 1 else w.index[-1]
-    out = {
-        "week_components": figures.week_components(w, sel),
-        "daily_bars.screen_min": figures.daily_bars_vs_baseline(
-            d, "screen_min", "screen_min_baseline",
-            t("chart.day.screen", user=user), t("unit.minutes"), user),
-        "daily_bars.pickups": figures.daily_bars_vs_baseline(
-            d, "pickups", "pickups_baseline",
-            t("chart.day.pickups", user=user), t("unit.unlocks"), user),
-        "hour_heat": figures.hour_heat(bundle["heat"], user),
-        "day_span": figures.day_span(d, user),
-        "top_bars.apps": figures.top_bars(
-            bundle["apps"], t("chart.time.apps", user=user)),
-        "top_bars.sites": figures.top_bars(
-            bundle["sites"], t("chart.time.domains", user=user)),
-        "category_area": figures.category_area(
-            bundle["cats"], t("chart.time.categories", user=user)),
-        "tracked_series": tracked(user, bundle, cursor),
-    }
+    out = {}
+    theme.use("light")
+    out["week_components"] = figures.week_components(w, sel)
     for col, title, unit in (
         ("screen_min", t("chart.week.screen"), t("unit.min")),
         ("night_min", t("chart.week.night"), t("unit.min")),
@@ -136,6 +130,29 @@ def profile_figures(user: str, bundle: dict, cursor) -> dict:
         out[f"week_days.night_min.{week}"] = figures.week_days(
             d, week, "night_min", t("chart.week_days.night", week=week),
             t("unit.min"), user)
+    theme.use("dusk")
+    out |= {
+        "daily_bars.screen_min": figures.daily_bars_vs_baseline(
+            d, "screen_min", "screen_min_baseline",
+            t("chart.day.screen", user=user), t("unit.minutes"), user),
+        "daily_bars.pickups": figures.daily_bars_vs_baseline(
+            d, "pickups", "pickups_baseline",
+            t("chart.day.pickups", user=user), t("unit.unlocks"), user),
+        "hour_heat": figures.hour_heat(bundle["heat"], user),
+        "day_span": figures.day_span(d, user),
+    }
+    # the same figure appears again in the night, where it belongs to that act
+    theme.use("dark")
+    out |= {
+        "day_span.night": figures.day_span(d, user),
+        "top_bars.apps": figures.top_bars(
+            bundle["apps"], t("chart.time.apps", user=user)),
+        "top_bars.sites": figures.top_bars(
+            bundle["sites"], t("chart.time.domains", user=user)),
+        "category_area": figures.category_area(
+            bundle["cats"], t("chart.time.categories", user=user)),
+        "tracked_series": tracked(user, bundle, cursor),
+    }
     if not bf.empty:
         out["blocks_daily"] = figures.blocks_daily(
             bf, t("chart.blocks.daily", user=user))
@@ -357,7 +374,8 @@ def week_emissions(bundle: dict, days: set) -> dict:
 
 def week_states(user: str, bundle: dict) -> list[dict]:
     df, w = bundle["df"], bundle["weekly"]
-    colour = USER_COLOR[user]
+    light = theme.SURFACES["light"]
+    colour, dim = light["USER_COLOR"][user], light["DIM"]
     out = []
     for week in w.index:
         cur = w.loc[week]
@@ -381,7 +399,7 @@ def week_states(user: str, bundle: dict) -> list[dict]:
             "held_title": t("week.recorded.title"),
             "held": [[x.headline, x.reason.split(".")[0]] for x in held],
             # what the browser re-points rather than re-downloads
-            "evolution_colors": [colour if i == week else DIM for i in w.index],
+            "evolution_colors": [colour if i == week else dim for i in w.index],
             "components_vline": t("label.week", week=week),
         })
     return out
@@ -485,19 +503,22 @@ def assemble() -> tuple[dict, dict]:
     frames = {u: bundles[u]["df"] for u in DATA}
     summaries = {u: summary(u, bundles[u]) for u in DATA}
 
-    template = {}
+    templates: dict[str, dict] = {}
 
-    def as_json(fig):
+    def as_json(fig, key=""):
         """Serialise, hoisting the theme out of the figure.
 
         Plotly writes the whole template into every figure. Repeated across
-        59 figures that is 95 KB of the payload saying the same thing; the
-        page re-attaches it once at plot time.
+        59 figures that is 95 KB of the payload saying the same thing, so the
+        page re-attaches one copy at plot time. There are two now, one per
+        surface, and the figure carries the name of the one it was drawn for.
         """
         raw = json.loads(fig.to_json())
+        mode = surface_for(key)
         found = raw.get("layout", {}).pop("template", None)
-        if found and not template:
-            template.update(found)
+        if found:
+            templates.setdefault(mode, found)
+        raw["surface"] = mode
         return raw
 
     payload = {
@@ -507,9 +528,9 @@ def assemble() -> tuple[dict, dict]:
             "events": sum(len(bundles[u]["events"]) for u in DATA),
             "weeks": [int(i) for i in bundles["A"]["weekly"].index],
         },
-        "template": template,
+        "templates": templates,
         "finding": finding(summaries),
-        "figures": {k: as_json(f)
+        "figures": {k: as_json(f, k)
                     for k, f in shared_figures(frames).items()},
         "profiles": {},
     }
@@ -519,7 +540,7 @@ def assemble() -> tuple[dict, dict]:
         weeks = week_states(user, bundle)
         payload["profiles"][user] = {
             "summary": summaries[user],
-            "figures": {k: as_json(f) for k, f
+            "figures": {k: as_json(f, k) for k, f
                         in profile_figures(user, bundle, default_day).items()},
             "days": day_states(user, bundle),
             "ui": day_labels(user),
@@ -528,5 +549,5 @@ def assemble() -> tuple[dict, dict]:
             "default_week": weeks[-2]["week"] if len(weeks) > 1
             else weeks[-1]["week"],
         }
-    payload["template"] = template
+    payload["templates"] = templates
     return finite(payload), bundles

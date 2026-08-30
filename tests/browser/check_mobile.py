@@ -1,4 +1,4 @@
-"""Phase 6 acceptance at 375x812. Every claim measured in the browser."""
+"""375x812. Every claim measured in the browser rather than reasoned about."""
 import pathlib
 from playwright.sync_api import sync_playwright
 
@@ -20,7 +20,7 @@ with sync_playwright() as p:
     # --- no horizontal page scroll, anywhere in the scroll -----------------
     worst = 0
     escapees = []
-    for i in range(1, 14):
+    for i in range(1, 13):
         page.evaluate(f"""() => {{ const a=document.getElementById('act-{i:02d}');
             document.querySelectorAll('details').forEach(d => d.open = true);
             window.scrollTo({{top:a.offsetTop, behavior:'instant'}}); }}""")

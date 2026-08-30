@@ -1,4 +1,4 @@
-"""Act 13 · under the hood. Everything closed by default; nothing hidden."""
+"""Act 12 · under the hood. Everything closed by default; nothing hidden."""
 
 from collections import Counter
 

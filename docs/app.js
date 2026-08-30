@@ -9,8 +9,7 @@
   var PART_TWO = ["04", "05", "06", "07", "08", "09"];
   var root = document.documentElement;
   var payload = null;
-  var seen = {};
-  var nightOn = false;
+  var surface = null;
 
   function $(sel, within) { return (within || document).querySelector(sel); }
   function $$(sel, within) {
@@ -24,7 +23,6 @@
     return String(v).replace(/[&<>"]/g, function (c) { return ESCAPES[c]; });
   }
   function span(cls, text) { return '<span class="' + cls + '">' + text + "</span>"; }
-
   /* Structure. Mirrors render/html.py: tag names and classes, never words. */
 
   function kpis(items) {
@@ -68,7 +66,6 @@
     if (target) { target.innerHTML = html; }
   }
   function heading(text) { return '<h3 class="sub">' + text + "</h3>"; }
-
   function figureFor(mount) {
     var key = mount.dataset.figure;
     return mount.dataset.scope === "shared"
@@ -78,7 +75,8 @@
   function draw(mount) {
     var fig = figureFor(mount);
     if (!fig) { return Promise.resolve(); }
-    var layout = Object.assign({}, fig.layout, { template: payload.template });
+    var layout = Object.assign({}, fig.layout,
+      { template: payload.templates[fig.surface || "dark"] });
     return Plotly.newPlot(mount, fig.data, layout, CONFIG);
   }
 
@@ -155,17 +153,7 @@
     }
     return { act: acts[0], into: window.scrollY };
   }
-  function markSeen(user) {
-    seen[user] = true;
-    var unread = payload.meta.profiles.filter(function (u) { return !seen[u]; });
-    $$("[data-other]").forEach(function (button) {
-      button.hidden = unread.indexOf(button.dataset.other) < 0;
-    });
-    var done = $('[data-slot="other.seen"]');
-    if (done) { done.hidden = unread.length > 0; }
-  }
   function slider(id) { return document.getElementById(id + "-slider"); }
-
   function applyProfile(user, keepPlace) {
     if (!payload.profiles[user]) { return Promise.resolve(); }
     var mark = keepPlace ? anchor() : null;
@@ -188,27 +176,41 @@
       slider(kind).value = held[kind];
       (kind === "week" ? applyWeek : applyDay)(+held[kind]);
     });
-    markSeen(user);
     return drawn.then(function () {
       if (mark) {
         window.scrollTo({ top: mark.act.offsetTop + mark.into, behavior: "instant" });
       }
-      paintNight(nightOn, true);
+      paintSurface(surface, true);
     });
   }
 
-  /* The surface shift. The tokens are CSS; the plot grids are not, so they
-     are re-pointed here to the same two values the stylesheet uses. */
-  function paintNight(on, force) {
-    if (on === nightOn && !force) { return; }
-    nightOn = on;
-    root.dataset.night = on ? "on" : "off";
+  /* The surface travels with the reader: whichever act holds the middle of
+     the viewport owns the page's tokens. Plot grids are not CSS, so they are
+     re-pointed from the stylesheet's own --grid rather than a second list. */
+  function paintSurface(id, force) {
+    if (id === surface && !force) { return; }
+    var left = surface;
+    surface = id;
+    root.dataset.surface = "a" + id;
     var colour = getComputedStyle(root).getPropertyValue("--grid").trim();
-    $$(".chart", act("06")).forEach(function (mount) {
-      if (mount.data) {
-        Plotly.relayout(mount, { "xaxis.gridcolor": colour, "yaxis.gridcolor": colour });
-      }
+    var grid = { "xaxis.gridcolor": colour, "yaxis.gridcolor": colour };
+    /* The act being left is repainted too. Only the night dims its grid, and
+       without this it would keep the dim once the reader had moved on. */
+    [id, left].forEach(function (which) {
+      if (!act(which)) { return; }
+      $$(".chart", act(which)).forEach(function (m) {
+        if (m.data) { Plotly.relayout(m, grid); }
+      });
     });
+  }
+
+  function actAtMiddle() {
+    var middle = window.innerHeight / 2, found = null;
+    $$(".act").forEach(function (el) {
+      var box = el.getBoundingClientRect();
+      if (!el.hidden && box.top <= middle && box.bottom >= middle) { found = el.id.slice(4); }
+    });
+    return found;
   }
 
   function onScroll() {
@@ -216,12 +218,13 @@
     $("#progress-bar").style.width =
       (doc > 0 ? (window.scrollY / doc) * 100 : 0) + "%";
 
+    /* The pill is only true where it does something. Part one has the fork
+       and part three reads both profiles at once, so it belongs to part two. */
     var pill = document.getElementById("profile-pill");
-    pill.hidden = window.scrollY + 80 < act("04").offsetTop;
+    var owned = actAtMiddle();
+    pill.hidden = !owned || PART_TWO.indexOf(owned) < 0;
 
-    var box = act("06").getBoundingClientRect();
-    var middle = window.innerHeight / 2;
-    paintNight(box.top < middle && box.bottom > middle);
+    if (owned) { paintSurface(owned); }
   }
 
   function watchActs() {
@@ -269,9 +272,7 @@
       act("03").hidden = true;
       var link = $('[data-rail="03"]');
       if (link) { link.parentNode.hidden = true; }
-      applyProfile(chosen, false);   // marks only the profile it renders
-    } else {
-      markSeen(profile());
+      applyProfile(chosen, false);
     }
 
     document.addEventListener("click", function (event) {

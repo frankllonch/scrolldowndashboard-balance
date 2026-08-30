@@ -1,4 +1,4 @@
-"""The thirteen acts, in reading order.
+"""The acts, in reading order.
 
 Parts 1 and 3 are the same for everyone and render once. Part 2 is one
 person's month: it renders for both profiles, and the page swaps it.
@@ -12,7 +12,7 @@ from typing import Callable
 from . import (
     a01_cover, a02_two_people, a03_choose, a04_the_week, a05_a_day,
     a06_the_night, a07_where_time_goes, a08_what_stopped, a09_what_said,
-    a10_the_other_one, a11_the_finding, a12_the_control, a13_under_the_hood,
+    a10_the_finding, a11_the_control, a12_under_the_hood,
 )
 
 
@@ -40,10 +40,9 @@ ACTS = [
     Act("07", 2, "act.07.eyebrow", "act.07.title", a07_where_time_goes.build),
     Act("08", 2, "act.08.eyebrow", "act.08.title", a08_what_stopped.build),
     Act("09", 2, "act.09.eyebrow", "act.09.title", a09_what_said.build),
-    Act("10", 3, "act.10.eyebrow", "act.10.title", a10_the_other_one.build),
-    Act("11", 3, "act.11.eyebrow", "act.11.title", a11_the_finding.build),
-    Act("12", 3, "act.12.eyebrow", "act.12.title", a12_the_control.build),
-    Act("13", 3, "act.13.eyebrow", "act.13.title", a13_under_the_hood.build),
+    Act("10", 3, "act.10.eyebrow", "act.10.title", a10_the_finding.build),
+    Act("11", 3, "act.11.eyebrow", "act.11.title", a11_the_control.build),
+    Act("12", 3, "act.12.eyebrow", "act.12.title", a12_under_the_hood.build),
 ]
 
 

@@ -15,7 +15,6 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import plotly
 
 from render import theme
 from render.page import render
@@ -37,13 +36,14 @@ def coerce(o):
 
 
 def vendor_plotly() -> Path:
-    """Copy plotly.min.js out of the installed package. Pinning the file we
-    tested against beats trusting a CDN to still be there."""
-    src = Path(plotly.__file__).parent / "package_data" / "plotly.min.js"
+    """The cartesian build, committed rather than fetched. The page draws bar,
+    scatter and heatmap, so the full bundle would ship 2.7 MB of traces it
+    never uses: 483 KB over the wire instead of 1,287 KB."""
+    src = SITE / "vendor" / "plotly-cartesian.min.js"
     if not src.exists():
-        raise SystemExit(f"plotly.min.js not found at {src}")
+        raise SystemExit(f"vendored plotly not found at {src}")
     VENDOR.mkdir(parents=True, exist_ok=True)
-    dst = VENDOR / "plotly.min.js"
+    dst = VENDOR / src.name
     shutil.copyfile(src, dst)
     return dst
 

@@ -40,7 +40,7 @@ def test_payload_has_every_figure_day_and_week_for_both_profiles(payload):
             "week_components", "hour_heat", "day_span", "category_area",
             "tracked_series", "blocks_daily", "blocks_by_hour",
             "daily_bars.screen_min", "daily_bars.pickups",
-            "top_bars.apps", "top_bars.sites",
+            "top_bars.apps", "top_bars.sites", "day_span.night",
         }
         expected |= {f"week_evolution.{c}" for c in
                      ("screen_min", "night_min", "pickups", "blocks")}
@@ -49,10 +49,12 @@ def test_payload_has_every_figure_day_and_week_for_both_profiles(payload):
         assert expected == set(profile["figures"]), f"user {user}"
         for name, figure in profile["figures"].items():
             assert figure["data"], f"{user}/{name} has no traces"
-            # the theme is hoisted to payload["template"] and re-attached in
+            # the theme is hoisted to payload["templates"] and re-attached in
             # the browser: 59 copies of it is 95 KB of the same thing
             assert "template" not in figure["layout"], f"{user}/{name}"
-    assert payload["template"], "the hoisted theme is missing"
+            assert figure["surface"] in payload["templates"], f"{user}/{name}"
+    assert set(payload["templates"]) == {"light", "dusk", "dark"}, \
+        payload["templates"]
 
 
 def _guardian_text(payload: dict) -> str:

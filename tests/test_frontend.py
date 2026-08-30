@@ -104,11 +104,63 @@ def test_the_reveal_starts_visible_enough_to_paint():
             assert float(value) == 0.001 or float(value) == 1, value
 
 
-def test_the_night_defines_every_token_it_changes():
-    """A half-swapped surface is worse than no swap at all."""
-    day = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", CSS.split(":root")[1]))
-    night = CSS.split('[data-night="on"]')[1].split("}")[0]
-    for token in re.findall(r"(--[\w-]+):", night):
-        assert token in day, f"{token} exists only at night"
-    for token in ("--bg", "--ink", "--accent", "--grid"):
-        assert token in night, f"{token} does not change at night"
+def test_every_surface_defines_the_same_tokens():
+    """A half-swapped surface is worse than no swap at all: ink that does not
+    follow its background is unreadable for the length of one act."""
+    root = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", CSS.split(":root")[1]))
+    surfaces = re.findall(r':root\[data-surface="(\w+)"\]\s*\{([^}]*)\}', CSS)
+    assert len(surfaces) >= 12, f"only {len(surfaces)} surfaces defined"
+
+    required = {"--bg", "--ink", "--ink-2", "--muted", "--rule", "--accent"}
+    for name, body in surfaces:
+        tokens = set(re.findall(r"(--[\w-]+):", body))
+        if not required <= tokens:          # act 06 adds a second, smaller block
+            continue
+        for token in tokens:
+            assert token in root, f"{name} sets {token}, which :root never defines"
+
+    full = [n for n, b in surfaces if required <= set(re.findall(r"(--[\w-]+):", b))]
+    assert len(full) == 12, f"{len(full)} acts carry a full palette, expected 12"
+
+
+def test_the_page_travels_from_light_to_dark():
+    """The arc is the point: the cover is paper, the night is black."""
+    def background(name):
+        block = re.search(r':root\[data-surface="%s"\]\s*\{([^}]*)\}' % name, CSS)
+        return re.search(r"--bg:\s*#([0-9a-f]{6})", block.group(1)).group(1)
+
+    def luminance(hex_colour):
+        return sum(int(hex_colour[i:i + 2], 16) for i in (0, 2, 4)) / 3
+
+    steps = [luminance(background(f"a{i:02d}")) for i in range(1, 7)]
+    assert steps == sorted(steps, reverse=True), f"the run to the night is not monotonic: {steps}"
+    assert luminance(background("a01")) > 200, "the cover should be paper"
+    assert luminance(background("a06")) == 0, "the night should be black"
+
+
+def test_no_surface_is_less_readable_than_the_default():
+    """The recessive role is recessive, not invisible. The editorial default
+    puts muted text at 3.6:1; a new act theme may not do worse."""
+    def channels(value):
+        return [int(value[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+
+    def luminance(value):
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4
+             for x in channels(value)]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    def contrast(a, b):
+        high, low = sorted((luminance(a), luminance(b)), reverse=True)
+        return (high + 0.05) / (low + 0.05)
+
+    thin = []
+    for name, body in re.findall(r':root\[data-surface="(\w+)"\]\s*\{([^}]*)\}', CSS):
+        tokens = dict(re.findall(r"(--[\w-]+):\s*#([0-9a-f]{6})", body))
+        if "--bg" not in tokens:
+            continue
+        for role, floor in (("--muted", 3.5), ("--ink-2", 4.5), ("--ink", 7.0)):
+            if role in tokens:
+                got = contrast(tokens[role], tokens["--bg"])
+                if got < floor:
+                    thin.append(f"{name} {role} = {got:.1f}, floor {floor}")
+    assert not thin, thin

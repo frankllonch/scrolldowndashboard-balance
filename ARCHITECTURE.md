@@ -43,7 +43,7 @@ page are two readers of the same core.
 | Time per app | Foreground to the next change or screen off, capped at 45 min |
 | Time per domain | The same, with the time moved off the browser |
 | Night band | 23:00 to 06:00 the next morning |
-| Longest disconnection | Longest screen-free gap between 07:00 and 23:00 |
+| Longest break | Longest screen-free gap between 07:00 and 23:00 |
 | App switch | A move between two different apps, reset daily |
 | Distraction share | Social, entertainment and gaming over attributed time |
 | Your normal | Rolling median of this user's last 14 days |

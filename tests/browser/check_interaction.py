@@ -1,4 +1,4 @@
-"""Phase 4 acceptance, driven for real in a browser."""
+"""The sliders, the fork, the pill and the deep link, driven for real."""
 from playwright.sync_api import sync_playwright
 
 URL = "http://127.0.0.1:8533/"
@@ -91,13 +91,10 @@ with sync_playwright() as p:
     after_switch = page.evaluate("""() => ({
         profile: document.documentElement.dataset.profile,
         id: [...document.querySelectorAll('.act')].filter(a=>a.offsetTop<=window.scrollY+1).pop().id,
-        seen: !document.querySelector('[data-slot="other.seen"]').hidden,
-        buttons: [...document.querySelectorAll('[data-other]')].filter(b=>!b.hidden).length,
+        nudge: (document.querySelector('[data-slot="day.cards"] .phone-h')||{}).textContent || '',
     })""")
     check("pill switches back", after_switch["profile"] == "A")
     check("scroll holds its act", after_switch["id"] == mark["id"], f'{mark["id"]} -> {after_switch["id"]}')
-    check("act 10 collapses once both seen", after_switch["seen"] and after_switch["buttons"] == 0,
-          f'seen={after_switch["seen"]} buttons={after_switch["buttons"]}')
 
     # --- deep link ---------------------------------------------------------
     page.goto(URL + "?profile=B", wait_until="networkidle"); page.wait_for_timeout(1800)
