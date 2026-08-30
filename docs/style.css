@@ -31,6 +31,10 @@
 
 *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
 
+/* [hidden] is only a UA `display: none`, so any element this sheet gives a
+   display to would ignore it. The fork is one. */
+[hidden] { display: none !important; }
+
 /* Smooth only when the reader has not asked for less motion. */
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
@@ -356,3 +360,161 @@ details .scroller, details .kpis, details .grid { margin-top: .8rem; }
 .scroll-cue::after { content: " ↓"; }
 
 .fork-act { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; }
+
+/* =======================================================================
+   The night · act 06 is the only act that changes the surface.
+   A mood change, not a brightness change: the room gets darker and warmer.
+   ======================================================================= */
+
+:root[data-night="on"] {
+  --bg:      #000000;
+  --panel:   #080806;
+  --card:    #0c0b09;
+  --rule:    #2a2720;
+  --rule-2:  #1b1913;
+  --ink:     #e8dfd0;
+  --ink-2:   #9a9184;
+  --accent:  #fab219;
+  --grid:    #141410;
+}
+
+.vignette {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 42%,
+              rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .82) 100%);
+}
+:root[data-night="on"] .vignette { opacity: 1; }
+
+/* =======================================================================
+   Motion · every rule below is an enhancement on content that is already
+   visible. Nothing here makes anything appear.
+
+   Two guards, both required. Without `prefers-reduced-motion: no-preference`
+   the reader has asked for less. Without `animation-timeline: view()` the
+   browser cannot drive an animation from scroll at all, which is still the
+   case in Firefox without a flag: there the page is simply static, which is
+   the point.
+   ======================================================================= */
+
+@keyframes reveal {
+  from { opacity: .001; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade {
+  from { opacity: .001; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* The surface shift, and only under this guard: asked for less motion,
+     the tokens still swap, they just swap at once. */
+  body { transition: background-color .6s ease, color .6s ease; }
+  .vignette { transition: opacity .6s ease; }
+  .rail a { transition: color .25s ease; }
+
+  @supports (animation-timeline: view()) {
+    .act-head,
+    .act-body > *,
+    .fork-card {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+
+    /* Charts reveal, they do not move: sliding a plot is a worse read than
+       no animation at all. The data itself is never animated. */
+    .chart {
+      animation: fade linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+
+    /* The number arrives behind its own label. */
+    .hero-number, .stat-value {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 8% entry 48%;
+    }
+
+    /* KPI cards stagger across the strip. */
+    .kpi { animation: reveal linear both; animation-timeline: view(); }
+    .kpi:nth-child(1) { animation-range: entry 0% entry 36%; }
+    .kpi:nth-child(2) { animation-range: entry 3% entry 39%; }
+    .kpi:nth-child(3) { animation-range: entry 6% entry 42%; }
+    .kpi:nth-child(4) { animation-range: entry 9% entry 45%; }
+    .kpi:nth-child(5) { animation-range: entry 12% entry 48%; }
+    .kpi:nth-child(6) { animation-range: entry 15% entry 51%; }
+    .kpi:nth-child(7) { animation-range: entry 18% entry 54%; }
+  }
+}
+
+/* =======================================================================
+   Below 900px the rail goes; the progress bar and the pill stay.
+   ======================================================================= */
+
+@media (max-width: 900px) {
+  .rail { display: none; }
+  main { margin-left: 0; }
+}
+
+/* =======================================================================
+   Narrow. One column, everything, and nothing wider than the screen: wide
+   content scrolls inside its own box rather than dragging the page with it.
+   ======================================================================= */
+
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+
+  .act { padding: 4rem 1.15rem; }
+  .act-head { margin-bottom: 1.6rem; }
+
+  /* Side-by-side is what pushed the page to 620px at 375. */
+  .grid.cols-2, .grid.cols-3, .grid.cols-4, .fork { grid-template-columns: 1fr; }
+  .grid { gap: 1rem; }
+
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi { min-height: 4.8rem; padding: .7rem .8rem; }
+  .kpi-value { font-size: 1.25rem; }
+  .kpi:nth-child(odd) { margin-left: 0; }
+  .kpi:nth-child(n + 3) { margin-top: -1.5px; }
+
+  /* Plotly gets a shorter box; its own margins do the rest. */
+  .chart, .grid .chart { min-height: 260px; padding: .35rem .3rem; }
+  .chart.tall { min-height: 420px; }
+
+  .lede { font-size: 1.05rem; }
+  .note { padding: .9rem 1rem; }
+  .hero-number { font-size: 3.2rem; }
+  .hero-number.huge { font-size: 3.6rem; }
+  .hero-sub { max-width: none; }
+  .stat-value { font-size: 2rem; }
+
+  /* The fork stays a real choice: two cards, both reachable in one screen. */
+  .fork-act { min-height: auto; }
+  .fork { gap: 1rem; }
+  .fork-card { padding: 1.2rem 1.1rem 1rem 1.1rem; }
+  .fork-sketch { font-size: 1rem; margin: .2rem 0 1rem 0; max-width: none; }
+  .fork-stats { gap: .5rem; }
+  .fork-stats .stat { padding-left: .6rem; }
+  .fork-stats .stat-value { font-size: 1.25rem; }
+  .fork-stats .stat-label { font-size: .56rem; letter-spacing: .06em; }
+  .fork-cta { margin-top: 1rem; }
+
+  .cover { min-height: 84vh; }
+  .cover .grid { margin-top: 2rem; }
+  .scroll-cue { margin-top: 2.4rem; }
+
+  /* The slider label sits over the track so the track keeps the width. */
+  .slider {
+    grid-template-columns: 1fr auto; padding: .7rem .9rem; gap: .4rem 1rem;
+  }
+  .slider input[type="range"] { grid-column: 1 / -1; grid-row: 2; }
+
+  .phone, .empty { max-width: none; }
+  .channel + .channel { margin-top: 1.4rem; }
+
+  th, td { white-space: nowrap; padding: .5rem .6rem; }
+  details { padding: 0 .9rem; }
+}

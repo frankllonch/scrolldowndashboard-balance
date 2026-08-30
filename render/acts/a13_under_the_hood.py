@@ -68,7 +68,7 @@ def index(ctx) -> str:
          t("table.col.scores_0"), t("table.col.weight")],
         [[label, f"{good:g}", f"{bad:g}", f"{weight*100:.0f} %"]
          for _, label, good, bad, weight in COMPONENTS])
-    charts = html.grid(*(html.chart("score_breakdown", f"profile:{u}")
+    charts = html.grid(*(html.chart(f"score_breakdown.{u}", "shared")
                          for u in ctx.payload["meta"]["profiles"]))
     return table + charts + html.note(t("hood.index.note"))
 

@@ -25,6 +25,7 @@ from balance.intelligence import (
 )
 from balance.score import COMPONENTS, add_score, contributions
 from copytext import MONTHS, t
+from render.fmt import ordinal
 
 st.set_page_config(page_title=t("site.page_title"),
                    page_icon="◐", layout="wide",
@@ -762,7 +763,7 @@ with TABS[6]:
                 t("phone.brand"),
                 f"<div class='phone-eyebrow'>{t('phone.eyebrow.nudge')}</div>"
                 f"<div class='phone-h'>"
-                f"{t('phone.nudge.headline', reopens=n.reopens)}</div>"
+                f"{t('phone.nudge.headline', ordinal=ordinal(n.reopens))}</div>"
                 f"<div class='phone-p'>{t('phone.nudge.body')}</div>"
                 f"<div class='phone-cta'>{t('phone.cta.off_until_tomorrow')}</div>"
                 f"<div class='phone-cta ghost'>{t('phone.cta.five_more')}</div>"),

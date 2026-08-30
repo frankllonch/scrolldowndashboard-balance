@@ -23,7 +23,7 @@ from balance.score import COMPONENTS, add_score, contributions
 from copytext import t
 
 from . import figures
-from .fmt import clock, date, hm, week_value as wk
+from .fmt import clock, date, hm, ordinal, week_value as wk
 from .theme import USER_COLOR
 
 DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
@@ -84,6 +84,9 @@ def shared_figures(frames: dict[str, pd.DataFrame]) -> dict:
         "score_line": figures.score_line(frames),
         "night_drift": figures.night_drift(frames),
     }
+    for user, df in frames.items():
+        out[f"score_breakdown.{user}"] = figures.score_breakdown(
+            contributions(df.mean(numeric_only=True)), user)
     for col, title, unit in (
         ("screen_min", t("chart.screen_per_day"), t("unit.minutes")),
         ("pickups", t("chart.pickups_per_day"), t("unit.unlocks")),
@@ -116,8 +119,6 @@ def profile_figures(user: str, bundle: dict, cursor) -> dict:
             bundle["sites"], t("chart.time.domains", user=user)),
         "category_area": figures.category_area(
             bundle["cats"], t("chart.time.categories", user=user)),
-        "score_breakdown": figures.score_breakdown(
-            contributions(d.mean(numeric_only=True)), user),
         "tracked_series": tracked(user, bundle, cursor),
     }
     for col, title, unit in (
@@ -190,7 +191,7 @@ def user_card(state: dict) -> dict | None:
         return phone_card(
             t("fmt.clock", h=at.hour, m=at.minute), t("phone.brand"),
             t("phone.eyebrow.nudge"),
-            t("phone.nudge.headline", reopens=nudge.reopens),
+            t("phone.nudge.headline", ordinal=ordinal(nudge.reopens)),
             t("phone.nudge.body"),
             ctas=[{"label": t("phone.cta.off_until_tomorrow"), "ghost": False},
                   {"label": t("phone.cta.five_more"), "ghost": True}])
@@ -234,6 +235,19 @@ def device_rows(row, state: dict) -> list[list[str]]:
         [t("device.row.nudges"), f"{state['nudges_so_far']}"],
         [t("device.row.reinforcements"), f"{state['positives_so_far']}"],
     ]
+
+
+def day_labels(user: str) -> dict:
+    """The handful of strings the day slider needs when it rebuilds the cards
+    in the browser. The page carries no copy of its own."""
+    return {
+        "channel_user": t("engine.channel.user"),
+        "channel_guardian": t("engine.channel.guardian"),
+        "channel_device": t("engine.channel.device"),
+        "empty": t("engine.empty"),
+        "device_caption": t("device.caption") + (
+            t("device.caption.guardian") if HAS_GUARDIAN[user] else ""),
+    }
 
 
 def day_states(user: str, bundle: dict) -> list[dict]:
@@ -507,6 +521,7 @@ def assemble() -> tuple[dict, dict]:
             "figures": {k: as_json(f) for k, f
                         in profile_figures(user, bundle, default_day).items()},
             "days": day_states(user, bundle),
+            "ui": day_labels(user),
             "weeks": weeks,
             "default_day": default_day.isoformat(),
             "default_week": weeks[-2]["week"] if len(weeks) > 1

@@ -395,7 +395,7 @@ STRINGS: dict[str, str] = {
     "phone.cta.off_until_tomorrow": "Off until tomorrow",
     "phone.cta.five_more": "5 more minutes",
     "phone.nudge.headline": (
-        "That is the {reopens}th time you have opened your phone tonight."
+        "That is the {ordinal} time you have opened your phone tonight."
     ),
     "phone.nudge.body": "A month ago you had already put it down by now.",
 

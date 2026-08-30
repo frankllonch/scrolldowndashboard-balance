@@ -40,3 +40,14 @@ def maybe(value, spec: str = ".0f", unit: str = "") -> str:
     if value is None or not math.isfinite(float(value)):
         return t("value.no_use")
     return f"{value:{spec}} {unit}".strip()
+
+
+def ordinal(n: int) -> str:
+    """1st, 2nd, 3rd, 4th. The teens are all -th, which is the case a naive
+    lookup on the last digit gets wrong."""
+    n = int(n)
+    if 10 <= n % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"

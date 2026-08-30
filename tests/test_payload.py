@@ -25,9 +25,11 @@ def payload() -> dict:
 
 def test_payload_has_every_figure_day_and_week_for_both_profiles(payload):
     assert set(payload["profiles"]) == {"A", "B"}
+    # act 13 puts both breakdowns side by side, so they are shared, not
+    # "the current profile's"
     shared = {"score_line", "night_drift", "compare.screen_min",
               "compare.pickups", "compare.night_min", "compare.blocks",
-              "compare.night_pickups"}
+              "compare.night_pickups", "score_breakdown.A", "score_breakdown.B"}
     assert shared <= set(payload["figures"])
 
     weeks = payload["meta"]["weeks"]
@@ -36,8 +38,8 @@ def test_payload_has_every_figure_day_and_week_for_both_profiles(payload):
         assert [w["week"] for w in profile["weeks"]] == weeks
         expected = {
             "week_components", "hour_heat", "day_span", "category_area",
-            "score_breakdown", "tracked_series", "blocks_daily",
-            "blocks_by_hour", "daily_bars.screen_min", "daily_bars.pickups",
+            "tracked_series", "blocks_daily", "blocks_by_hour",
+            "daily_bars.screen_min", "daily_bars.pickups",
             "top_bars.apps", "top_bars.sites",
         }
         expected |= {f"week_evolution.{c}" for c in
