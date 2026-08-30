@@ -1,0 +1,62 @@
+"""Compose `docs/index.html` from the hand-written shell and the acts.
+
+Parts 1 and 3 are rendered once. Part 2 is rendered for every profile: the
+default profile's copy goes into the page so it is complete before any script
+runs, and both go into the payload so the switch has something to swap in.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from copytext import t
+
+from .acts import ACTS, Context
+
+SHELL = Path(__file__).parent.parent / "site" / "index.html"
+
+
+def section(act, body: str) -> str:
+    return (f'<header class="act-head"><p class="eyebrow">{t(act.eyebrow)}</p>'
+            f'<h2 class="act-title">{t(act.title)}</h2></header>'
+            f'<div class="act-body">{body}</div>')
+
+
+def rail() -> str:
+    """Thirteen acts in uppercase mono, grouped into the three parts."""
+    out, part = "", None
+    for act in ACTS:
+        if act.part != part:
+            out += "</ol>" if part is not None else ""
+            out += (f'<p class="rail-part">{t(f"part.{act.part}")}</p><ol>')
+            part = act.part
+        out += (f'<li><a href="#act-{act.id}" data-rail="{act.id}">'
+                f'<span class="num">{act.id}</span>{t(act.title)}</a></li>')
+    return out + "</ol>"
+
+
+def render(payload: dict, bundles: dict) -> str:
+    """Returns the page. Part 2 is added to `payload` as a side effect."""
+    default = payload["meta"]["profiles"][0]
+    per_profile: dict[str, dict[str, str]] = {u: {} for u in payload["profiles"]}
+
+    html = SHELL.read_text()
+    for act in ACTS:
+        if act.per_profile:
+            for user in per_profile:
+                ctx = Context(payload, bundles, user)
+                per_profile[user][act.id] = act.builder(ctx)
+            body = per_profile[default][act.id]
+        else:
+            body = act.builder(Context(payload, bundles))
+        html = html.replace(f"<!--act:{act.id}-->", section(act, body))
+
+    for user, acts in per_profile.items():
+        payload["profiles"][user]["acts"] = acts
+
+    return (html
+            .replace("<!--title-->", t("site.page_title"))
+            .replace("<!--description-->", t("cover.standfirst"))
+            .replace("<!--rail-->", rail())
+            .replace("<!--pill-->",
+                     f'{t("pill.label")} <span class="who">{default}</span>'))

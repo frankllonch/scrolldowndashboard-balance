@@ -516,15 +516,15 @@ with TABS[3]:
     clock_f4 = t("fmt.clock", h=int(f4), m=int(f4 % 1 * 60))
 
     kpis([
-        (t("night.kpi.first_week"), f"{n1:.0f} {t('unit.min')}", None),
-        (t("night.kpi.last_week"), f"{n4:.0f} {t('unit.min')}",
+        (t("night.kpi.first_week", user="B"), f"{n1:.0f} {t('unit.min')}", None),
+        (t("night.kpi.last_week", user="B"), f"{n4:.0f} {t('unit.min')}",
          t("delta.times", n=n4 / max(n1, .01))),
-        (t("night.kpi.last_screen_first"), clock_e1, None),
-        (t("night.kpi.last_screen_last"), clock_e4,
+        (t("night.kpi.last_screen_first", user="B"), clock_e1, None),
+        (t("night.kpi.last_screen_last", user="B"), clock_e4,
          t("delta.minutes", n=(e4 - e1) * 60)),
-        (t("night.kpi.first_unlock"), clock_f4,
+        (t("night.kpi.first_unlock", user="B"), clock_f4,
          t("delta.minutes", n=(f4 - f1) * 60)),
-        (t("night.kpi.sleep_window"), f"{sleep4:.1f} {t('unit.hours')}",
+        (t("night.kpi.sleep_window", user="B"), f"{sleep4:.1f} {t('unit.hours')}",
          t("delta.minutes", n=(sleep4 - sleep1) * 60)),
     ])
 

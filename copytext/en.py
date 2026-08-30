@@ -50,6 +50,7 @@ STRINGS: dict[str, str] = {
     "sidebar.notifications.line": "**User {user}**: {sent} · {nudges} nudges",
     "sidebar.notifications.to_guardian": "{n} to the guardian",
 
+    "pill.label": "Reading",
     "profile.label": "Profile to inspect",
     "profile.help": (
         "Affects Daily rhythm, Where the time goes and What the phone "
@@ -167,7 +168,7 @@ STRINGS: dict[str, str] = {
     "table.col.type": "Type",
     "table.col.detail": "Detail",
     "week.emitted.none": "No notification and no nudge this week.",
-    "week.recorded.title": "**Also recorded this week, not notified**",
+    "week.recorded.title": "Also recorded this week, not notified",
 
     # -- daily rhythm -------------------------------------------------------
     "day.title": "User {user} · month at a glance",
@@ -217,12 +218,12 @@ STRINGS: dict[str, str] = {
 
     # -- the night ----------------------------------------------------------
     "night.title": "Night band · user B",
-    "night.kpi.first_week": "B · late night wk 1",
-    "night.kpi.last_week": "B · late night wk 4",
-    "night.kpi.last_screen_first": "B · last screen wk 1",
-    "night.kpi.last_screen_last": "B · last screen wk 4",
-    "night.kpi.first_unlock": "B · first unlock",
-    "night.kpi.sleep_window": "B · sleep window",
+    "night.kpi.first_week": "{user} · late night wk 1",
+    "night.kpi.last_week": "{user} · late night wk 4",
+    "night.kpi.last_screen_first": "{user} · last screen wk 1",
+    "night.kpi.last_screen_last": "{user} · last screen wk 4",
+    "night.kpi.first_unlock": "{user} · first unlock",
+    "night.kpi.sleep_window": "{user} · sleep window",
     "delta.times": "×{n:.0f}",
     "delta.minutes": "{n:+.0f} min",
     "night.note.drift": (
@@ -370,7 +371,7 @@ STRINGS: dict[str, str] = {
         "percentage of its own maximum for the period, which is what lets them "
         "be compared without a second scale: what you read is the shape and "
         "the coincidence in time, and the real value with its unit is in the "
-        "tooltip. **Click the legend** to switch any series on or off. Below "
+        "tooltip. <b>Click the legend</b> to switch any series on or off. Below "
         "zero, the rail showing what the phone emitted each day. The white "
         "line is the selected day."
     ),
@@ -515,7 +516,7 @@ STRINGS: dict[str, str] = {
         "per night. The figures come from replaying the rule over the 30 days "
         "of the period."
     ),
-    "engine.nudge.activation": "**User {user} · activation**",
+    "engine.nudge.activation": "User {user} · activation",
     "engine.nudge.row.nights": "Nights evaluated",
     "engine.nudge.row.nudged": "Nights with a nudge",
     "engine.nudge.row.nudged_value": "{nudged} ({pct:.0f} %)",
@@ -524,7 +525,7 @@ STRINGS: dict[str, str] = {
     "engine.nudge.row.after_value": "{minutes:.0f} ({pct:.0f} %)",
     "engine.nudge.row.per_night": "Per nudged night",
     "engine.nudge.row.per_night_value": "{minutes:.0f} min",
-    "engine.nudge.quiet.title": "**Nights without a nudge · reason**",
+    "engine.nudge.quiet.title": "Nights without a nudge · reason",
     "engine.nudge.note": (
         "The minutes after the nudge bound its headroom: {after:.0f} of user "
         "B's {total:.0f} night minutes ({pct:.0f} %), about {per_night:.0f} "
@@ -800,6 +801,113 @@ STRINGS: dict[str, str] = {
     "hover.component": "%{y:.0f}/100<extra>$label</extra>",
     "text.minutes": "{minutes:,.0f} min",
     "tick.hour": "{hour:02d}:00",
+    # -- the scroll: parts and act headings ---------------------------------
+    "part.1": "Setup",
+    "part.2": "One person's month",
+    "part.3": "The analysis",
+
+    "act.01.eyebrow": "Balance · May 2026",
+    "act.01.title": "Device behaviour",
+    "act.02.eyebrow": "Both profiles, thirty days",
+    "act.02.title": "Two people, one phone",
+    "act.03.eyebrow": "Pick one",
+    "act.03.title": "Choose a profile",
+    "act.04.eyebrow": "Week by week",
+    "act.04.title": "The week",
+    "act.05.eyebrow": "Hour by hour",
+    "act.05.title": "A day in the life",
+    "act.06.eyebrow": "23:00 to 06:00",
+    "act.06.title": "The night",
+    "act.07.eyebrow": "Apps, domains, categories",
+    "act.07.title": "Where the time goes",
+    "act.08.eyebrow": "The filter",
+    "act.08.title": "What the phone stopped",
+    "act.09.eyebrow": "Alerts, nudges, reinforcements",
+    "act.09.title": "What the phone said",
+    "act.10.eyebrow": "Halfway",
+    "act.10.title": "The other one",
+    "act.11.eyebrow": "The reveal",
+    "act.11.title": "The finding",
+    "act.12.eyebrow": "The negative control",
+    "act.12.title": "What a screen-time rule would have missed",
+    "act.13.eyebrow": "Schema and derivations",
+    "act.13.title": "Under the hood",
+
+    # -- act 01 · cover -----------------------------------------------------
+    "cover.standfirst": (
+        "A device event log, read end to end: what the phone recorded, what it "
+        "computed from that, and what it decided to say out loud."
+    ),
+    "cover.stat.profiles": "profiles",
+    "cover.stat.events": "events",
+    "cover.stat.days": "days each",
+    "cover.scroll": "Scroll",
+
+    # -- act 02 · two people, one phone -------------------------------------
+    "overview.lede": (
+        "Two files, two kinds of profile, the same thirty days. The index "
+        "reads every day of both."
+    ),
+    "overview.hook": (
+        "Watch B. The index falls from {first:.0f} to {last:.0f} while screen "
+        "time moves {screen:+.0f} %."
+    ),
+    "profile.card.eyebrow": "User {user}",
+
+    # -- act 03 · choose a profile ------------------------------------------
+    "fork.lede": "Both months are here. Read one, then the other.",
+    "fork.sketch.A": (
+        "An adult with no guardian. A routine that holds for thirty days."
+    ),
+    "fork.sketch.B": (
+        "A minor with a guardian. A schedule that slides, week by week."
+    ),
+    "fork.stat.screen": "screen / day",
+    "fork.stat.index": "index",
+    "fork.stat.nights": "nights with a nudge",
+    "fork.cta": "Read this month",
+
+    # -- act 10 · the other one ---------------------------------------------
+    "other.body": (
+        "One profile is half the story. The rules are the same for both; what "
+        "changes is what the month does with them."
+    ),
+    "other.cta": "Read user {user}",
+    "other.seen": "Both months read. The analysis follows.",
+
+    # -- act 11 · the finding -----------------------------------------------
+    "finding.lede": (
+        "The index did not fall because B used the phone more. It fell "
+        "because of when."
+    ),
+    "finding.hero.value": "×{multiple:.0f}",
+    "finding.hero.label": "late-night screen, week 1 against week 4",
+    "finding.sleep.value": "{minutes:.0f} min",
+    "finding.sleep.label": "less rest available per night",
+    "finding.body": (
+        "B's last screen moves {shift:.0f} minutes later across the month "
+        "while their first unlock stays put, so the window between the two "
+        "closes from {first:.1f} h to {last:.1f} h. Unlocks after midnight go "
+        "from {pick_first:.1f} to {pick_last:.1f} a night.<br><br>"
+        "A, over the same thirty days, records 0.0 minutes between 23:00 and "
+        "06:00. The night band is not a threshold that punishes everyone; it "
+        "is one that B crossed and A did not."
+    ),
+
+    # -- act 12 · the negative control --------------------------------------
+    "control.lede": (
+        "The obvious rule is a cap on screen time. Here is what it would have "
+        "seen."
+    ),
+    "control.screen.label": "screen time, week 1 to week 4",
+    "control.night.label": "late-night screen, same weeks",
+    "control.body": (
+        "<code>screen_jump</code> is implemented and reads the same frames as "
+        "every other rule. It fires on neither profile: B's volume grows "
+        "{screen:+.0f} %, under any reasonable threshold, while the night band "
+        "multiplies by {night:.0f}. Catching this month depends on watching "
+        "the schedule, not the total."
+    ),
 }
 
 #: Month abbreviations. Written out rather than taken from `strftime` so the

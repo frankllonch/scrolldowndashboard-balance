@@ -7,6 +7,8 @@ frontend carries no copy of its own.
 
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 from balance.events import SENSITIVE, load
@@ -410,6 +412,7 @@ def summary(user: str, bundle: dict) -> dict:
         "night_multiple": wk(d, "night_min", last) / night_first,
         "night_pickups_first_week": wk(d, "night_pickups", first),
         "night_pickups_last_week": wk(d, "night_pickups", last),
+        "last_use_mean": clock(d.last_use_h.mean()),
         "last_screen_first_week": clock(end_first),
         "last_screen_last_week": clock(end_last),
         "last_screen_shift_min": (end_last - end_first) * 60,
@@ -447,6 +450,17 @@ def finding(summaries: dict) -> dict:
 # ---------------------------------------------------------------------------
 # Assembly
 # ---------------------------------------------------------------------------
+
+def finite(node):
+    """NaN and Infinity are not JSON. A metric that does not exist is null."""
+    if isinstance(node, dict):
+        return {k: finite(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [finite(v) for v in node]
+    if isinstance(node, float) and not math.isfinite(node):
+        return None
+    return node
+
 
 def assemble() -> tuple[dict, dict]:
     """Return (payload, bundles). The bundles stay in Python for the acts."""
@@ -499,4 +513,4 @@ def assemble() -> tuple[dict, dict]:
             else weeks[-1]["week"],
         }
     payload["template"] = template
-    return payload, bundles
+    return finite(payload), bundles

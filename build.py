@@ -18,6 +18,7 @@ import numpy as np
 import plotly
 
 from render import theme
+from render.page import render
 from render.payload import assemble
 
 ROOT = Path(__file__).parent
@@ -62,11 +63,14 @@ def main() -> int:
     DOCS.mkdir(exist_ok=True)
 
     payload, bundles = assemble()
+    page = DOCS / "index.html"
+    page.write_text(render(payload, bundles))
+
     target = DOCS / "payload.json"
     target.write_text(json.dumps(payload, separators=(",", ":"),
-                                 default=coerce))
+                                 allow_nan=False, default=coerce))
 
-    written = [target, vendor_plotly(), *copy_frontend()]
+    written = [page, target, vendor_plotly(), *copy_frontend()]
     for path in written:
         print(f"{path.relative_to(ROOT)}  {path.stat().st_size / 1024:,.0f} KB")
     return 0
