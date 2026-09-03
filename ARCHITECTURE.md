@@ -3,6 +3,9 @@
 The event file is the system of record. Everything else is a pure function of
 it, computed at build time, so the browser never sees an event.
 
+Two halves, one boundary. Python computes; TypeScript draws. Everything that
+crosses is declared in `web/types/` and checked from both sides.
+
 ```
 data/*.json              the log · immutable
   │
@@ -12,17 +15,38 @@ data/*.json              the log · immutable
   ├─ balance/score.py      layer 2 · the 0 to 100 index
   └─ balance/intelligence/ layer 3 · signals, alerts, nudge, positives, replay
        │
-       ├─ balance/run.py   adapter · CLI
-       └─ render/          adapter · figures/, acts/, payload, states, summary
+       ├─ balance/run.py   adapter · the command line
+       └─ emit/            adapter · the frames as one typed JSON document
+            │
+            ▼
+       docs/data.json      ─── the boundary. No HTML, no figures, no copy ───
+            │
+            ▼
+       web/                the page: types, charts, acts, copy, interaction
             │
             └─ build.py  →  docs/  →  GitHub Pages
 ```
 
-No module is longer than 350 lines; where a concern outgrew that it became a
-package whose `__init__.py` re-exports the same names, so no caller changed.
+Want to change something? The section it belongs to is one file:
 
-No layer imports plotly, and none of them imports `render/`. The CLI and the
-page are two readers of the same core.
+| To change | Open |
+|---|---|
+| What a section says, or the charts it mounts | `web/acts/aNN-*.ts` |
+| The line under a chart | `web/copy/explain.ts` |
+| How a chart is drawn | `web/charts/` |
+| The palette, or which ground an act sits on | `web/theme.ts`, `web/charts/index.ts` |
+| What a slider does | `web/sliders.ts` |
+| What crosses from Python | `web/types/`, then `emit/` |
+| A metric, a threshold, a rule | `balance/` |
+| Spacing, type, colour tokens | `site/css/` |
+
+No module is longer than 350 lines; where a concern outgrew that it became a
+package or a folder whose index re-exports the same names, so no caller
+changed.
+
+Nothing in `balance/` imports plotly or knows the page exists, and nothing in
+`emit/` builds a figure or writes markup. The command line and the page are
+two readers of the same core.
 
 ## Invariants
 
@@ -34,8 +58,9 @@ page are two readers of the same core.
 | Truncated days leave every view | `metrics.py`, `daily_frame` | totals stop matching |
 | Browser time belongs to the domain | `events.py` | Chrome tops every ranking |
 | At most 2 alerts per 30 days | `intelligence.py`, `_decide` | the channel burns out |
-| No app or domain reaches a notification | `intelligence.py`, payload | the privacy line is gone |
-| Numbers come from the frames, never from copy | `copytext/`, `render/` | a copy edit moves a figure |
+| No app or domain reaches a notification | `intelligence.py`, `emit/` | the privacy line is gone |
+| Numbers come from the frames, never from copy | `web/`, `test_copy.py` | a copy edit moves a figure |
+| Nothing but data crosses the boundary | `emit/`, `test_emit.py` | Python starts rendering again |
 
 ## From event to metric
 
@@ -55,8 +80,9 @@ page are two readers of the same core.
 ## How to make the likely changes
 
 **Add a daily metric.** Compute it per day in `daily_frame()`, aggregate it in
-`weekly_frame()` if it belongs in the weekly panel, and add its label to
-`copytext/en.py`. Nothing else knows the column exists.
+`weekly_frame()` if it belongs in the weekly panel, name it in
+`emit/profile.py`'s column list, and declare it in `web/types/series.ts`. The
+type check fails until both sides agree, which is the point.
 
 **Add an alert rule.** Write `_your_rule(df) -> list[Signal]` in
 `intelligence/alerts.py`, put its thresholds in `intelligence/signals.py`, and
@@ -72,16 +98,17 @@ to 1; `tests/test_score.py` asserts it, and `tests/test_data_contract.py`
 asserts the published figures, so a weight change will show up as a failing
 number rather than a silent drift.
 
-**Add an act to the page.** Write `render/acts/aNN_name.py` with a
-`build(ctx) -> str`, register it in `render/acts/__init__.py`, add a
-`<section>` and its `<!--act:NN-->` marker to `site/index.html`, and put its
-strings in the right part of `copytext/strings/`. Acts in part 2 render once
-per profile.
+**Add an act to the page.** Write `web/acts/aNN-name.ts` exporting an `Act`
+with its own `copy` object and a `build(ctx)`, add it to `ACTS` in
+`web/acts/index.ts`, and add a `<section>` with its `<!--act:NN-->` marker to
+`site/index.html`. Its words live in that file: one section, one place. Acts
+in part 2 are rebuilt when the reader switches profile.
 
-**Add a figure.** A builder in the right family under `render/figures/`,
-exported from its `__init__.py`, a key in `render/payload.py`, and a
-`html.chart("key")` mount in the act. Selection-dependent figures ship once and
-are re-pointed in the browser unless their data actually changes.
+**Add a figure.** A builder in the right family under `web/charts/`, a case in
+`build()` in `web/charts/index.ts`, a line in `web/copy/explain.ts`, and a
+`chart("key", explain("key"))` mount in the act. A figure with no line does not
+build. If it needs a series the document does not carry, add that first: the
+column list in `emit/profile.py` and the type in `web/types/`.
 
 ## Known limits
 

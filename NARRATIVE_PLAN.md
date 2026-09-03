@@ -34,10 +34,13 @@ Python holds only the numbers.
       writes: 20 of 24 byte-identical after normalising whitespace, and the
       four that differ are two deliberate divergences named in that test.
       It goes with `render/` at the cutover.
-- [ ] **5 · Cutover.** `bundle.js` becomes `app.js`; `render/`, `copytext/` and
-      `page.py` are deleted; `build.py` runs `python -m emit` and `npm run build`.
-- [ ] **6 · The map.** An `ARCHITECTURE.md` that says "want to change X? it is
-      here", replacing the current one.
+- [x] **5 · Cutover.** `render/` and `copytext/` are gone — 3,129 lines of
+      Python that built HTML, figures and copy. `build.py` now orchestrates:
+      `python -m emit`, the type check, a node prerender of every section, then
+      the bundle. The page is still complete before any script runs.
+- [x] **6 · The map.** `ARCHITECTURE.md` opens with a "to change X, open Y"
+      table and the boundary drawn through the middle of the diagram. The
+      README and the Makefile follow.
 
 ## Decided
 

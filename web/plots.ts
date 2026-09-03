@@ -1,0 +1,44 @@
+/**
+ * Getting a figure onto the page.
+ *
+ * A mount names the figure it wants; this builds it and draws it. Python used
+ * to ship 35 built figures and a template per surface in the payload — 59 KB
+ * of layout, and a second copy of the palette — because the browser could not
+ * make one. It can.
+ */
+
+import { build, type Selection } from "./charts/index";
+import { CONFIG } from "./charts/frame";
+import { plotly } from "./charts/plotly";
+import { all } from "./dom";
+import { profile as profileOf } from "./payload";
+import type { Payload } from "./types/index";
+
+/** A mount Plotly has already drawn into carries its own data. */
+type Drawn = HTMLElement & { data?: unknown };
+
+export function drawn(mount: HTMLElement): boolean {
+  return Boolean((mount as Drawn).data);
+}
+
+export function draw(mount: HTMLElement, payload: Payload,
+                     selection: Selection): Promise<unknown> {
+  const key = mount.dataset.figure;
+  if (!key) return Promise.resolve();
+  const figure = build(key, payload, profileOf(payload, selection.user),
+                       selection);
+  if (!figure) return Promise.resolve();
+  return plotly().newPlot(mount, figure.data, figure.layout, CONFIG);
+}
+
+/**
+ * Every plot inside one scope.
+ *
+ * Plotly settles asynchronously and every figure it draws changes the height
+ * of the act holding it, so anything that moves the reader waits on this or
+ * aims at geometry about to shift underneath it.
+ */
+export function drawWithin(scope: ParentNode, payload: Payload,
+                           selection: Selection): Promise<unknown[]> {
+  return Promise.all(all(".chart", scope).map((m) => draw(m, payload, selection)));
+}

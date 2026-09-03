@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
+from pathlib import Path
 
 from balance.events import CATEGORIES
 from balance.intelligence import (
@@ -24,6 +26,9 @@ from balance.intelligence import (
     evaluate_alerts, evaluate_positives, weekly_digest, month_replay,
     nudge_summary, replay_nudge,
 )
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
@@ -237,19 +242,24 @@ def test_emissions_cover_every_destination(tl_b, df_b):
 
 
 def test_the_decision_vocabulary_is_the_one_the_charts_expect():
-    """The rail markers key off these exact strings.
+    """A signal starts as a candidate and ends as one of four words.
 
-    They were left in Spanish once during the translation and the alert
-    markers silently vanished from the walkthrough: the traces were built from
-    an empty list and nothing failed.
+    They were left in Spanish once during a translation and the alert markers
+    silently vanished from the walkthrough: the traces were built from an
+    empty list and nothing failed. The page now reads the replay rather than
+    these strings, and `tests/test_emit.py` holds the four against the
+    `Decision` union the frontend declares — so what is left to check here is
+    that the vocabulary itself has not grown or moved.
     """
     from balance.intelligence import Signal
-    import render.figures as charts
-    import inspect
 
-    source = inspect.getsource(charts.tracked_series)
-    assert '== "sent"' in source
-    assert '== "summary"' in source
-    assert Signal(key="k", day=dt.date(2026, 5, 1), headline="h",
-                  body="t", magnitude=1, persistence=1,
-                  actionability=1).decision == "candidate"
+    fresh = Signal(key="k", day=dt.date(2026, 5, 1), headline="h", body="t",
+                   magnitude=1, persistence=1, actionability=1)
+    assert fresh.decision == "candidate"
+
+    spoken = set()
+    for source in (ROOT / "balance" / "intelligence").glob("*.py"):
+        spoken |= set(re.findall(r'decision[^=\n]*=\s*\(?\s*"(\w+)"',
+                                 source.read_text()))
+    # "candidate" is the default in signals.py, which this glob also reads.
+    assert spoken == {"candidate", "sent", "summary", "discarded"}, spoken

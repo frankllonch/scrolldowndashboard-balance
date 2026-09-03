@@ -1,17 +1,21 @@
 # Shortcuts. Everything works the same typing the commands by hand.
 VENV := .venv/bin
 
-.PHONY: install test build serve run json csv clean
+.PHONY: install lint types test build serve run json csv clean browser
 
 install:            ## create the environment and install everything
 	uv venv --python 3.12 .venv
 	uv pip install --python $(VENV)/python -e ".[dev]"
 	$(VENV)/python -m playwright install chromium
+	npm install
 
 lint:               ## unused imports, undefined names, import order
 	$(VENV)/ruff check .
 
-test: lint          ## lint, then the whole suite
+types:              ## the payload contract, compiled
+	npm run typecheck
+
+test: lint types    ## lint, typecheck, then the whole suite
 	$(VENV)/python -m pytest
 
 build:              ## run the pipeline and write docs/

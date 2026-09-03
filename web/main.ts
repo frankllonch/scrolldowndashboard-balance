@@ -1,24 +1,48 @@
 /**
  * The page.
  *
- * Everything the reader sees is built here and under `web/`: Python hands
- * over numbers and this decides what they look like.
+ * Everything visible is already in the document when this runs: the sections
+ * were written at build time, so the page reads without script. What this adds
+ * is the plots, the two sliders, the profile switch and the travelling
+ * surface.
  */
 
-import { load, profile } from "./payload";
+import type { Selection } from "./charts/index";
+import { currentProfile, root } from "./dom";
+import { load, profile as profileOf } from "./payload";
+import { drawWithin } from "./plots";
+import { progressBar, watchActs, watchResize } from "./reader";
+import { bindSliders } from "./sliders";
+import { applyProfile, bindSwitches, requested, skipTheFork } from "./switch";
 
-async function main(): Promise<void> {
+async function start(): Promise<void> {
   const payload = await load();
-  const first = payload.meta.profiles[0];
-  if (!first) {
-    throw new Error("the document carries no profiles");
+  const user = currentProfile() || payload.meta.defaultProfile;
+  const profile = profileOf(payload, user);
+
+  /** What the sliders point at. One object, updated in place, read by
+   *  everything that builds a figure. */
+  const selection: Selection = {
+    user, week: profile.defaultWeek, day: profile.defaultDay,
+  };
+  root.dataset.profile = user;
+
+  await drawWithin(document, payload, selection);
+  bindSliders(payload, selection);
+  watchActs();
+  bindSwitches(payload, selection);
+
+  const asked = requested(payload);
+  if (asked) {
+    skipTheFork();
+    await applyProfile(payload, selection, asked, false);
   }
-  // Phase 3 hangs the figures off here; phase 4, the acts.
-  console.info("balance board", {
-    profiles: payload.meta.profiles,
-    days: payload.meta.days,
-    score: profile(payload, first).summary.score_mean,
-  });
+
+  progressBar();
+  window.addEventListener("scroll", progressBar, { passive: true });
+  watchResize();
 }
 
-void main();
+void start().catch((error: unknown) => {
+  console.error("the page could not start", error);
+});

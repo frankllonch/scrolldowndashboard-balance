@@ -10,7 +10,9 @@ and what it said out loud. One scrolling page, twelve acts, two profiles.
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -e ".[dev]"
-.venv/bin/python -m pytest        # 122 tests
+npm install
+.venv/bin/python -m pytest        # 169 tests
+npm run typecheck                 # the payload against web/types/
 .venv/bin/python build.py         # writes docs/
 .venv/bin/python -m http.server -d docs 8000
 ```
@@ -26,15 +28,18 @@ the page.
 | `balance/metrics.py` | the daily and weekly frames |
 | `balance/score.py` | the 0 to 100 index, five weighted components |
 | `balance/intelligence/` | alerts, the silence budget, nudges, reinforcements |
-| `render/acts/` | one module per act of the page |
-| `render/payload.py` | everything the browser gets, resolved at build time |
-| `copytext/strings/` | every user-visible string |
-| `site/` | `index.html`, `css/`, `app.js`, hand-written, no build step |
+| `emit/` | the frames as one typed JSON document · the whole boundary |
+| `web/types/` | what crosses it, declared |
+| `web/acts/` | one module per act, holding its markup and its words |
+| `web/charts/` | every figure, built in the browser |
+| `site/` | the shell and the stylesheet, hand-written |
 
-`tests/test_intelligence.py::test_notifications_contain_no_apps_or_domains` and
-`tests/test_payload.py::test_payload_notifications_name_no_app_or_domain` are the
-privacy contract. A notification says what changed, never what you were on, and
-the weekly digest goes further: no category either.
+Python computes; TypeScript draws. Nothing crossing between them is HTML, a
+figure or a word — `tests/test_emit.py` asserts it, and `npm run typecheck`
+compiles the emitted document against `web/types/`, so a field one side renames
+fails the build rather than a chart. And
+`test_intelligence.py::test_notifications_contain_no_apps_or_domains` is the
+privacy contract: a notification says what changed, never what you were on.
 
 ## Also here
 
