@@ -5,18 +5,20 @@ Python computes and hands over numbers; the TypeScript in `web/` decides what
 they look like. Nothing here formats a label, builds a figure or writes markup.
 
     scalars.py   pandas and core objects into JSON-safe values
-    profile.py   one profile's frames, laid out flat
-    __init__.py  the document, and the command that writes it
+    profile.py   one analysis, laid out flat
+    __init__.py  the document, and the finding it adds up to
 
 The shape is declared in `web/types/` and checked two ways: `npm run
-typecheck` compiles the emitted file against it, and `tests/test_emit.py`
+typecheck` compiles the emitted file against it, and `tests/test_payload.py`
 asserts the values sit inside the declared unions. The two sides cannot drift
 apart quietly.
 """
 
 from __future__ import annotations
 
-from .profile import DATA, compute, profile
+from analysis.pipeline import PROFILES, analyse
+
+from .profile import profile
 from .scalars import rounded
 
 
@@ -36,16 +38,15 @@ def finding(summaries: dict) -> dict:
 
 def payload() -> dict:
     """Everything the browser is given. See `web/types.ts` for the shape."""
-    bundles = {user: compute(user) for user in DATA}
-    profiles = {user: profile(user, bundle)
-                for user, bundle in bundles.items()}
-    default = next(iter(DATA))
+    runs = {user: analyse(user) for user in PROFILES}
+    profiles = {user: profile(run) for user, run in runs.items()}
+    default = next(iter(PROFILES))
     document = {
         "meta": {
-            "profiles": list(DATA),
-            "days": len(bundles[default]["df"]),
-            "events": sum(len(b["timeline"].events) for b in bundles.values()),
-            "weeks": [int(i) for i in bundles[default]["weekly"].index],
+            "profiles": list(PROFILES),
+            "days": len(runs[default].daily),
+            "events": sum(len(r.timeline.events) for r in runs.values()),
+            "weeks": [int(i) for i in runs[default].weekly.index],
             "defaultProfile": default,
         },
         "finding": finding({u: p["summary"] for u, p in profiles.items()}),
@@ -54,4 +55,4 @@ def payload() -> dict:
     return rounded(document)
 
 
-__all__ = ["DATA", "compute", "finding", "payload", "profile"]
+__all__ = ["finding", "payload", "profile"]

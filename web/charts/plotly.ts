@@ -35,16 +35,11 @@ export interface Trace {
   line?: Line;
   marker?: Marker;
   colorscale?: Array<[number, string]>;
-  showscale?: boolean;
   colorbar?: Record<string, unknown>;
-  zmin?: number;
-  zmax?: number;
   xgap?: number;
   ygap?: number;
   base?: Array<number>;
   width?: number | number[];
-  offsetgroup?: string;
-  cliponaxis?: boolean;
 }
 
 interface Font {
@@ -58,7 +53,6 @@ interface Line {
   width?: number;
   dash?: string;
   shape?: string;
-  smoothing?: number;
 }
 
 interface Marker {
@@ -68,9 +62,6 @@ interface Marker {
   opacity?: number | number[];
   line?: Line;
   colorscale?: Array<[number, string]>;
-  showscale?: boolean;
-  cmin?: number;
-  cmax?: number;
 }
 
 export interface Axis {
@@ -78,13 +69,10 @@ export interface Axis {
   range?: Array<number | string | null>;
   autorange?: boolean | "reversed";
   dtick?: number | string;
-  tick0?: number | string;
   tickformat?: string;
   tickvals?: Array<number | string>;
   ticktext?: string[];
   tickfont?: Font;
-  tickangle?: number;
-  showticklabels?: boolean;
   showgrid?: boolean;
   showline?: boolean;
   linecolor?: string;
@@ -95,17 +83,12 @@ export interface Axis {
   ticklen?: number;
   gridcolor?: string;
   zeroline?: boolean;
-  zerolinecolor?: string;
-  zerolinewidth?: number;
   type?: "linear" | "log" | "date" | "category";
   categoryorder?: string;
   categoryarray?: string[];
-  fixedrange?: boolean;
   side?: string;
-  overlaying?: string;
   domain?: [number, number];
   anchor?: string;
-  automargin?: boolean;
 }
 
 interface Shape {
@@ -118,7 +101,6 @@ interface Shape {
   yref?: string;
   line?: Line;
   fillcolor?: string;
-  layer?: string;
 }
 
 export interface Annotation {
@@ -133,11 +115,8 @@ export interface Annotation {
   xshift?: number;
   yshift?: number;
   font?: Font;
-  align?: string;
   bgcolor?: string;
   bordercolor?: string;
-  borderpad?: number;
-  textangle?: number;
 }
 
 export interface Layout {
@@ -150,7 +129,6 @@ export interface Layout {
   colorway?: string[];
   xaxis?: Axis;
   yaxis?: Axis;
-  yaxis2?: Axis;
   legend?: {
     bgcolor?: string; font?: Font; orientation?: string; yanchor?: string;
     y?: number; xanchor?: string; x?: number; traceorder?: string;
@@ -163,12 +141,9 @@ export interface Layout {
   hoverlabel?: { bgcolor?: string; bordercolor?: string; font?: Font };
   hovermode?: string | false;
   bargap?: number;
-  bargroupgap?: number;
   barmode?: "stack" | "group" | "overlay" | "relative";
   shapes?: Shape[];
   annotations?: Annotation[];
-  uirevision?: string | number;
-  separators?: string;
 }
 
 export interface Figure {
@@ -179,8 +154,6 @@ export interface Figure {
 export interface Config {
   displayModeBar?: boolean;
   responsive?: boolean;
-  staticPlot?: boolean;
-  scrollZoom?: boolean;
   doubleClick?: boolean | string;
   showTips?: boolean;
   locale?: string;

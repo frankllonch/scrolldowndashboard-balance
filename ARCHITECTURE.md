@@ -25,13 +25,14 @@ analysis/                      ── computes. Draws nothing. Knows no page. �
     positives.py  179             reinforcements: what to say when nothing is wrong
     nudge.py       78             the on-device night nudge, replayed
     replay.py      96             the state at the close of each day
-  run.py          297   adapter · the same engine on the command line
+  pipeline.py     100   every layer in order over one log · wired once
+  run.py          242   adapter · the same engine on the command line
   │
   ▼
 payload/                       ── packages it. Formats nothing. ──
-  profile.py      306   one profile's frames, laid out flat
+  profile.py      254   one analysis, laid out flat
   scalars.py       92   pandas and core objects into JSON-safe values
-  __init__.py      57   the document, and the finding it adds up to
+  __init__.py      58   the document, and the finding it adds up to
   │
   ▼
 docs/data.json    163 KB  ═══ THE BOUNDARY · no HTML, no figures, no copy ═══
@@ -52,7 +53,7 @@ web/                           ── draws it. Owns every word. ──
     index.ts      151     the summaries, and the document itself
     contract.ts    34     compiles the emitted file against all of the above
   charts/               ═══ every figure ═══
-    plotly.ts     212     the slice of Plotly this project uses, typed by hand
+    plotly.ts     185     the slice of Plotly this project uses, typed by hand
     frame.ts       73     the layout every figure starts from
     series.ts     186     one line or one bar per day
     score.ts      207     the index: the curve, the breakdown, the weekly panels
@@ -113,6 +114,7 @@ docs/                          ── the built site · GitHub Pages serves this
 | What a slider does | `web/interaction/sliders.ts` |
 | Spacing, type, colour tokens | `web/styles/` |
 | A metric, a threshold, a rule | `analysis/` |
+| The order the layers run in | `analysis/pipeline.py` |
 | What crosses the boundary | `web/types/`, then `payload/profile.py` |
 
 ## Invariants

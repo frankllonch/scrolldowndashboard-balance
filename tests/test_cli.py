@@ -44,7 +44,7 @@ def test_the_json_is_serialisable_and_free_of_numpy_types(result):
     """`json.dumps` without `default=` only passes if everything is native."""
     raw = json.dumps(render_json(result), ensure_ascii=False)
     back = json.loads(raw)
-    assert back["user"] == result["user"]
+    assert back["user"] == result.user
     assert isinstance(back["averages"]["screen_min"], float)
 
 
@@ -85,7 +85,7 @@ def test_the_cli_and_the_dashboard_compute_the_same_thing():
     from analysis.score import add_score
 
     direct = add_score(daily_frame(load(ROOT / "data/events_user_b.json", "B")))
-    via_cli = analyse("B", ROOT)["daily"]
+    via_cli = analyse("B", ROOT).daily
     assert direct["score"].tolist() == via_cli["score"].tolist()
     assert ([s.key for s in evaluate_alerts(direct)]
-            == [s.key for s in analyse("B", ROOT)["alerts"]])
+            == [s.key for s in analyse("B", ROOT).alerts])

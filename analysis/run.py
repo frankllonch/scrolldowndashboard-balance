@@ -20,63 +20,8 @@ from dataclasses import asdict, is_dataclass
 from datetime import date
 from pathlib import Path
 
-from .events import load
-from .intelligence import (
-    emissions,
-    evaluate_alerts,
-    evaluate_positives,
-    month_replay,
-    nudge_summary,
-    replay_nudge,
-    weekly_digest,
-)
-from .metrics import blocks_frame, daily_frame, totals, weekly_frame
-from .score import add_score
-
-#: Input files. In production
-#: this would come from the account, not from a constant.
-PROFILES = {
-    "A": {"path": "data/events_user_a.json"},
-    "B": {"path": "data/events_user_b.json"},
-}
-
-
-# ---------------------------------------------------------------------------
-# Compute
-# ---------------------------------------------------------------------------
-
-def analyse(user: str, root: Path) -> dict:
-    """Everything the system derives from one event file.
-
-    It is a pure function of the log: same file, same result, no external state
-    and no dependency on the time of execution.
-    """
-    cfg = PROFILES[user]
-    tl = load(root / cfg["path"], user)
-    df = add_score(daily_frame(tl))
-    days = set(df["day"])
-
-    nudges = replay_nudge(tl, df)
-    alerts = evaluate_alerts(df)
-    positives = evaluate_positives(df)
-    replay = month_replay(df, nudges, positives)
-
-    return {
-        "user": user,
-        "timeline": tl,
-        "daily": df,
-        "weekly": weekly_frame(df),
-        "apps": totals(tl, df, "app"),
-        "sites": totals(tl, df, "site"),
-        "blocks": blocks_frame(tl, days),
-        "alerts": alerts,
-        "positives": positives,
-        "nudges": nudges,
-        "nudge_summary": nudge_summary(nudges),
-        "digest": weekly_digest(df, alerts),
-        "emissions": emissions(replay),
-    }
-
+from .intelligence import weekly_digest
+from .pipeline import PROFILES, Analysis, analyse
 
 # ---------------------------------------------------------------------------
 # Text output
@@ -93,13 +38,13 @@ def _hm(minutes: float) -> str:
     return f"{h}h{m:02d}" if h else f"{m}min"
 
 
-def render_text(r: dict) -> str:
-    df, w = r["daily"], r["weekly"]
-    tl = r["timeline"]
+def render_text(r: Analysis) -> str:
+    df, w = r.daily, r.weekly
+    tl = r.timeline
     out: list[str] = []
     add = out.append
 
-    add(_rule(f"PROFILE {r['user']}"))
+    add(_rule(f"PROFILE {r.user}"))
     add(f"  {len(tl.events):,} events · {len(df)} complete days "
         f"· {len(tl.intervals)} screen stretches")
     if tl.anomalies:
@@ -140,9 +85,9 @@ def render_text(r: dict) -> str:
     add("")
 
     add(_rule("ALERTS"))
-    if not r["alerts"]:
+    if not r.alerts:
         add("  no rule fired in the period")
-    for s in r["alerts"]:
+    for s in r.alerts:
         add(f"  [{s.decision:<10}] {s.day}  {s.key}  priority {s.priority:.2f}")
         add(f"               {s.headline}")
         if s.decision == "sent":
@@ -153,15 +98,15 @@ def render_text(r: dict) -> str:
     add("")
 
     add(_rule("REINFORCEMENTS"))
-    if not r["positives"]:
+    if not r.positives:
         add("  none in the period")
-    for s in r["positives"]:
+    for s in r.positives:
         add(f"  [{s.decision:<10}] {s.day}  {s.key}")
         add(f"               \"{s.body}\"")
     add("")
 
     add(_rule("NIGHT NUDGE (replayed over history)"))
-    ns = r["nudge_summary"]
+    ns = r.nudge_summary
     add(f"  nights evaluated            {ns['nights']:>12}")
     add(f"  nights with a nudge         "
         f"{ns['nights with a nudge']:>7} ({ns['appearance rate']*100:.0f} %)")
@@ -174,12 +119,12 @@ def render_text(r: dict) -> str:
     add("")
 
     add(_rule("WEEKLY SUMMARY"))
-    for k, v in r["digest"].items():
+    for k, v in weekly_digest(r.daily, r.alerts).items():
         add(f"  {k:<34} {v:>24}")
     add("")
 
     add(_rule("EMISSIONS IN THE PERIOD"))
-    em = r["emissions"]
+    em = r.emissions
     if not em:
         add("  the phone emitted nothing")
     for e in em:
@@ -208,12 +153,12 @@ def _plain(obj):
     return obj
 
 
-def render_json(r: dict) -> dict:
-    df, w = r["daily"], r["weekly"]
+def render_json(r: Analysis) -> dict:
+    df, w = r.daily, r.weekly
     return _plain({
-        "user": r["user"],
+        "user": r.user,
         "days": len(df),
-        "anomalies": dict(r["timeline"].anomalies),
+        "anomalies": dict(r.timeline.anomalies),
         "averages": {
             "screen_min": df.screen_min.mean(),
             "offline_wake_h": df.offline_wake_h.mean(),
@@ -241,17 +186,17 @@ def render_json(r: dict) -> dict:
              "decision": s.decision, "priority": s.priority,
              "tone": s.tone, "headline": s.headline, "text": s.body,
              "reason": s.reason, "evidence": s.evidence}
-            for s in r["alerts"]
+            for s in r.alerts
         ],
         "positives": [
             {"key": s.key, "day": s.day, "decision": s.decision,
              "headline": s.headline, "text": s.body,
              "evidence": s.evidence}
-            for s in r["positives"]
+            for s in r.positives
         ],
-        "nudge": r["nudge_summary"],
-        "weekly_digest": r["digest"],
-        "emissions": r["emissions"],
+        "nudge": r.nudge_summary,
+        "weekly_digest": weekly_digest(r.daily, r.alerts),
+        "emissions": r.emissions,
     })
 
 
@@ -281,9 +226,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.csv:
             args.csv.mkdir(parents=True, exist_ok=True)
             # columns holding dictionaries do not go into a flat CSV
-            r["daily"].drop(columns=["_cat_s", "_app_s", "_site_s"]).to_csv(
+            r.daily.drop(columns=["_cat_s", "_app_s", "_site_s"]).to_csv(
                 args.csv / f"daily_{u}.csv", index=False)
-            r["weekly"].to_csv(args.csv / f"weekly_{u}.csv")
+            r.weekly.to_csv(args.csv / f"weekly_{u}.csv")
 
     if args.format == "json":
         print(json.dumps([render_json(r) for r in results],

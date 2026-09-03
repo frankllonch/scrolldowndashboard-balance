@@ -9,30 +9,11 @@ from __future__ import annotations
 
 import pandas as pd
 
-from analysis.events import load
-from analysis.intelligence import (
-    ALERT_BUDGET,
-    emissions,
-    evaluate_alerts,
-    evaluate_positives,
-    month_replay,
-    nudge_summary,
-    replay_nudge,
-)
-from analysis.metrics import (
-    blocks_frame,
-    category_daily,
-    daily_frame,
-    hourly_heat,
-    totals,
-    weekly_frame,
-)
-from analysis.score import COMPONENTS, add_score
+from analysis.intelligence import ALERT_BUDGET
+from analysis.pipeline import Analysis
+from analysis.score import COMPONENTS
 
 from .scalars import nudge, plain, rows, signal, snake
-
-#: Where each profile's log lives.
-DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
 
 #: Columns of the daily frame that cross the boundary. The frame carries 67;
 #: these are the ones the page reads. Anything else is an intermediate.
@@ -76,40 +57,7 @@ def week_value(df: pd.DataFrame, col: str, week: int) -> float:
 # One profile
 # ---------------------------------------------------------------------------
 
-def compute(user: str) -> dict:
-    """Run the core over one profile. Frames in, frames out; no formatting."""
-    timeline = load(DATA[user], user)
-    df = add_score(daily_frame(timeline))
-    # Days truncated by the file edge stay out of EVERY view, not only the
-    # daily frame, or the totals stop matching.
-    days = set(df["day"])
-
-    nudges = replay_nudge(timeline, df)
-    positives = evaluate_positives(df)
-    alerts = evaluate_alerts(df)
-    replay = month_replay(df, nudges, positives)
-
-    weekly = weekly_frame(df)
-    for col, *_ in COMPONENTS:
-        weekly[f"score_{col}"] = df.groupby("week")[f"score_{col}"].mean()
-
-    blocks = blocks_frame(timeline, days)
-    if not blocks.empty:
-        week_of = dict(zip(df["day"], df["week"]))
-        blocks = blocks.assign(week=[week_of[d] for d in blocks["day"]])
-
-    return {
-        "timeline": timeline, "df": df, "weekly": weekly, "blocks": blocks,
-        "apps": totals(timeline, df, "app"),
-        "sites": totals(timeline, df, "site"),
-        "cats": category_daily(df), "heat": hourly_heat(timeline, days),
-        "alerts": alerts, "positives": positives, "nudges": nudges,
-        "nudge_summary": nudge_summary(nudges), "replay": replay,
-        "emissions": emissions(replay),
-    }
-
-
-def filter_outage(bundle: dict) -> dict:
+def filter_outage(run: Analysis) -> dict:
     """The apps that appear in the usage frame despite being blocked, and the
     hole in the filter that let them in.
 
@@ -119,7 +67,7 @@ def filter_outage(bundle: dict) -> dict:
     is at hour resolution, so the gap is measured from the top of the hour the
     last block landed in and slightly overstates the true silence.
     """
-    apps, blocks = bundle["apps"], bundle["blocks"]
+    apps, blocks = run.apps, run.blocks
     if blocks.empty:
         return {}
     leaked = set(apps["key"]) & set(blocks.loc[blocks["block_type"] == "APP",
@@ -138,17 +86,17 @@ def filter_outage(bundle: dict) -> dict:
     }
 
 
-def summary(user: str, bundle: dict) -> dict:
+def summary(run: Analysis) -> dict:
     """The headline numbers, as numbers.
 
     Hours stay hours and minutes stay minutes: the clock face, the "2h 02m"
     and the "no use" for a metric user A genuinely does not have are all
     decisions the frontend makes, because they are all wording.
     """
-    d, w = bundle["df"], bundle["weekly"]
+    d, w = run.daily, run.weekly
     first = w.index[0]
     last = w.index[-2] if len(w.index) > 1 else w.index[-1]
-    timeline = bundle["timeline"]
+    timeline = run.timeline
     screen_h = sum(i.seconds for i in timeline.intervals) / 3600
     attributed_h = sum(u.seconds for u in timeline.usages) / 3600
     end_first, end_last = (week_value(d, "night_end_h", first),
@@ -158,7 +106,7 @@ def summary(user: str, bundle: dict) -> dict:
     night_first = week_value(d, "night_min", first)
 
     out = {
-        "user": user,
+        "user": run.user,
         "days": len(d),
         "events": len(timeline.events),
         "intervals": len(timeline.intervals),
@@ -196,53 +144,53 @@ def summary(user: str, bundle: dict) -> dict:
         "sleep_first_week_h": (24 + wake_first) - end_first,
         "sleep_last_week_h": (24 + wake_last) - end_last,
 
-        "alerts_sent": sum(1 for s in bundle["alerts"] if s.decision == "sent"),
-        "alerts_held": sum(1 for s in bundle["alerts"]
+        "alerts_sent": sum(1 for s in run.alerts if s.decision == "sent"),
+        "alerts_held": sum(1 for s in run.alerts
                            if s.decision == "summary"),
         "alert_budget": ALERT_BUDGET,
-        "positives_sent": sum(1 for s in bundle["positives"]
+        "positives_sent": sum(1 for s in run.positives
                               if s.decision == "sent"),
-        "nudge_nights": bundle["nudge_summary"]["nights with a nudge"],
-        "nights": bundle["nudge_summary"]["nights"],
-        "emissions_total": len(bundle["emissions"]),
+        "nudge_nights": run.nudge_summary["nights with a nudge"],
+        "nights": run.nudge_summary["nights"],
+        "emissions_total": len(run.emissions),
     }
-    outage = filter_outage(bundle)
+    outage = filter_outage(run)
     if outage:
         out["outage"] = outage
     return {k: plain(v) for k, v in out.items()}
 
 
-def profile(user: str, bundle: dict) -> dict:
-    df, blocks = bundle["df"], bundle["blocks"]
-    default_day = next((r["day"] for r in bundle["replay"] if r["alert"]),
-                       bundle["replay"][-1]["day"])
-    weeks = list(bundle["weekly"].index)
+def profile(run: Analysis) -> dict:
+    df, blocks = run.daily, run.blocks
+    default_day = next((r["day"] for r in run.replay if r["alert"]),
+                       run.replay[-1]["day"])
+    weeks = list(run.weekly.index)
     return {
-        "summary": summary(user, bundle),
+        "summary": summary(run),
         "daily": rows(df.reset_index(drop=True), DAILY_COLUMNS),
-        "weekly": rows(bundle["weekly"], WEEKLY_COLUMNS, index_as="week"),
-        "apps": rows(bundle["apps"].reset_index(drop=True),
+        "weekly": rows(run.weekly, WEEKLY_COLUMNS, index_as="week"),
+        "apps": rows(run.apps.reset_index(drop=True),
                      ("key", "label", "category", "minutes", "opens",
                       "min_per_open")),
-        "sites": rows(bundle["sites"].reset_index(drop=True),
+        "sites": rows(run.sites.reset_index(drop=True),
                       ("key", "label", "category", "minutes", "opens",
                        "min_per_open")),
-        "categoryDaily": rows(bundle["cats"].reset_index(drop=True),
+        "categoryDaily": rows(run.categories.reset_index(drop=True),
                               ("day", "category", "minutes")),
-        "hourHeat": rows(bundle["heat"].reset_index(drop=True),
+        "hourHeat": rows(run.heat.reset_index(drop=True),
                          ("dow", "hour", "minutes")),
         "blocks": block_counts(blocks),
-        "alerts": [signal(s) for s in bundle["alerts"]],
-        "positives": [signal(s) for s in bundle["positives"]],
-        "nudges": [nudge(n) for n in bundle["nudges"]],
+        "alerts": [signal(s) for s in run.alerts],
+        "positives": [signal(s) for s in run.positives],
+        "nudges": [nudge(n) for n in run.nudges],
         "nudgeSummary": {snake(k): plain(v)
-                         for k, v in bundle["nudge_summary"].items()},
-        "replay": [replay_day(r) for r in bundle["replay"]],
+                         for k, v in run.nudge_summary.items()},
+        "replay": [replay_day(r) for r in run.replay],
         "emissions": [{"day": plain(e["day"]), "destination": e["destination"],
                        "type": e["type"], "detail": e["detail"]}
-                      for e in bundle["emissions"]],
-        "anomalies": {k: int(v) for k, v in bundle["timeline"].anomalies.items()},
-        "eventCounts": event_counts(bundle["timeline"]),
+                      for e in run.emissions],
+        "anomalies": {k: int(v) for k, v in run.timeline.anomalies.items()},
+        "eventCounts": event_counts(run.timeline),
         "defaultDay": plain(default_day),
         "defaultWeek": int(weeks[-2] if len(weeks) > 1 else weeks[-1]),
     }

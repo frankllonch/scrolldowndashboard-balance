@@ -135,3 +135,11 @@ Swapping the chart library during the rewrite would have meant redesigning
 twenty-six figures with nothing to check the result against. Keeping it made
 the port mechanical and verifiable: every figure was built on both sides and
 compared trace by trace before the Python was deleted.
+
+## The pipeline is wired once
+
+`analyse()` in `pipeline.py` runs every layer over one log and returns one
+frozen dataclass. The command line and `payload/` both call it. They each used
+to wire the layers themselves, in slightly different orders, with slightly
+different joins — two answers to "what does the system derive from a log", free
+to drift apart.
