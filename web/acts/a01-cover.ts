@@ -26,10 +26,10 @@ const copy = {
     + "The goal is to turn that data into meaning and answer one question: "
     + "<b>so what?</b>",
 
-  intro: (drop: number) =>
-    `Two adults, thirty days each. A holds steady all month; B loses `
-    + `${drop.toFixed(0)} points off the same index — not from using the phone `
-    + `more, but from using it later and later. Everything below is why.`,
+  intro:
+    "Two adults, thirty days each. A holds steady; B loses control as the "
+    + "month goes on — not from using the phone more, but from using it later "
+    + "and later. Everything below is why.",
 
   profiles: "profiles",
   events: "events",
@@ -45,7 +45,7 @@ export const act: Act = {
   title: copy.title,
   next: copy.next,
   build({ payload }: Context): string {
-    const { meta, finding } = payload;
+    const { meta } = payload;
     return lede(copy.standfirst)
       + note(copy.purpose)
       + grid([
@@ -53,6 +53,6 @@ export const act: Act = {
         stat(thousands(meta.events), copy.events),
         stat(String(meta.days), copy.days),
       ], 3)
-      + lede(copy.intro(finding.score_drop));
+      + lede(copy.intro);
   },
 };

@@ -3,7 +3,7 @@
 A device event log, read end to end: what the phone recorded, what it computed,
 and what it said out loud. One scrolling page, twelve acts, two profiles.
 
-**Live:** <https://frankllonch.github.io/scrolldowndashboard-analysis/>
+**Live:** <https://frankllonch.github.io/scrolldowndashboard-balance/>
 
 ## Run it
 
