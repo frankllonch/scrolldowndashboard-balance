@@ -4,6 +4,13 @@ The budget is on prose, meaning words that were written. A short table cell
 is a value the pipeline produced and no amount of editing shortens it, so
 those are counted apart. A cell holding a sentence is prose: a table is not a
 loophole.
+
+The budget started at 1200, when the brief was to cut. It moved when the
+brief did: every chart now carries a line explaining it, and the page opens
+with a summary. The number is here to catch drift, not to hold a page that
+was deliberately made longer — raise it on purpose or not at all. The test
+below it, that no act may hold a third of the words, is the one guarding
+shape.
 """
 
 from __future__ import annotations
@@ -17,7 +24,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = ROOT / "docs" / "index.html"
 
-WORD_BUDGET = 1200
+WORD_BUDGET = 2800
 DATA_CELL_WORDS = 6
 
 

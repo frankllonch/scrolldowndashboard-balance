@@ -20,6 +20,11 @@
 
   --user-a: #199e70;
   --user-b: #d95926;
+  /* The same two identities, stepped darker. The chart hues are chosen to
+     read as lines on every ground; as chrome on the pale card they fall under
+     3:1, so anything that outlines or underlines borrows these instead. */
+  --user-a-deep: #0f7150;
+  --user-b-deep: #b4441a;
 
   /* The card has its own set of tokens because it is its own surface: the
      figures are drawn against it, not against the page. Acts 01 to 04

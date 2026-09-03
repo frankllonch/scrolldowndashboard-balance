@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from html import escape
 
+from copytext import STRINGS, MissingCopy, t
+
 
 def _attrs(**kw) -> str:
     out = ""
@@ -69,10 +71,43 @@ def pairs(items: list[list[str]]) -> str:
 
 
 def chart(key: str, scope: str = "profile", size: str = "") -> str:
-    """A mount point. The figure itself arrives from payload.json."""
+    """A mount point and its one-line explanation.
+
+    The figure itself arrives from payload.json; the line under it is resolved
+    here so no chart can ship without one.
+    """
     css = " ".join(("chart", size)).strip()
-    return (f'<figure class="{css}"'
-            f"{_attrs(data_figure=key, data_scope=scope)}></figure>")
+    return chart_block(
+        f'<figure class="{css}"{_attrs(data_figure=key, data_scope=scope)}>'
+        "</figure>", key)
+
+
+def chart_block(mount: str, key: str) -> str:
+    """A plot and the line under it.
+
+    The line lives outside the mount on purpose: Plotly replaces everything
+    inside the element it draws into, so anything kept in there is destroyed
+    on the first redraw.
+    """
+    return (f'<div class="chart-block">{mount}'
+            f'<p class="chart-explain">{explain(key)}</p></div>')
+
+
+def explain(key: str) -> str:
+    """The line under a chart, found by walking the figure key from the most
+    specific name to the least: `week_days.night_min.3` falls back through
+    `week_days.night_min` to `week_days`.
+
+    A figure with no line anywhere up that chain is a build error, not a
+    silently bare chart.
+    """
+    parts = key.split(".")
+    while parts:
+        candidate = "chart.explain." + ".".join(parts)
+        if candidate in STRINGS:
+            return t(candidate)
+        parts.pop()
+    raise MissingCopy(f"no chart.explain.* for figure {key!r}")
 
 
 def details(summary: str, body: str) -> str:

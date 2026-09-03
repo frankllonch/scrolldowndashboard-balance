@@ -29,10 +29,16 @@ def build(ctx) -> str:
              "delta": t("time.kpi.distract.delta")},
         ])
         + html.grid(html.chart("top_bars.apps"), html.chart("top_bars.sites"))
-        + f'<p class="caption">{t("time.colour.caption")}</p>'
         + html.chart("category_area")
         + reading(ctx, apps, sites, top3)
+        + html.note(t("time.distract.explain"))
     )
+
+
+def top3_names(apps) -> str:
+    """The three apps the reader is about to see at the top of the chart."""
+    names = list(apps.label.head(3))
+    return ", ".join(names[:-1]) + " and " + names[-1]
 
 
 def reading(ctx, apps, sites, top3: float) -> str:
@@ -43,6 +49,7 @@ def reading(ctx, apps, sites, top3: float) -> str:
         news = (sites[sites.category == "NEWS"].minutes.sum()
                 / sites.minutes.sum() * 100)
         return (html.note(t("time.note.a", apps=len(apps), top3=top3, news=news,
+                            top3_names=top3_names(apps),
                             distract=df.distract_share.mean() * 100,
                             first=week("distract_share", 1) * 100,
                             last=week("distract_share", 4) * 100), "good")
@@ -50,9 +57,11 @@ def reading(ctx, apps, sites, top3: float) -> str:
                 + t("time.caption.chrome", opens=chrome.opens.iloc[0],
                     minutes=chrome.minutes.iloc[0]) + "</p>")
     reference = ctx.bundles["A"]
+    summary = ctx.profile["summary"]
     names, through, attempts = most_blocked(ctx, apps)
     return (html.note(t("time.note.b", apps=len(apps),
                         apps_a=len(reference["apps"]), top3=top3,
+                        top3_names=top3_names(apps),
                         messaging=apps[apps.category == "MESSAGING"].minutes.sum(),
                         messaging_apps=len(apps[apps.category == "MESSAGING"]),
                         distract=df.distract_share.mean() * 100,
@@ -61,7 +70,12 @@ def reading(ctx, apps, sites, top3: float) -> str:
             + '<p class="caption">'
             + t("time.caption.blocked_absent", names=names, through=through,
                 attempts=attempts)
-            + "</p>")
+            + "</p>"
+            + html.note(t("time.leak.explain",
+                          days=summary["leaked_days"],
+                          median=summary["leaked_median"],
+                          outage=summary["outage_day"],
+                          hours=summary["outage_hours"])))
 
 
 def most_blocked(ctx, apps) -> tuple[str, str, str]:

@@ -1,44 +1,36 @@
-# Narrative rewrite — pending work
+# Narrative rewrite — done, and what is left
 
-Steps 1–3 are done (commit `ef420fa` restored the source of truth; the "who is user B"
-investigation is finished). What follows is steps 4–10, saved to pick up later.
+Steps 1–12 are complete. This file now records what was decided, so the reasoning
+survives the commits.
 
-## Open questions before writing
+## Settled
 
-1. **Person B's framing.** Settled. B is an adult; the sketch is rewritten and the
-   guardian channel is gone. See the "Single recipient" commit.
-2. **Code navigation.** Which part was hard to navigate ("costa navegar codi")? Needed to
-   know what to restructure.
+- **Person B is an adult.** r(usage, blocks) = 0.954, and every "leak" app was blocked
+  on all 30 days, a median of 14 times a day. They opened only inside one ~22-hour
+  window on 18 May when the filter stopped firing. Both profile sketches rewritten.
+- **No guardian.** The product notifies the person holding the phone and nobody else.
+  Alerts land on the user's own screen; the weekly digest stays on the device.
+- **Every chart carries a line** explaining what it shows, resolved in `html.chart()`
+  from the figure key, so a new chart cannot ship without one.
+- **The wellbeing score is explained where the reader meets it**, including the two
+  questions the names invite: fragmentation counts unlocks, not apps; distraction is
+  a share of time by category, not a count of apps.
+- **Weeks read Monday to Sunday.** A week is still the Nth block of seven days — the
+  log opens on a Friday — but the bars are sorted by weekday.
+- **Each act hands off to the next** (`act.NN.next`), appended to the act body so the
+  bridge survives a profile switch.
+- **The pill wears each person's colour**, with a darker step of the same hue on the
+  pale card where the chart hues fall under 3:1.
 
-## 4. Cover and product intro
-New opening that says what Balance is and what the page is for, in the user's own words.
+## Still open
 
-## 5. Summary at the top
-"summary al inici" — the headline numbers and the conclusion before the scroll starts,
-so the reader knows what they are looking at ("no se que estic veient").
-
-## 6. Person A / Person B lines
-Rewrite both, per the supplied text, once question 1 is settled.
-
-## 7. Wellbeing score
-Explain what it is and how it is computed. Answer, in the copy: "a more concentrated use in
-fewer apps means what?" and "how do we measure distraction? more apps more distracted?".
-Also the act about the index falling 60 → 40.
-
-## 8. Per-chart explanations
-A short plain explanation under every chart (~26 of them). Kill the phrases that mean
-nothing to a reader: "the week has no edges", "best stretch" vs "longest break",
-"what the phone said".
-
-## 9. A/B switch
-More noticeable, with a distinct colour per user, and the labels legible.
-
-## 10. Structure and bugs
-- Weekday ordering: the week starts on Friday, it should start on Monday.
-- Scene-to-scene continuity: each section should hand the reader to the next.
-- Rebuild act 09; expand act 12.
-- "why is Netflix and YouTube let through?" — answer it in the copy (18 May, filter outage).
+1. **Which part of the code is hard to navigate?** ("costa navegar codi") Needed before
+   any restructuring — nothing has been done here.
+2. **Reading time.** The page is now ~2,760 words, about 14 minutes. The prose budget
+   in `tests/test_prose.py` is 2,800 and is nearly spent. Adding more explanation means
+   either cutting elsewhere or deciding the page is a report, not a scroll.
 
 ## Constraint
-`docs/` is build output. `build.py` regenerates it from `site/` and `render/`, so hand edits
-to `docs/style.css`, `docs/app.js` or `docs/index.html` are lost. Edit `site/` instead.
+
+`docs/` is build output. `build.py` regenerates it from `site/` and `render/`, so hand
+edits to `docs/style.css`, `docs/app.js` or `docs/index.html` are lost. Edit `site/`.

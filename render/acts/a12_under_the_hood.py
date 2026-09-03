@@ -89,9 +89,19 @@ def anomalies(ctx) -> str:
             + f'<p class="caption">{t("hood.anomalies.footnote")}</p>')
 
 
+def pipeline() -> str:
+    """The five layers, in the order a number passes through them."""
+    return (html.table([t("table.col.layer"), t("table.col.does")],
+                       [[t(f"layer.{n}"), t(f"layer.{n}.does")]
+                        for n in range(5)])
+            + html.note(t("hood.pipeline.note")))
+
+
 def build(ctx) -> str:
     return (
-        html.details(t("hood.stream.title"), stream(ctx))
+        html.lede(t("hood.lede"))
+        + html.details(t("hood.pipeline.title"), pipeline())
+        + html.details(t("hood.stream.title"), stream(ctx))
         + html.details(t("hood.fields.title"), fields())
         + html.details(t("hood.anomalies.title"), anomalies(ctx))
         + html.details(t("hood.derivations.title"), derivations())

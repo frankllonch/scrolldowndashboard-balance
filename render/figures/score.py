@@ -91,8 +91,13 @@ def week_evolution(w: pd.DataFrame, col: str, label: str, unit: str,
 
 def week_days(df: pd.DataFrame, week: int, col: str, label: str, unit: str,
               user: str, h: int = 300) -> go.Figure:
-    """The days of the selected week against the mean of previous weeks."""
-    cur = df[df["week"] == week]
+    """The days of the selected week against the mean of previous weeks.
+
+    A week is the Nth block of seven days, so week 1 opens on whatever weekday
+    the log does. The bars are still read Monday to Sunday: each block holds
+    one of every weekday, so sorting on it loses nothing.
+    """
+    cur = df[df["week"] == week].sort_values("dow")
     prev = df[df["week"] < week]
     ref = prev[col].mean() if len(prev) else None
 
@@ -113,6 +118,7 @@ def week_days(df: pd.DataFrame, week: int, col: str, label: str, unit: str,
                            showarrow=False,
                            font=dict(family=MONO, size=11, color=theme.MUTED))
         fig.update_yaxes(range=[0, 1], showticklabels=False)
+    fig.update_xaxes(categoryorder="array", categoryarray=DOW)
     fig.update_layout(title=label, yaxis_title=unit, bargap=.3, height=h,
                       showlegend=False, margin=dict(t=52, r=20, b=40, l=54))
     return fig

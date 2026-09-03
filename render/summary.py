@@ -2,10 +2,39 @@
 
 from __future__ import annotations
 
+import pandas as pd
+
 from balance.intelligence import ALERT_BUDGET
 
-from .fmt import clock, hm
+from .fmt import clock, date, hm
 from .fmt import week_value as wk
+
+
+def filter_outage(bundle: dict) -> dict:
+    """The apps that appear in the usage frame despite being blocked, and the
+    hole in the filter that let them in.
+
+    An app that is both used and blocked is the anomaly: the filter had an
+    opinion about it every day, and for one stretch the opinion did not fire.
+    That stretch is the longest gap between two of its blocks. The block frame
+    is at hour resolution, so the gap is measured from the top of the hour the
+    last block landed in and slightly overstates the true silence.
+    """
+    apps, blocks = bundle["apps"], bundle["blocks"]
+    leaked = set(apps["key"]) & set(blocks.loc[blocks["block_type"] == "APP",
+                                               "target"])
+    if not leaked:
+        return {}
+    theirs = blocks[blocks["target"].isin(leaked)]
+    stamps = sorted({(row.day, row.hour) for row in theirs.itertuples()})
+    hours = [pd.Timestamp(d) + pd.Timedelta(hours=h) for d, h in stamps]
+    longest, start = max((b - a, a) for a, b in zip(hours, hours[1:]))
+    return {
+        "leaked_days": int(theirs.groupby("day").ngroups),
+        "leaked_median": float(theirs.groupby("day").size().median()),
+        "outage_day": date(start.date()),
+        "outage_hours": longest.total_seconds() / 3600,
+    }
 
 
 def summary(user: str, bundle: dict) -> dict:
@@ -61,6 +90,7 @@ def summary(user: str, bundle: dict) -> dict:
         "nudge_nights": bundle["nudge_summary"]["nights with a nudge"],
         "nights": bundle["nudge_summary"]["nights"],
         "emissions_total": len(bundle["emissions"]),
+        **filter_outage(bundle),
     }
 
 

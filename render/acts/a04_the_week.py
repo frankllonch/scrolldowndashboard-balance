@@ -26,9 +26,20 @@ def slider(weeks: list[dict], current: dict) -> str:
 def days_chart(column: str, week: int) -> str:
     """The only figure whose data really changes with the week, so it ships as
     one variant per week and the mount re-points."""
-    return (f'<figure class="chart" data-figure="week_days.{column}.{week}" '
-            f'data-figure-week="week_days.{column}" data-scope="profile">'
-            "</figure>")
+    key = f"week_days.{column}"
+    return html.chart_block(
+        f'<figure class="chart" data-figure="{key}.{week}" '
+        f'data-figure-week="{key}" data-scope="profile"></figure>', key)
+
+
+def reading(ctx) -> str:
+    """What the five weeks add up to, for this profile."""
+    df = ctx.df
+    week = lambda n: df[df["week"] == n]["blocks"].mean()  # noqa: E731
+    if ctx.user == "A":
+        return html.note(t("week.reading.A",
+                           blocks=int(df["blocks"].sum())), "good")
+    return html.note(t("week.reading.B", first=week(1), last=week(4)), "warn")
 
 
 def build(ctx) -> str:
@@ -36,7 +47,8 @@ def build(ctx) -> str:
     current = next(w for w in profile["weeks"]
                    if w["week"] == profile["default_week"])
     return (
-        slider(profile["weeks"], current)
+        html.lede(t("week.lede"))
+        + slider(profile["weeks"], current)
         + html.slot("week.range", f'<p class="caption">{current["range"]}</p>')
         + html.slot("week.kpis", html.kpis(current["kpis"]))
         + html.grid(*(html.chart(f"week_evolution.{c}") for c in EVOLUTION))
@@ -52,6 +64,7 @@ def build(ctx) -> str:
                     f'<h3 class="sub">{current["emitted_title"]}</h3>')
         + html.slot("week.emissions", emissions(current))
         + html.slot("week.held", held(current))
+        + reading(ctx)
     )
 
 

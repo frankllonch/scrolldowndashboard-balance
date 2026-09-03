@@ -18,7 +18,8 @@ SOURCES = sorted(p for p in ROOT.rglob("*.py")
 #: Keys built at call time, as `t(f"prefix.{value}")`. Each family is resolved
 #: by prefix instead, so a key can never be silently unused or missing.
 FAMILIES = ("event.", "derive.", "engine.coverage.", "category.", "tracked.",
-            "field.", "fork.sketch.", "part.", "anomaly.", "act.")
+            "field.", "fork.sketch.", "overview.person.", "chart.explain.",
+            "layer.", "part.", "anomaly.", "act.")
 
 
 def referenced() -> set[str]:

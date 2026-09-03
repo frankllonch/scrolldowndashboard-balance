@@ -34,9 +34,77 @@ STRINGS: dict[str, str] = {
     "act.12.eyebrow": "Schema and derivations",
     "act.12.title": "Under the hood",
 
+    # -- the bridge at the close of each act ---------------------------------
+    # One line handing the reader to the next scene. The last act has none:
+    # nothing follows it, and page.py leaves the slot empty.
+    "act.01.next": "First, one number for each of them.",
+    "act.02.next": (
+        "Two months, two very different shapes. Pick one and read it from the "
+        "inside."
+    ),
+    "act.03.next": "Start where the shape is easiest to see: a week at a time.",
+    "act.04.next": (
+        "Now zoom in. A week is thirty days seen from a distance — here is a "
+        "single day."
+    ),
+    "act.05.next": (
+        "The days look ordinary enough. So look at the hours the days do not "
+        "cover."
+    ),
+    "act.06.next": "Now you know when. The next question is what.",
+    "act.07.next": "That is what got through. Here is what did not.",
+    "act.08.next": (
+        "The phone knew all of this. Here is what it decided to say about it, "
+        "and what it kept to itself."
+    ),
+    "act.09.next": (
+        "That is the whole month, and everything the phone did with it. Now "
+        "the finding."
+    ),
+    "act.10.next": (
+        "One obvious objection: surely a plain screen-time rule would have "
+        "caught this too?"
+    ),
+    "act.11.next": (
+        "Everything above comes from eight fields in a log. Here is how."
+    ),
+
     # -- act 01 · cover -----------------------------------------------------
     "cover.standfirst": (
-        "One month of usage by two very different users, who used it better? "
+        "Balance makes a phone that helps people build a healthier "
+        "relationship with their device — it blocks distraction, understands "
+        "how someone actually uses their phone, and helps keep younger users "
+        "safer online. Not a dumbphone, not anti-tech: technology that serves "
+        "your life instead of hijacking it."
+    ),
+    "cover.purpose": (
+        "This dashboard takes in the raw behavioural output of two Balance "
+        "Phones, with two very different users, across the whole of May 2026. "
+        "The goal is to turn that data into meaning and answer one question: "
+        "<b>so what?</b>"
+    ),
+
+    # -- act 01 · the summary up front --------------------------------------
+    "summary.title": "The short version",
+    "summary.1.label": "Two adults, same phone, very different months",
+    "summary.1.body": (
+        "A scores {a_score:.0f} out of 100 and barely moves all month. B "
+        "starts at {b_first:.0f} and ends at {b_last:.0f}. Everything below is "
+        "the story of those {drop:.0f} points."
+    ),
+    "summary.2.label": "It is not that B is on the phone more",
+    "summary.2.body": (
+        "B's screen time only moves {screen:+.0f} % over the month. What "
+        "moves is <b>when</b>: late-night use multiplies by {night:.0f}, "
+        "bedtime slides from {bed_first} to {bed_last}, and the alarm does "
+        "not move. That is {sleep:.0f} minutes of sleep a night, gone."
+    ),
+    "summary.3.label": "The filter worked, and one day it did not",
+    "summary.3.body": (
+        "B's phone blocked {blocks:,} attempts, {sensitive} of them adult or "
+        "gambling, and none of it ever opened. Except on {outage}, when the "
+        "filter went quiet for about {hours:.0f} hours and everything it had "
+        "been holding back walked straight in."
     ),
     "cover.stat.profiles": "profiles",
     "cover.stat.events": "events",
@@ -44,12 +112,50 @@ STRINGS: dict[str, str] = {
     "cover.scroll": "Scroll",
 
     # -- act 02 · A single wellbeing score -------------------------------------
-    "overview.lede": "Two kinds of profile, the same thirty days.",
+    "overview.lede": (
+        "One month, thirty days of raw on-device events, for two different "
+        "people."
+    ),
+    "overview.person.A": (
+        "Likely an adult with a stable relationship with their phone. "
+        "WhatsApp, Spotify and the news fill most of their days, consistent "
+        "throughout the whole month."
+    ),
+    "overview.person.B": (
+        "Also an adult, and on the surface not that different: WhatsApp, "
+        "Spotify, Maps, the papers, Kindle. What sets this month apart is "
+        "that the filter is switched on, it stops {blocks:,} attempts, and "
+        "the nights get later every week."
+    ),
     "overview.hook": (
-        "Watch B. The index falls from {first:.0f} to {last:.0f} while screen "
-        "time moves {screen:+.0f} %."
+        "A stays constant throughout the month, whilst B drops {drop:.0f} "
+        "points. We will see why below."
     ),
     "profile.card.eyebrow": "User {user}",
+
+    # -- act 02 · what the index actually is ---------------------------------
+    "score.explain.title": "What the wellbeing score is",
+    "score.explain.body": (
+        "It is a compound index: five components, each scored 0 to 100 "
+        "against fixed bands, then weighted into one number a day. Nothing "
+        "here is scored against your own past — otherwise a steady six hours "
+        "a day would score 100 for being steady."
+    ),
+    "score.explain.note": (
+        "Two things the names get asked about. <b>Fragmentation</b> is not "
+        "about how many apps you use — it counts how many times a day you "
+        "pick the phone up: {frag_good} unlocks scores 100, {frag_bad} scores "
+        "0. And <b>intent</b> is how distraction is measured: the share of "
+        "your attributed time that went to social, entertainment or gaming. "
+        "Opening thirty apps for two minutes each is not distraction by this "
+        "definition; one hour of TikTok is."
+    ),
+    "score.explain.blocks": (
+        "Blocked attempts do not score at all. A block means the phone did "
+        "its job and nothing opened; docking you for it would charge you for "
+        "the product working, and would reward switching the filter off."
+    ),
+    "table.col.scoring": "Weight",
 
     # -- act 03 · choose a profile ------------------------------------------
     "fork.lede": "Both months are here. Read one, then the other.",
@@ -59,9 +165,9 @@ STRINGS: dict[str, str] = {
         "across the whole month."
     ),
     "fork.sketch.B": (
-        "Also an adult, and also mostly WhatsApp, Spotify, Maps and the "
-        "papers — but with the filter switched on, and leaning on it more "
-        "every week. The days hold. The nights slide."
+        "Also an adult, and also mostly WhatsApp, Spotify, Maps and the papers"
+        "— but with a more erratic pattern. A lot of tries to acces blocked sites. "
+        "The days hold steady. The nights slide and sleep is lost."
     ),
     "fork.stat.screen": "screen / day",
     "fork.stat.index": "index",

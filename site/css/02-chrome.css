@@ -74,7 +74,7 @@
   z-index: 55;
   background: var(--card);
   color: var(--ink);
-  border: 1.5px solid var(--rule);
+  border: 2px solid var(--user, var(--rule));
   cursor: pointer;
   font-family: var(--mono);
   font-size: .68rem;
@@ -83,15 +83,37 @@
   padding: .5rem .9rem;
 }
 
-.pill:hover {
-  border-color: var(--accent);
+.pill:hover,
+.pill:focus-visible {
+  border-color: var(--user);
 }
 
+/* Which month you are reading is the one piece of state on the page, so the
+   pill wears that person's colour rather than the generic accent. The letter
+   itself stays in card ink: the colour is the second signal, never the only
+   one. */
+:root[data-profile="A"] .pill { --user: var(--user-a); }
+:root[data-profile="B"] .pill { --user: var(--user-b); }
+
+:root[data-surface="a01"][data-profile="A"] .pill,
+:root[data-surface="a02"][data-profile="A"] .pill,
+:root[data-surface="a03"][data-profile="A"] .pill,
+:root[data-surface="a04"][data-profile="A"] .pill { --user: var(--user-a-deep); }
+
+:root[data-surface="a01"][data-profile="B"] .pill,
+:root[data-surface="a02"][data-profile="B"] .pill,
+:root[data-surface="a03"][data-profile="B"] .pill,
+:root[data-surface="a04"][data-profile="B"] .pill { --user: var(--user-b-deep); }
+
 .pill .who {
+  display: inline-block;
+  min-width: 1.4em;
+  margin-left: .2rem;
+  padding-bottom: 2px;
+  border-bottom: 3px solid var(--user);
   color: var(--card-ink);
-  font-weight: 600;
-  border-bottom: 2px solid var(--accent);
-  padding-bottom: 1px;
+  font-weight: 700;
+  text-align: center;
 }
 
 /* ------------------------------------------------------------------ acts */

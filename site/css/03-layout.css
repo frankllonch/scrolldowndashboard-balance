@@ -129,3 +129,19 @@ h3.sub {
 }
 
 /* --------------------------------------------------------- numbers, KPIs */
+/* The handoff at the close of an act. It sits apart from the act's own prose:
+   the reader has finished here, and this is the reason to keep going. */
+.act-next {
+  margin: 3rem 0 0 0;
+  padding-top: 1.4rem;
+  border-top: 1.5px solid var(--rule);
+  color: var(--ink-2);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 46ch;
+}
+
+.act-next::after {
+  content: " ↓";
+  color: var(--accent);
+}

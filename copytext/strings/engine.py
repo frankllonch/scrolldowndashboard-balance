@@ -5,6 +5,10 @@ Part of the catalogue. See copytext/en.py for how the parts come together.
 
 STRINGS: dict[str, str] = {
     # -- alerts and nudges --------------------------------------------------
+    "engine.lede": (
+        "Slide through each day and see below what was notified to you, and "
+        "what the phone worked out and kept to itself."
+    ),
     "engine.caption": (
         "Every variable the rules read, each as a share of its own maximum so "
         "the shapes compare. The rail below zero is what the phone emitted."
@@ -92,6 +96,33 @@ STRINGS: dict[str, str] = {
     "engine.nudge.row.per_night_value": "{minutes:.0f} min",
 
     # -- under the hood -----------------------------------------------------
+    "hood.lede": (
+        "Every number on this page is a pure function of one event log. "
+        "Nothing was estimated, nothing was fetched, and the browser never "
+        "sees an event — the whole pipeline runs before the page is written. "
+        "Open any of these to see how a given figure was reached."
+    ),
+
+    "hood.pipeline.title": "From the log to this page",
+    "table.col.layer": "Layer",
+    "table.col.does": "What it turns into what",
+    "layer.0": "Events",
+    "layer.0.does": "Raw log into screen stretches, unlocks and attributed time",
+    "layer.1": "Metrics",
+    "layer.1.does": "Stretches into one row per day, and one per week",
+    "layer.2": "Index",
+    "layer.2.does": "A day's row into five component scores and one number",
+    "layer.3": "Intelligence",
+    "layer.3.does": "The daily rows into alerts, nudges and reinforcements",
+    "layer.4": "Render",
+    "layer.4.does": "All of the above into figures, acts and this page",
+    "hood.pipeline.note": (
+        "The layers only ever point downwards: none of them knows the page "
+        "exists, and none of them imports a charting library. That is why the "
+        "command line and this dashboard can be two readers of the same "
+        "numbers rather than two implementations of them."
+    ),
+
     "hood.stream.title": "The stream",
     "table.col.means": "What it means",
     "event.SCREEN_ON": "May be a glance.",

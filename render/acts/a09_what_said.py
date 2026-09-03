@@ -96,7 +96,8 @@ def nudge(ctx) -> str:
 def build(ctx) -> str:
     days = ctx.profile["days"]
     current = next(d for d in days if d["iso"] == ctx.profile["default_day"])
-    return (f'<p class="caption">{t("engine.caption")}</p>'
+    return (html.lede(t("engine.lede"))
+            + f'<p class="caption">{t("engine.caption")}</p>'
             + slider(days, current)
             + html.chart("tracked_series", size="tall")
             + html.slot("day.title", f'<h3 class="sub">{current["title"]}</h3>')

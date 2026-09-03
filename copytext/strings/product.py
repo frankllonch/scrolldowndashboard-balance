@@ -54,6 +54,22 @@ STRINGS: dict[str, str] = {
     "row.blocks_per_day": "Blocks per day",
 
     # -- weekly summary -----------------------------------------------------
+    "week.lede": (
+        "Slide through each week to see your usage across those seven days."
+    ),
+    "week.reading.A": (
+        "Nothing here really moves. Your screen time, your unlocks and your "
+        "nights sit in the same place in week 4 as they did in week 1, and "
+        "the filter barely has to step in — {blocks} attempts in the whole "
+        "month, all of them ordinary distraction."
+    ),
+    "week.reading.B": (
+        "Your night usage varies noticeably from week to week, but your "
+        "general usage stays high every week. And as the month goes along the "
+        "blocks get more recurrent — {first:.0f} a day in week 1, {last:.0f} "
+        "by week 4 — every time you try harder to find where the blocking "
+        "fails."
+    ),
     "week.slider.label": "Week",
     "week.slider.option": "Week {week}",
     "week.slider.option_short": "Week {week} (short)",
@@ -120,11 +136,12 @@ STRINGS: dict[str, str] = {
         "after 23:00 on any day."
     ),
     "day.note.b": (
-        "The week has no edges. {weekend:.0f} min at weekends against "
-        "{weekday:.0f} on weekdays, spread from 08:00 to midnight all seven "
-        "days. Sessions are short at {session:.1f} min but arrive "
-        "{switches:.0f} times an hour, {ratio:.1f}× A's rate: checking, not "
-        "sitting down with it."
+        "Your weekend looks like your Tuesday. {weekend:.0f} min at weekends "
+        "against {weekday:.0f} on weekdays, and you are on the phone from "
+        "08:00 to midnight all seven days. You pick it up {switches:.0f} "
+        "times an hour and stay about {session:.1f} minutes each time — you "
+        "are checking the phone, not sitting down with it "
+        "({ratio:.1f} times more than A's rate of usage)."
     ),
 
     # -- the night ----------------------------------------------------------
@@ -137,22 +154,25 @@ STRINGS: dict[str, str] = {
     "delta.times": "×{n:.0f}",
     "delta.minutes": "{n:+.0f} min",
     "night.note.drift": (
-        "<b>Bedtime slides; the alarm does not.</b> Last screen {end_first} → "
-        "{end_last}, first unlock {wake_first} → {wake_last}. The window "
-        "between them closes from {sleep_first:.1f} h to {sleep_last:.1f} h, "
-        "<b>{sleep_loss:.0f} min less rest a night</b>. Unlocks after midnight "
-        "go from {pick_first:.1f} to {pick_last:.1f}."
+        "<b>You are losing sleep.</b> You started the month going to bed at "
+        "{end_first} and ended it averaging {end_last}, whilst always waking "
+        "up at the same time — {wake_first} then {wake_last}. You went from "
+        "hardly unlocking your phone after midnight to doing it nearly "
+        "{pick_last:.0f} times a night. That is <b>{sleep_loss:.0f} minutes "
+        "less rest, every night</b>."
     ),
     "chart.night_pickups": "Unlocks after midnight",
     "night.note.user_a": (
-        "Nothing here. Zero minutes between 23:00 and 06:00 across all thirty "
-        "days, last screen at {last_use} on average. The 23:00 line costs this "
-        "profile nothing."
+        "You only see user B's usage here, because A slept remarkably well "
+        "throughout the whole of May: zero minutes between 23:00 and 06:00 on "
+        "all thirty days, last screen at {last_use} on average."
     ),
     "night.weight.body": (
-        "The smallest metric here, {night:.0f} min a day against {screen:.0f} "
-        "of screen, carries 20 % of the index. An hour at 01:00 comes out of "
-        "rest; an hour at 17:00 does not."
+        "The night-time usage increase is the main reason your wellbeing "
+        "score has dropped so much. Sleep! It is the smallest number on this "
+        "page — {night:.0f} min a day against {screen:.0f} of screen — and it "
+        "carries 20 % of the index, because an hour at 01:00 comes out of "
+        "your rest and an hour at 17:00 does not."
     ),
 
     # -- Where your time goes ------------------------------------------------
@@ -170,26 +190,42 @@ STRINGS: dict[str, str] = {
     "chart.time.apps": "User {user} · apps by minutes",
     "chart.time.domains": "User {user} · domains by minutes",
     "chart.time.categories": "User {user} · minutes by content category",
-    "time.colour.caption": "Colour is the category; openings are in the tooltip.",
     "time.note.a": (
-        "A small catalogue: {apps} apps in thirty days, the top three holding "
-        "{top3:.0f} % of the time. Browsing is {news:.0f} % news. Distraction "
-        "averages {distract:.0f} % and falls, {first:.0f} % to {last:.0f} %."
+        "You used {apps} apps this month, with {top3_names} holding "
+        "{top3:.0f} % of your time. When you browse, {news:.0f} % of it is "
+        "news. Distraction averages {distract:.0f} % and it is going down, "
+        "not up: {first:.0f} % in week 1 to {last:.0f} % in week 4."
     ),
     "time.caption.chrome": (
         "Chrome shows {opens:.0f} openings and {minutes:.0f} min: browser time "
         "goes to the domain."
     ),
     "time.note.b": (
-        "{apps} apps against A's {apps_a}, with the top three holding only "
-        "{top3:.0f} %, and {messaging:,.0f} min of reaching people across "
-        "{messaging_apps} apps. Distraction sits at {distract:.0f} % against A's "
-        "{distract_a:.0f} %. What this profile spends time on is ordinary; "
-        "how much, and when, is not."
+        "You used {apps} apps this month, with {top3_names} holding "
+        "{top3:.0f} % of your usage — against A's {apps_a} apps. You spent "
+        "{messaging:,.0f} min reaching people across {messaging_apps} apps. "
+        "Your distraction share is {distract:.0f} %, barely above A's "
+        "{distract_a:.0f} %. What you spend your time on is completely "
+        "ordinary. How much of it, and when, is not."
+    ),
+    "time.distract.explain": (
+        "<b>How is distraction measured?</b> Not by how many apps you open. "
+        "It is the share of your attributed time that landed in social, "
+        "entertainment or gaming. Thirty apps for two minutes each is not "
+        "distraction by this definition; one hour of one app is."
     ),
     "time.caption.blocked_absent": (
-        "Only content that opened. {names} were stopped {attempts} times and "
-        "let through {through}, so they never reach this chart."
+        "This chart only shows what actually opened, which is why "
+        "{names} are barely on it: the filter stopped them {attempts} times "
+        "and let through {through}."
+    ),
+    "time.leak.explain": (
+        "<b>So why are they here at all? Were they downloaded that day?</b> "
+        "No. They were on the phone all month, and the filter blocked them on "
+        "every one of the {days} days, a median of {median:.0f} times a day. "
+        "Every minute they ever got comes from a single window on {outage}, "
+        "when the filter stopped firing for about {hours:.0f} hours. It came "
+        "back the next morning and they were never opened again."
     ),
 
     # -- what the phone stopped ---------------------------------------------

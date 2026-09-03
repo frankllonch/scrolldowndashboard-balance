@@ -26,6 +26,28 @@
   min-height: 320px;
 }
 
+/* A plot and its explanation move as one block, so a grid cell holds the
+   pair rather than letting the line drift under a neighbouring chart. */
+.chart-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 1.6rem 0 0 0;
+}
+
+.grid .chart-block,
+.chart-block .chart {
+  margin: 0;
+}
+
+.chart-explain {
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.5;
+  max-width: 62ch;
+  margin: .55rem 0 0 0;
+}
+
 /* --------------------------------------------------------------- tables */
 
 .scroller {

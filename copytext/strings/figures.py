@@ -4,6 +4,126 @@ Part of the catalogue. See copytext/en.py for how the parts come together.
 """
 
 STRINGS: dict[str, str] = {
+    # -- one line under every chart, in reading order ------------------------
+    # Resolved by html.chart(), which walks the figure key from the most
+    # specific name to the least, so a variant inherits its family's line.
+    "chart.explain.score_line": (
+        "Both people's wellbeing index, every day of the month. The line is a "
+        "7-day average so it does not jump around; the faint dots behind it "
+        "are the actual daily scores."
+    ),
+    # A week marked * is short; that caveat is on the footnote under the group
+    # rather than repeated in all four lines.
+    "chart.explain.week_evolution.screen_min": (
+        "Your average screen time per day, week by week. The highlighted bar "
+        "is the week you have selected."
+    ),
+    "chart.explain.week_evolution.night_min": (
+        "The same weeks, but only the minutes between 23:00 and 06:00. Watch "
+        "this one against the bar chart beside it."
+    ),
+    "chart.explain.week_evolution.pickups": (
+        "How many times a day you really unlocked the phone, week by week. A "
+        "screen that lit up without being unlocked is a glance, and is not "
+        "counted here."
+    ),
+    "chart.explain.week_evolution.blocks": (
+        "How many attempts the filter stopped per day, week by week. Rising "
+        "bars mean the phone is being asked more often, not that more is "
+        "getting through."
+    ),
+    "chart.explain.week_components": (
+        "The five parts of the index, scored 0 to 100, week by week. The "
+        "dotted line marks the week you have selected. A part that falls here "
+        "is a part that is pulling your score down."
+    ),
+    "chart.explain.week_days.screen_min": (
+        "Screen time for each day of the week you picked, Monday to Sunday. "
+        "The dotted line is your average across every week before this one, "
+        "so a bar above it is a day above your own normal."
+    ),
+    "chart.explain.week_days.night_min": (
+        "The same seven days, counting only what happened after 23:00. Most "
+        "weeks this should be a flat row of nothing."
+    ),
+    "chart.explain.daily_bars.screen_min": (
+        "Your screen time on every day of the month, against your own rolling "
+        "14-day median — not against the other user, and not against a "
+        "target. The first two weeks have no history to compare with yet."
+    ),
+    "chart.explain.daily_bars.pickups": (
+        "The same thirty days, counting unlocks instead of minutes. A day can "
+        "sit under your median for time and over it for unlocks: that is a "
+        "day you checked the phone a lot without settling into it."
+    ),
+    "chart.explain.hour_heat": (
+        "Your week as a grid: days down, hours across. The darker the cell, "
+        "the more screen time in that hour. It shows the shape of your week "
+        "at a glance — where the phone lives in your day."
+    ),
+    "chart.explain.day_span": (
+        "One bar per day, running from your first unlock to your last screen. "
+        "It is not how much you used the phone, it is how much of the day the "
+        "phone was part of."
+    ),
+    "chart.explain.day_span.night": (
+        "The same day-length bars, with the 23:00 to 06:00 band marked. What "
+        "you are looking for is bars leaking into the band."
+    ),
+    "chart.explain.night_drift": (
+        "Screen minutes between 23:00 and 06:00, night by night, for both "
+        "people. This is the single chart the whole month turns on."
+    ),
+    "chart.explain.compare.night_pickups": (
+        "Unlocks after midnight, both people on the same scale. One of these "
+        "two lines stays on the floor for thirty days."
+    ),
+    "chart.explain.compare.screen_min": (
+        "Total screen time per day for both people, week 1 to the last. This "
+        "is the measure a plain screen-time rule would watch — and it barely "
+        "moves."
+    ),
+    "chart.explain.compare.night_min": (
+        "The same weeks, same scale, but only the night band. This is the "
+        "measure that moves, and it is why watching the total would have "
+        "missed the whole month."
+    ),
+    "chart.explain.top_bars.apps": (
+        "Your ten biggest apps by minutes. Colour is the content category; "
+        "hover for how many times you opened each one."
+    ),
+    "chart.explain.top_bars.sites": (
+        "The same, for websites. Only the domain is ever recorded, never the "
+        "page — so time spent in the browser lands here rather than under "
+        "Chrome."
+    ),
+    "chart.explain.category_area": (
+        "What your minutes were made of, day by day, stacked. The order of "
+        "the bands is fixed, so a band that grows really is growing and has "
+        "not just been re-ranked."
+    ),
+    "chart.explain.blocks_daily": (
+        "How many attempts the filter stopped each day, split by what kind. "
+        "Nothing here opened — a block is an attempt that went nowhere."
+    ),
+    "chart.explain.blocks_by_hour": (
+        "What time of day you hit the wall. Sensitive attempts are drawn "
+        "separately from ordinary distraction."
+    ),
+    "chart.explain.tracked_series": (
+        "Every variable the alert rules watch, on one axis. Each is drawn as "
+        "a share of its own maximum, so shapes can be compared even though "
+        "the units cannot. The rail below zero is what the phone actually "
+        "did that day."
+    ),
+    "chart.explain.score_breakdown.A": (
+        "Where A's index came from: what each of the five parts contributed "
+        "on an average day, and how many points it let go."
+    ),
+    "chart.explain.score_breakdown.B": (
+        "The same breakdown for B. Compare the bars, not the totals — the "
+        "gap between the two people is one component doing most of the work."
+    ),
     # -- figures: titles and axes -------------------------------------------
     "unit.score": "0 to 100",
     "chart.day_span": "User {user} · from what time to what time",

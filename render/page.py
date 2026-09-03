@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from copytext import t
+from copytext import STRINGS, t
 
 from .acts import ACTS, Context
 
@@ -20,6 +20,21 @@ def section(act, body: str) -> str:
     return (f'<header class="act-head"><p class="eyebrow">{t(act.eyebrow)}</p>'
             f'<h2 class="act-title">{t(act.title)}</h2></header>'
             f'<div class="act-body">{body}</div>')
+
+
+def bridge(act) -> str:
+    """The line that hands the reader to the next act.
+
+    A scroll only works if each scene asks for the next one, so the handoff is
+    part of the frame rather than something each act remembers to write. The
+    last act has nothing to hand to.
+
+    It is appended to the act body, not to the section around it: the profile
+    switch replaces the whole body with the copy it stored, so a bridge added
+    outside would survive the first paint and vanish on the first swap.
+    """
+    key = f"act.{act.id}.next"
+    return "" if key not in STRINGS else f'<p class="act-next">{t(key)}</p>' 
 
 
 def rail() -> str:
@@ -45,10 +60,10 @@ def render(payload: dict, bundles: dict) -> str:
         if act.per_profile:
             for user in per_profile:
                 ctx = Context(payload, bundles, user)
-                per_profile[user][act.id] = act.builder(ctx)
+                per_profile[user][act.id] = act.builder(ctx) + bridge(act)
             body = per_profile[default][act.id]
         else:
-            body = act.builder(Context(payload, bundles))
+            body = act.builder(Context(payload, bundles)) + bridge(act)
         html = html.replace(f"<!--act:{act.id}-->", section(act, body))
 
     # The default profile's part two is already in the document, so the page

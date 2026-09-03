@@ -94,6 +94,16 @@ details:hover,
   border-left-color: var(--user-b);
 }
 
+/* The sketch inside a hero card belongs to that person, so it carries their
+   colour rather than the generic note accent. */
+.hero-card[data-user="A"] .note {
+  border-left-color: var(--user-a);
+}
+
+.hero-card[data-user="B"] .note {
+  border-left-color: var(--user-b);
+}
+
 .hero-number {
   font-family: var(--mono);
   font-weight: 600;
