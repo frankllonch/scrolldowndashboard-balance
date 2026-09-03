@@ -21,6 +21,9 @@ import { act as a12 } from "./a12-under-the-hood";
 export const ACTS = [a01, a02, a03, a04, a05, a06, a07, a08, a09, a10, a11,
                      a12];
 
-export { panel as weekPanel } from "./a04-the-week";
-export { panel as dayPanel } from "./a09-what-said";
+// `readout` is what the slider shows while the thumb moves; `panel` is
+// everything it lands on. The chart axis's short "W4" is a different thing
+// and lives in copy/figures.ts.
+export { label as weekReadout, panel as weekPanel } from "./a04-the-week";
+export { label as dayReadout, panel as dayPanel } from "./a09-what-said";
 export * from "./act";

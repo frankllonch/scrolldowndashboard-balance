@@ -91,6 +91,7 @@ const SURFACES: Record<SurfaceName, Surface> = {
   },
 };
 
+/** One of the three grounds, by name. */
 export function surface(name: SurfaceName): Surface {
   return SURFACES[name];
 }

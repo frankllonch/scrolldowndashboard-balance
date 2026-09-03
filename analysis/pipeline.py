@@ -68,6 +68,13 @@ class Analysis:
 
 
 def analyse(user: str, root: Path | str = ".") -> Analysis:
+    """Run every layer over one profile's log, in order.
+
+    The joins here are the ones a reader would get wrong: the truncated days
+    have to leave every view rather than only the daily frame, the component
+    scores have to be averaged onto the weekly rows, and the blocks have to
+    know which week they fell in.
+    """
     timeline = load(Path(root) / PROFILES[user], user)
     daily = add_score(daily_frame(timeline))
     # Days truncated by the file edge stay out of EVERY view, not only the

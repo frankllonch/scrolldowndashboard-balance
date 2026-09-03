@@ -1,0 +1,62 @@
+# Build the page on every push to main, and publish what the build produced.
+#
+# The point is not automation for its own sake: it is that the build now runs
+# on a machine that has only what the repository declares. Anything that
+# worked because it was already installed here fails in public instead of
+# quietly shipping.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. A queued push waits rather than racing the one ahead.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: pip install -e ".[dev]"
+
+      - run: ruff check .
+
+      # build.py emits the document, compiles it against web/types/, then
+      # prerenders and bundles. The tests come after it because several of
+      # them read the built page, and dist/ is not in the repository.
+      - run: python build.py
+
+      - run: python -m pytest -q
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

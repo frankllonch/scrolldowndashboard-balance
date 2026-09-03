@@ -39,8 +39,8 @@ def _hm(minutes: float) -> str:
 
 
 def render_text(r: Analysis) -> str:
-    df, w = r.daily, r.weekly
-    tl = r.timeline
+    """The whole analysis as one screen of monospaced text."""
+    df, w, tl = r.daily, r.weekly, r.timeline
     out: list[str] = []
     add = out.append
 
@@ -154,6 +154,7 @@ def _plain(obj):
 
 
 def render_json(r: Analysis) -> dict:
+    """The same analysis as JSON, for piping into something else."""
     df, w = r.daily, r.weekly
     return _plain({
         "user": r.user,
@@ -205,6 +206,7 @@ def render_json(r: Analysis) -> dict:
 # ---------------------------------------------------------------------------
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse the arguments and print. Returns an exit code."""
     ap = argparse.ArgumentParser(
         prog="python -m analysis.run",
         description="Derives metrics, index, alerts and nudges from a device "

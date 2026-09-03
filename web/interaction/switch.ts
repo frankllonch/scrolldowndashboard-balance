@@ -13,6 +13,14 @@ import { anchor, repaint, restore } from "../interaction/reader";
 import { bindSliders, held, restoreSliders } from "../interaction/sliders";
 import type { Payload } from "../types/index";
 
+/**
+ * Show a different person's month.
+ *
+ * Part two is rebuilt from scratch and redrawn. `keepPlace` is the pill: both
+ * profiles run the same five weeks and thirty days, so it holds the reader on
+ * the one they were reading and puts them back at the same point once the new
+ * plots have settled and the section has stopped changing height.
+ */
 export async function applyProfile(payload: Payload, selection: Selection,
                                    user: string,
                                    keepPlace: boolean): Promise<void> {
@@ -71,6 +79,8 @@ export function requested(payload: Payload): string | null {
   return asked && payload.profiles[asked] ? asked : null;
 }
 
+/** Hide act 03 and its rail entry. A reader who arrived with `?profile=`
+ *  has already answered the question the fork asks. */
 export function skipTheFork(): void {
   const fork = act("03");
   if (fork) fork.hidden = true;

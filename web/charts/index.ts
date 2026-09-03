@@ -33,6 +33,8 @@ const LIGHT_PREFIXES = ["week_evolution.", "week_days."];
 const DUSK = new Set(["hour_heat", "day_span", "daily_bars.screen_min",
                       "daily_bars.pickups"]);
 
+/** Which of the three grounds a figure is drawn for. A figure carries its
+ *  surface's colours from the moment it is built, so this decides them. */
 export function surfaceFor(key: string): SurfaceName {
   if (LIGHT.has(key) || LIGHT_PREFIXES.some((p) => key.startsWith(p))) {
     return "light";

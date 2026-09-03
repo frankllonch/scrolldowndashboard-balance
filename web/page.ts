@@ -22,6 +22,7 @@ function bridge(act: Act): string {
   return act.next ? `<p class="act-next">${act.next}</p>` : "";
 }
 
+/** One act's heading and body, as the shell's `<section>` expects them. */
 export function section(act: Act, body: string): string {
   return '<header class="act-head">'
     + `<p class="eyebrow">${act.eyebrow}</p>`

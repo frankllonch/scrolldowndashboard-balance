@@ -37,6 +37,7 @@ export function repaint(): void {
   if (painted) paintSurface(painted, true);
 }
 
+/** How far down the page the reader is, as the bar across the top. */
 export function progressBar(): void {
   const bar = one("#progress-bar");
   if (!bar) return;

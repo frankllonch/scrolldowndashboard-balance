@@ -19,7 +19,7 @@ balance = "analysis.run:main"
 
 [tool.ruff]
 line-length = 88
-extend-exclude = ["docs", "data"]
+extend-exclude = ["dist", "data"]
 
 [tool.ruff.lint]
 # Correctness and import hygiene. Formatting is not enforced: the code is

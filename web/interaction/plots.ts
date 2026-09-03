@@ -21,6 +21,8 @@ export function drawn(mount: HTMLElement): boolean {
   return Boolean((mount as Drawn).data);
 }
 
+/** Build the figure a mount asks for and draw it. A mount whose key has no
+ *  builder, or whose profile has no data for it, is left empty. */
 export function draw(mount: HTMLElement, payload: Payload,
                      selection: Selection): Promise<unknown> {
   const key = mount.dataset.figure;

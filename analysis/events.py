@@ -322,6 +322,11 @@ def _blocks(events: list[dict]) -> list[Block]:
 
 
 def load(path: str | Path, user: str) -> Timeline:
+    """One event file into a Timeline: the entry point of the whole system.
+
+    The sort is by timestamp and then id, because two events can share a
+    millisecond and the reconstruction below depends on a stable order.
+    """
     events = json.loads(Path(path).read_text())
     events.sort(key=lambda e: (e["timestamp_millis"], e["id"]))
 

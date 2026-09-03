@@ -9,6 +9,7 @@
 import { explain } from "../copy/explain";
 import { unit, value } from "../copy/units";
 import { hm, shortDate, thousands } from "../format";
+import { median } from "../stats";
 import {
   caption, chart, grid, kpis, lede, note, pairs, slot, sub, table,
   type Kpi,
@@ -93,79 +94,73 @@ function num(row: WeeklyRow, key: keyof WeeklyRow): number | null {
 }
 
 /**
- * Change against the previous week, in the metric's own unit.
+ * How a measure moved, in its own unit.
  *
- * A change that rounds to zero is not shown: "+0 min" beside an arrow says
- * something improved when nothing moved.
+ * Both values are rounded to the precision they are displayed at before being
+ * subtracted, so the change always equals the difference between the two
+ * numbers on screen. Rounding after would let the table say 2.1, 2.3 and
+ * "+0.2" in one row while the strip above it said "+0.3" for the same week.
+ *
+ * A change that rounds away is worded, not printed: "+0 min" beside an arrow
+ * says something improved when nothing moved.
  */
-function delta(row: WeeklyRow, key: keyof WeeklyRow, label: string,
-               decimals = 0): string | undefined {
-  const change = num(row, `${String(key)}_delta` as keyof WeeklyRow);
-  if (change === null) return undefined;
-  if (Math.abs(Number(change.toFixed(decimals))) < 10 ** -decimals / 2) {
-    return value.noChange;
-  }
-  return `${change > 0 ? "+" : ""}${change.toFixed(decimals)} ${label}`.trim();
+function change(now: number, was: number, label: string,
+                decimals: number): string {
+  const moved = Number(now.toFixed(decimals)) - Number(was.toFixed(decimals));
+  if (Math.abs(moved) < 10 ** -decimals / 2) return value.noChange;
+  return `${moved > 0 ? "+" : ""}${moved.toFixed(decimals)} ${label}`.trim();
 }
 
-function weekKpis(row: WeeklyRow): Kpi[] {
+/** The same, against the week before, or nothing where there is no week
+ *  before to compare against. */
+function delta(row: WeeklyRow, before: WeeklyRow | undefined,
+               key: keyof WeeklyRow, label: string,
+               decimals = 0): string | undefined {
+  const was = before ? num(before, key) : null;
+  const now = num(row, key);
+  if (was === null || now === null) return undefined;
+  return change(now, was, label, decimals);
+}
+
+function weekKpis(row: WeeklyRow, before: WeeklyRow | undefined): Kpi[] {
   const items: Array<[string, string, string | undefined]> = [
     [copy.kpi.screen, hm(row.screen_min),
-     delta(row, "screen_min", unit.min)],
-    [copy.kpi.pickups, row.pickups.toFixed(0), delta(row, "pickups", "")],
+     delta(row, before, "screen_min", unit.min)],
+    [copy.kpi.pickups, row.pickups.toFixed(0),
+     delta(row, before, "pickups", "")],
     [copy.kpi.night, `${row.night_min.toFixed(0)} ${unit.min}`,
-     delta(row, "night_min", unit.min)],
+     delta(row, before, "night_min", unit.min)],
     [copy.kpi.offline, `${row.longest_offline_h.toFixed(1)} ${unit.hours}`,
-     delta(row, "longest_offline_h", unit.hours, 1)],
+     delta(row, before, "longest_offline_h", unit.hours, 1)],
     [copy.kpi.bestOffline, `${row.best_offline_h.toFixed(1)} ${unit.hours}`,
      row.best_offline_when ?? undefined],
-    [copy.kpi.blocks, row.blocks.toFixed(1), delta(row, "blocks", "", 1)],
-    [copy.kpi.score, row.score.toFixed(0), delta(row, "score", "")],
+    [copy.kpi.blocks, row.blocks.toFixed(1),
+     delta(row, before, "blocks", "", 1)],
+    [copy.kpi.score, row.score.toFixed(0), delta(row, before, "score", "")],
   ];
   return items.map(([label, val, d]) =>
     (d === undefined ? { label, value: val } : { label, value: val, delta: d }));
 }
 
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (!sorted.length) return 0;
-  return sorted.length % 2
-    ? (sorted[mid] ?? 0)
-    : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
-}
-
-function weekTable(weeks: WeeklyRow[], row: WeeklyRow): string {
-  // From the row before it, not from a `_prev` column: the frame only carries
-  // those for the seven measures the KPI strip reads, and this table walks
-  // nine.
-  const before = weeks.find((w) => w.week === row.week - 1);
+function weekTable(weeks: WeeklyRow[], row: WeeklyRow,
+                   before: WeeklyRow | undefined): string {
   const rows = ROWS.map((spec) => {
     const scale = spec.share ? 100 : 1;
     const fmt = (v: number) =>
       `${v.toFixed(spec.decimals)} ${spec.unit}`.trim();
-    // Rounded BEFORE subtracting: otherwise the change does not match the two
-    // columns beside it and reads as an arithmetic error.
-    const now = Number(((num(row, spec.key) ?? 0) * scale)
-      .toFixed(spec.decimals));
+    const now = (num(row, spec.key) ?? 0) * scale;
     const was = before ? num(before, spec.key) : null;
-    const previous = was === null
-      ? null : Number((was * scale).toFixed(spec.decimals));
+    const previous = was === null ? null : was * scale;
     const mid = Number((median(weeks.map((w) => (num(w, spec.key) ?? 0) * scale))
       ).toFixed(spec.decimals));
 
-    let change: string;
-    if (previous === null) change = value.notAvailable;
-    else if (Math.abs(now - previous) < 10 ** -spec.decimals / 2) {
-      change = value.noChange;
-    } else {
-      const diff = now - previous;
-      change = `${diff > 0 ? "+" : ""}${diff.toFixed(spec.decimals)} `
-        .concat(spec.unit).trim();
-    }
-    return [spec.label, fmt(now),
-            previous === null ? value.notAvailable : fmt(previous),
-            fmt(mid), change];
+    return [
+      spec.label, fmt(now),
+      previous === null ? value.notAvailable : fmt(previous),
+      fmt(mid),
+      previous === null ? value.notAvailable
+                        : change(now, previous, spec.unit, spec.decimals),
+    ];
   });
   return table(copy.tableColumns(row.week), rows);
 }
@@ -199,12 +194,21 @@ function slider(weeks: WeeklyRow[], current: WeeklyRow): string {
     + `<datalist id="week-ticks">${ticks}</datalist></div>`;
 }
 
+/** What the slider's readout says at one step. The panel says the same, so
+ *  the label the reader sees while dragging is the label they land on. */
+export function label(profile: Profile, week: number): string {
+  const row = profile.weekly.find((w) => w.week === week);
+  return row ? copy.option(row.week, row.is_partial) : "";
+}
+
+
 /** Everything behind the slider, for one week. Exported so the interaction
  *  can rebuild it without going through the whole act. */
 export function panel(profile: Profile, week: number): Record<string, string> {
   const weeks = profile.weekly;
   const row = weeks.find((w) => w.week === week) ?? weeks[weeks.length - 1];
   if (!row) return {};
+  const before = weeks.find((w) => w.week === row.week - 1);
   const days = new Set(profile.daily.filter((d) => d.week === row.week)
     .map((d) => d.day));
   return {
@@ -212,9 +216,9 @@ export function panel(profile: Profile, week: number): Record<string, string> {
     "week.range": caption(
       copy.range(shortDate(row.start), shortDate(row.end), row.days)
       + (row.is_partial ? copy.rangePartial : "")),
-    "week.kpis": kpis(weekKpis(row)),
+    "week.kpis": kpis(weekKpis(row, before)),
     "week.days_title": sub(copy.daysTitle(row.week)),
-    "week.table": weekTable(weeks, row),
+    "week.table": weekTable(weeks, row, before),
     "week.emitted_title": sub(copy.emittedTitle(row.week)),
     "week.emissions": emissions(profile.emissions, days),
     "week.held": held(profile.positives, days),

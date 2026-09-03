@@ -10,3 +10,4 @@ screenshots/
 
 node_modules/
 .ruff_cache/
+dist/

@@ -12,17 +12,18 @@ install:            ## create the environment and install everything
 lint:               ## unused imports, undefined names, import order
 	$(VENV)/ruff check .
 
-types:              ## the payload contract, compiled
+types:              ## the contract, compiled against a freshly emitted document
+	$(VENV)/python -m payload
 	npm run typecheck
 
 test: lint types    ## lint, typecheck, then the whole suite
 	$(VENV)/python -m pytest
 
-build:              ## run the pipeline and write docs/
+build:              ## run the pipeline and write dist/
 	$(VENV)/python build.py
 
 serve: build        ## build, then serve the page
-	$(VENV)/python -m http.server -d docs 8000
+	$(VENV)/python -m http.server -d dist 8000
 
 run:                ## console analysis of both profiles
 	$(VENV)/python -m analysis.run

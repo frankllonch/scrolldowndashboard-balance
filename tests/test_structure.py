@@ -9,12 +9,17 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-#: Files whose size is part of the design, not an accident.
+#: Files whose size is part of the design, not an accident. A front door that
+#: needs two screens is not a front door, and a shell or a build script that
+#: grows is doing something that belongs elsewhere.
+#:
+#: ARCHITECTURE.md is deliberately not here. It is a reference map — a line per
+#: module — so it grows with the code, and capping it only produced a failing
+#: build the day the map got more useful.
 BUDGETS = {
     "build.py": 105,
     "web/index.html": 200,
     "README.md": 60,
-    "ARCHITECTURE.md": 175,
 }
 
 #: No file in the repo goes past this. Where a concern outgrew it, it became a

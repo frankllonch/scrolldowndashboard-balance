@@ -160,6 +160,13 @@ function deviceRows(row: DailyRow, day: ReplayDay): Array<[string, string]> {
   ];
 }
 
+/** What the slider's readout says at one step. */
+export function label(profile: Profile, index: number): string {
+  const day = profile.replay[index];
+  return day ? shortDate(day.day) : "";
+}
+
+
 /** Everything behind the day slider, for one day. Exported so the interaction
  *  can rebuild it without going through the whole act. */
 export function panel(profile: Profile, iso: string): Record<string, string> {

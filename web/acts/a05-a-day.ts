@@ -5,6 +5,7 @@
 import { explain } from "../copy/explain";
 import { unit } from "../copy/units";
 import { clockAt, hm } from "../format";
+import { deviation, mean, median, mode } from "../stats";
 import { caption, chart, grid, kpis, note } from "../html";
 import type { DailyRow } from "../types/index";
 import { other, type Act, type Context } from "./act";
@@ -51,45 +52,6 @@ const copy = {
     + "the lights off?",
 };
 
-function mean(values: number[]): number {
-  return values.reduce((a, b) => a + b, 0) / (values.length || 1);
-}
-
-function sd(values: number[]): number {
-  if (values.length < 2) return 0;
-  const m = mean(values);
-  const variance = values.reduce((a, v) => a + (v - m) ** 2, 0)
-    / (values.length - 1);
-  return Math.sqrt(variance);
-}
-
-/**
- * The most common value, which is what a "usual" first unlock means.
- *
- * A tie goes to the smallest, which for a clock face is the earliest. Every
- * value being unique is a tie between all of them, and picking whichever came
- * first in the frame would make the answer depend on row order.
- */
-function mode(values: string[]): string {
-  const counts = new Map<string, number>();
-  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
-  let best = "";
-  let most = -1;
-  for (const [v, n] of [...counts.entries()].sort((a, b) =>
-    a[0].localeCompare(b[0]))) {
-    if (n > most) { best = v; most = n; }
-  }
-  return best;
-}
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (!sorted.length) return 0;
-  return sorted.length % 2 ? (sorted[mid] ?? 0)
-    : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
-}
-
 function present(rows: DailyRow[], key: "first_pickup_h" | "last_use_h"): number[] {
   return rows.map((r) => r[key]).filter((v): v is number => v !== null);
 }
@@ -99,7 +61,7 @@ function strip(rows: DailyRow[]): string {
     (r.longest_offline_h > best.longest_offline_h ? r : best), rows[0]!);
   return kpis([
     { label: copy.kpi.screen, value: hm(mean(rows.map((r) => r.screen_min))),
-      delta: copy.kpi.screenDelta(sd(rows.map((r) => r.screen_min))) },
+      delta: copy.kpi.screenDelta(deviation(rows.map((r) => r.screen_min))) },
     { label: copy.kpi.sessions,
       value: mean(rows.map((r) => r.sessions)).toFixed(0),
       delta: copy.kpi.sessionsDelta(

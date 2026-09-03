@@ -1,4 +1,4 @@
-"""Build the static site into `docs/`.
+"""Build the static site into `dist/`.
 
     python build.py
 
@@ -6,11 +6,11 @@ Two halves, one command. Python turns the event logs into one typed JSON
 document; the TypeScript in `web/` turns that into the page — every section
 rendered at build time, so what ships reads without script.
 
-    python -m emit          data/*.json  →  docs/data.json
+    python -m emit          data/*.json  →  dist/data.json
     npm run typecheck       the document against web/types/
-    prerender               docs/data.json + web/index.html  →  docs/index.html
-    npm run bundle          web/main.ts  →  docs/app.js
-                            web/styles/*   →  docs/style.css
+    prerender               dist/data.json + web/index.html  →  dist/index.html
+    npm run bundle          web/main.ts  →  dist/app.js
+                            web/styles/*   →  dist/style.css
                             vendored plotly, copied
 
 Node is required. `npm install` once, then this.
@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 WEB = ROOT / "web"
-DOCS = ROOT / "docs"
+DIST = ROOT / "dist"
 CACHE = ROOT / "node_modules" / ".cache"
 
 
@@ -41,7 +41,7 @@ def run(*command: str) -> str:
 def emit() -> Path:
     """The document. Everything the page is given, and nothing else."""
     run(sys.executable, "-m", "payload")
-    return DOCS / "data.json"
+    return DIST / "data.json"
 
 
 def typecheck() -> None:
@@ -54,7 +54,7 @@ def prerender() -> Path:
     """The page, with every section already in it."""
     run("npm", "run", "--silent", "prerender")
     html = run("node", str(CACHE / "prerender.cjs"), str(WEB / "index.html"))
-    page = DOCS / "index.html"
+    page = DIST / "index.html"
     page.write_text(html)
     return page
 
@@ -62,14 +62,14 @@ def prerender() -> Path:
 def bundle() -> Path:
     """The one script the page loads."""
     run("npm", "run", "--silent", "bundle")
-    return DOCS / "app.js"
+    return DIST / "app.js"
 
 
 def stylesheet() -> Path:
     """One stylesheet out of many. The sections exist so the source is
     readable; the page still gets one file and one request."""
     parts = sorted((WEB / "styles").glob("*.css"))
-    css = DOCS / "style.css"
+    css = DIST / "style.css"
     css.write_text("\n".join(p.read_text().rstrip("\n") for p in parts) + "\n")
     return css
 
@@ -81,14 +81,14 @@ def vendor_plotly() -> Path:
     src = WEB / "vendor" / "plotly-cartesian.min.js"
     if not src.exists():
         raise SystemExit(f"vendored plotly not found at {src}")
-    (DOCS / "vendor").mkdir(parents=True, exist_ok=True)
-    dst = DOCS / "vendor" / src.name
+    (DIST / "vendor").mkdir(parents=True, exist_ok=True)
+    dst = DIST / "vendor" / src.name
     shutil.copyfile(src, dst)
     return dst
 
 
 def main() -> int:
-    DOCS.mkdir(exist_ok=True)
+    DIST.mkdir(exist_ok=True)
     data = emit()
     typecheck()
     written = [data, prerender(), bundle(), stylesheet(), vendor_plotly()]

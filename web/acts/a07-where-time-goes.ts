@@ -5,6 +5,7 @@
 import { explain } from "../copy/explain";
 import { unit } from "../copy/units";
 import { pct, shortDate, thousands } from "../format";
+import { mean } from "../stats";
 import { caption, chart, grid, kpis, note, tags } from "../html";
 import type { Profile, UsageTotal } from "../types/index";
 import { other, type Act, type Context } from "./act";
@@ -72,10 +73,6 @@ const copy = {
 
   next: "That is what got through. Here is what did not.",
 };
-
-function mean(values: number[]): number {
-  return values.reduce((a, b) => a + b, 0) / (values.length || 1);
-}
 
 /** The three apps the reader is about to see at the top of the chart. */
 function top3Names(apps: UsageTotal[]): string {

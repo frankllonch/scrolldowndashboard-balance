@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGE = ROOT / "docs" / "index.html"
+PAGE = ROOT / "dist" / "index.html"
 
 WORD_BUDGET = 2800
 DATA_CELL_WORDS = 6

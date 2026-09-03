@@ -1,14 +1,16 @@
-"""One profile: run the core over its log, then lay the result out flat.
+"""One analysis, laid out flat.
 
-The column lists are deliberate. The daily frame carries 67 columns, most of
-them intermediates; a new one has to be named here on purpose before it can
-reach the browser.
+Takes what `analysis.pipeline` computed and turns it into the records the page
+reads. The column lists below are the whole point: the daily frame carries 67
+columns and 33 of them cross, so a new intermediate in `metrics.py` has to be
+named here on purpose before it can reach the browser.
 """
 
 from __future__ import annotations
 
 import pandas as pd
 
+from analysis.events import Timeline
 from analysis.intelligence import ALERT_BUDGET
 from analysis.pipeline import Analysis
 from analysis.score import COMPONENTS
@@ -40,22 +42,17 @@ WEEKLY_COLUMNS = (
     "first_pickup_h", "longest_offline_h", "best_offline_h",
     "best_offline_when", "distinct_apps", "switches_per_screen_hour",
     "distract_share", "blocks", "blocks_total", "blocks_sensitive", "score",
-) + tuple(
-    # The change, but not the previous value: the one table that shows a
-    # previous week reads that week's own row.
-    f"{col}_delta"
-    for col in ("screen_min", "pickups", "night_min", "blocks", "score",
-                "distract_share", "longest_offline_h")
 ) + tuple(f"score_{col}" for col, *_ in COMPONENTS)
+
+#: An app and a domain carry the same five facts, so they cross the same way.
+USAGE_COLUMNS = ("key", "label", "category", "minutes", "opens", "min_per_open")
 
 
 def week_value(df: pd.DataFrame, col: str, week: int) -> float:
+    """One measure averaged over one week. The summary compares the first
+    against the last, so it asks for the same thing a dozen times."""
     return df[df["week"] == week][col].mean()
 
-
-# ---------------------------------------------------------------------------
-# One profile
-# ---------------------------------------------------------------------------
 
 def filter_outage(run: Analysis) -> dict:
     """The apps that appear in the usage frame despite being blocked, and the
@@ -161,25 +158,28 @@ def summary(run: Analysis) -> dict:
 
 
 def profile(run: Analysis) -> dict:
-    df, blocks = run.daily, run.blocks
+    """One profile's whole entry in the document.
+
+    Every key here is declared in `web/types/index.ts` as a `Profile`, and the
+    type check compiles the emitted file against it — so adding one means
+    adding it there too, and renaming one fails the build.
+    """
+    # Where the walkthrough opens: the day something was said, else the last.
+    # A reader who never touches the slider should land on the interesting day.
+    weeks = list(run.weekly.index)
     default_day = next((r["day"] for r in run.replay if r["alert"]),
                        run.replay[-1]["day"])
-    weeks = list(run.weekly.index)
     return {
         "summary": summary(run),
-        "daily": rows(df.reset_index(drop=True), DAILY_COLUMNS),
+        "daily": rows(run.daily.reset_index(drop=True), DAILY_COLUMNS),
         "weekly": rows(run.weekly, WEEKLY_COLUMNS, index_as="week"),
-        "apps": rows(run.apps.reset_index(drop=True),
-                     ("key", "label", "category", "minutes", "opens",
-                      "min_per_open")),
-        "sites": rows(run.sites.reset_index(drop=True),
-                      ("key", "label", "category", "minutes", "opens",
-                       "min_per_open")),
+        "apps": rows(run.apps.reset_index(drop=True), USAGE_COLUMNS),
+        "sites": rows(run.sites.reset_index(drop=True), USAGE_COLUMNS),
         "categoryDaily": rows(run.categories.reset_index(drop=True),
                               ("day", "category", "minutes")),
         "hourHeat": rows(run.heat.reset_index(drop=True),
                          ("dow", "hour", "minutes")),
-        "blocks": block_counts(blocks),
+        "blocks": block_counts(run.blocks),
         "alerts": [signal(s) for s in run.alerts],
         "positives": [signal(s) for s in run.positives],
         "nudges": [nudge(n) for n in run.nudges],
@@ -192,6 +192,8 @@ def profile(run: Analysis) -> dict:
         "anomalies": {k: int(v) for k, v in run.timeline.anomalies.items()},
         "eventCounts": event_counts(run.timeline),
         "defaultDay": plain(default_day),
+        # The last full week. The final one is a two-day tail, and opening on
+        # it would show a short week's averages as if they were a week's.
         "defaultWeek": int(weeks[-2] if len(weeks) > 1 else weeks[-1]),
     }
 
@@ -226,7 +228,7 @@ def block_counts(blocks: pd.DataFrame) -> dict:
     }
 
 
-def event_counts(timeline) -> dict:
+def event_counts(timeline: Timeline) -> dict:
     """How many of each event type the log carries.
 
     The events themselves do not cross the boundary — 2.4 MB of them, and the
@@ -241,6 +243,7 @@ def event_counts(timeline) -> dict:
 
 
 def replay_day(r: dict) -> dict:
+    """One day of the replay: what the phone knew, and what it did about it."""
     return {
         "day": plain(r["day"]),
         "alert": signal(r["alert"]) if r["alert"] else None,

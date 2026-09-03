@@ -8,12 +8,14 @@
  */
 
 import type { Selection } from "./charts/index";
-import { currentProfile, root } from "./interaction/dom";
 import { load, profile as profileOf } from "./document";
+import { currentProfile, root } from "./interaction/dom";
 import { drawWithin } from "./interaction/plots";
 import { progressBar, watchActs, watchResize } from "./interaction/reader";
 import { bindSliders } from "./interaction/sliders";
-import { applyProfile, bindSwitches, requested, skipTheFork } from "./interaction/switch";
+import {
+  applyProfile, bindSwitches, requested, skipTheFork,
+} from "./interaction/switch";
 
 async function start(): Promise<void> {
   const payload = await load();
@@ -27,6 +29,9 @@ async function start(): Promise<void> {
   };
   root.dataset.profile = user;
 
+  // Draw first. Every figure changes the height of the act holding it, and
+  // the two things below aim at geometry: the observer that decides which act
+  // owns the surface, and the fork's scroll into act 04.
   await drawWithin(document, payload, selection);
   bindSliders(payload, selection);
   watchActs();

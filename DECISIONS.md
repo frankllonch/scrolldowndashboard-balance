@@ -103,7 +103,7 @@ gone with it.
 
 ## The page is built, not mounted
 
-`web/tools/prerender.ts` writes every section into `docs/index.html` at build
+`web/tools/prerender.ts` writes every section into `dist/index.html` at build
 time rather than leaving the browser to inject them. What arrives is complete
 and reads without script; what the bundle adds is the plots and the
 interaction.

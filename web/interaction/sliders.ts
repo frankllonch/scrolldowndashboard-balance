@@ -9,7 +9,9 @@
  */
 
 import { plotly } from "../charts/plotly";
-import { dayPanel, weekPanel } from "../acts/index";
+import {
+  dayPanel, dayReadout, weekPanel, weekReadout,
+} from "../acts/index";
 import { act, all, fill, fillAll, one, slider } from "../interaction/dom";
 import { draw, drawn } from "../interaction/plots";
 import { profile as profileOf } from "../document";
@@ -72,22 +74,19 @@ function applyDay(payload: Payload, selection: Selection): void {
   }
 }
 
-/** What the readout beside a slider says at a given step. */
+/**
+ * What the readout says while the thumb is moving.
+ *
+ * Asked of the act that owns the panel, so the preview during a drag and the
+ * heading it settles on are the same words. They used to be written twice.
+ */
 function readout(payload: Payload, selection: Selection, kind: "week" | "day",
                  index: number): string {
   const profile = profileOf(payload, selection.user);
-  if (kind === "week") {
-    const row = profile.weekly.find((w) => w.week === index);
-    return row ? (row.is_partial ? `Week ${row.week} (short)`
-                                 : `Week ${row.week}`) : "";
-  }
-  const day = profile.replay[index];
-  if (!day) return "";
-  const [, month, dayOfMonth] = day.day.split("-");
-  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${Number(dayOfMonth)} ${names[Number(month) - 1] ?? month}`;
+  return kind === "week" ? weekReadout(profile, index)
+                         : dayReadout(profile, index);
 }
+
 
 /**
  * Bind both sliders to the live selection.

@@ -4,7 +4,7 @@
   "description": "Static scroll over one month of Balance Phone events.",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "bundle": "esbuild web/main.ts --bundle --format=iife --target=es2019 --minify --outfile=docs/app.js",
+    "bundle": "esbuild web/main.ts --bundle --format=iife --target=es2019 --minify --outfile=dist/app.js",
     "prerender": "esbuild web/tools/prerender.ts --bundle --format=cjs --platform=node --outfile=node_modules/.cache/prerender.cjs",
     "check": "npm run typecheck && npm run bundle"
   },

@@ -94,13 +94,6 @@ export interface WeeklyRow {
   blocks_sensitive: number;
   score: number;
 
-  screen_min_delta: number | null;
-  pickups_delta: number | null;
-  night_min_delta: number | null;
-  blocks_delta: number | null;
-  score_delta: number | null;
-  distract_share_delta: number | null;
-  longest_offline_h_delta: number | null;
 
   /** Component scores averaged over the week. */
   score_screen_min: number;

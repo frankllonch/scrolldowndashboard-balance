@@ -66,6 +66,12 @@ def rows(frame: pd.DataFrame, columns: tuple[str, ...],
 
 
 def signal(sig) -> dict:
+    """An alert or a reinforcement, with its evidence.
+
+    The evidence is the figures behind the decision. It crosses because the
+    page shows it on the device panel — the side of the screen that never
+    leaves the phone — and never in a notification.
+    """
     return {
         "key": sig.key, "day": plain(sig.day), "until": plain(sig.until),
         "decision": sig.decision, "reason": sig.reason,
@@ -76,6 +82,7 @@ def signal(sig) -> dict:
 
 
 def nudge(n) -> dict:
+    """One night of the nudge replay, fired or not."""
     return {
         "day": plain(n.day), "fired": bool(n.fired), "at_ms": plain(n.at_ms),
         "quiet_reason": n.quiet_reason, "reopens": int(n.reopens),
@@ -85,6 +92,8 @@ def nudge(n) -> dict:
 
 
 def snake(text: str) -> str:
+    """`nudge_summary` is keyed by English phrases, because it is printed by
+    the CLI as-is. The page reads them as fields, so they cross underscored."""
     return text.replace(" ", "_")
 
 

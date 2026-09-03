@@ -5,7 +5,7 @@ page in Chromium and report what they saw.
 
 ```bash
 python build.py
-python -m http.server -d docs 8533 &
+python -m http.server -d dist 8533 &
 make browser
 ```
 

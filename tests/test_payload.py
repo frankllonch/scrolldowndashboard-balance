@@ -146,3 +146,33 @@ def test_the_block_tallies_agree_with_their_total(document):
             counted = sum(row["count"] for row in blocks[field])
             assert counted == blocks["total"], f"{user}/{field}"
         assert sum(blocks["byType"].values()) == blocks["total"], user
+
+
+# ---------------------------------------------------------------------------
+# The one thing declared on both sides
+# ---------------------------------------------------------------------------
+
+def test_the_index_components_match_on_both_sides():
+    """`COMPONENTS` is written twice: once in `analysis/score.py`, which
+    computes the index, and once in `web/charts/score.ts`, which explains it
+    and draws its breakdown.
+
+    It cannot cross in the document — the page needs it before the first fetch
+    resolves, to render act 02 at build time — so this holds the two copies
+    together instead. A weight changed on one side and not the other would
+    otherwise show a chart that disagrees with the number above it.
+    """
+    from analysis.score import COMPONENTS
+
+    source = (ROOT / "web" / "charts" / "score.ts").read_text()
+    block = re.search(r"export const COMPONENTS[^=]*= \[(.+?)\n\];", source, re.S)
+    assert block, "no COMPONENTS array in web/charts/score.ts"
+
+    declared = re.findall(
+        r'key: "(\w+)", label: "([^"]+)", good: ([\d.]+), bad: ([\d.]+),\s*'
+        r"weight: ([\d.]+)", block.group(1))
+    assert len(declared) == len(COMPONENTS), declared
+
+    for (key, label, good, bad, weight), found in zip(COMPONENTS, declared):
+        assert found[:2] == (key, label), found
+        assert [float(x) for x in found[2:]] == [good, bad, weight], found

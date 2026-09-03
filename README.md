@@ -11,10 +11,9 @@ and what it said out loud. One scrolling page, twelve acts, two profiles.
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -e ".[dev]"
 npm install
-.venv/bin/python -m pytest        # 169 tests
-npm run typecheck                 # the payload against web/types/
-.venv/bin/python build.py         # writes docs/
-.venv/bin/python -m http.server -d docs 8000
+.venv/bin/python build.py         # writes dist/, type-checking on the way
+.venv/bin/python -m pytest        # 167 tests, several of which read dist/
+.venv/bin/python -m http.server -d dist 8000
 ```
 
 `python -m analysis.run --user B --format json` prints the same analysis without
@@ -31,7 +30,7 @@ the page.
 | `web/acts/` | one file per section, holding its markup and its words |
 | `web/charts/` | every figure, built in the browser |
 | `web/interaction/` | sliders, the profile switch, the travelling surface |
-| `docs/` | the built site. Output — edit `web/`, not this |
+| `dist/` | the built site. Output — edit `web/`, not this |
 
 Python computes; TypeScript draws. Nothing crossing between them is HTML, a
 figure or a word — `tests/test_payload.py` asserts it, and `npm run typecheck`

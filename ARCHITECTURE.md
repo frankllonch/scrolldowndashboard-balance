@@ -35,7 +35,6 @@ payload/                       ── packages it. Formats nothing. ──
   __init__.py      58   the document, and the finding it adds up to
   │
   ▼
-docs/data.json    163 KB  ═══ THE BOUNDARY · no HTML, no figures, no copy ═══
   │
   ▼
 web/                           ── draws it. Owns every word. ──
@@ -92,16 +91,23 @@ web/                           ── draws it. Owns every word. ──
 build.py          101   python -m payload · typecheck · prerender · bundle
   │
   ▼
-docs/                          ── the built site · GitHub Pages serves this ──
-  index.html      39 KB  every section already in it: the page reads without JS
-  data.json      163 KB  the document
-  app.js          75 KB  the bundle
-  style.css       28 KB  the ten stylesheets, joined
-  vendor/       1450 KB  plotly
+dist/                          ── the built site · five files, one request each ──
+  index.html      39 KB  ← web/index.html + every act, prerendered by node
+  data.json      163 KB  ← python -m payload · fetched, not bundled, so it caches
+  app.js          75 KB  ← web/main.ts and everything it imports, bundled
+  style.css       28 KB  ← web/styles/*.css, concatenated in filename order
+  vendor/       1450 KB  ← web/vendor/, copied
 ```
 
-`docs/` is build output. Editing it loses the change on the next build; edit
-`web/`. The name is GitHub Pages' requirement, not a description.
+`dist/` is build output and is not in the repository: the workflow in
+`.github/workflows/` builds it on every push and publishes that. Nothing here
+is edited by hand — a change made in `dist/` is gone at the next build. The
+arrows say where each file comes from; go there instead.
+
+The page needs four of the five. `data.json` is fetched rather than bundled so
+the browser caches it apart from the code, and `index.html` already contains
+every section, so the page reads with JavaScript switched off — what `app.js`
+adds is the plots and the interaction.
 
 ## To change something, open one file
 

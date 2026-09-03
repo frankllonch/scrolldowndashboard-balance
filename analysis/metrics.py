@@ -255,6 +255,12 @@ def hourly_heat(tl: Timeline, days: set[date] | None = None) -> pd.DataFrame:
 
 
 def blocks_frame(tl: Timeline, days: set[date] | None = None) -> pd.DataFrame:
+    """One row per blocked attempt. Nothing in it ever opened.
+
+    `days` is the set of complete days: a block on a day the file cut short
+    has to leave this frame too, or the per-day counts stop matching the
+    daily frame beside them.
+    """
     return pd.DataFrame([{
         "day": b.day, "hour": to_dt(b.ts_ms).hour,
         "block_type": b.block_type, "category": b.category, "target": b.target,

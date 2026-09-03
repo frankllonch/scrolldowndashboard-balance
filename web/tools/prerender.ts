@@ -16,7 +16,7 @@ declare function require(id: "node:fs"): {
   readFileSync(path: string, encoding: string): string;
 };
 
-import raw from "../../docs/data.json";
+import raw from "../../dist/data.json";
 import { bodies, rail, section } from "../page";
 import { ACTS } from "../acts/index";
 import { chrome } from "../copy/units";
@@ -30,6 +30,7 @@ const DESCRIPTION =
   + "Not a dumbphone, not anti-tech: technology that serves your life instead "
   + "of hijacking it.";
 
+/** The shell with every section written into it. */
 export function render(shell: string, payload: Payload): string {
   const user = payload.meta.defaultProfile;
   const built = bodies(payload, user);

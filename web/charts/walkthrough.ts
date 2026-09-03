@@ -73,6 +73,13 @@ function rails(replay: ReplayDay[]) {
   return { nudges, alerts, digests, positives };
 }
 
+/**
+ * Every watched variable on one axis, with the event rail under it.
+ *
+ * The one chart that answers "how did the engine see this month": seven
+ * series the rules read, each normalised against its own maximum, and below
+ * zero a rail of what the phone actually emitted on which day.
+ */
 export function trackedSeries(s: Surface, rows: DailyRow[],
                               replay: ReplayDay[], cursor: Day): Figure {
   const days = rows.map((r) => r.day);

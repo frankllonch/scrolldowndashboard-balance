@@ -6,7 +6,7 @@
  * page expects a number, the build fails here rather than at a blank chart.
  */
 
-import raw from "../../docs/data.json";
+import raw from "../../dist/data.json";
 import type { Payload } from "./index";
 
 /**

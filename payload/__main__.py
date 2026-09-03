@@ -7,7 +7,7 @@ from pathlib import Path
 
 from . import payload
 
-OUT = Path("docs/data.json")
+OUT = Path("dist/data.json")
 
 
 def main() -> None:

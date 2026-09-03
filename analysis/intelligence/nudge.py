@@ -61,6 +61,11 @@ def replay_nudge(tl: Timeline, df: pd.DataFrame) -> list[NightNudge]:
 
 
 def nudge_summary(nudges: list[NightNudge]) -> dict:
+    """What the replay adds up to: how often the nudge would have appeared,
+    and how many night minutes sat behind it.
+
+    Keyed by English phrases because the CLI prints them as they are.
+    """
     fired = [n for n in nudges if n.fired]
     night_total = sum(n.night_minutes for n in nudges)
     after = sum(n.minutes_after for n in fired)
