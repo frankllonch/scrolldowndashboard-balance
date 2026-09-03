@@ -6,7 +6,7 @@ Two invariants survive the move, and one does not.
   sentence drifts from the frames the moment anything is recalibrated. This
   reads the source text, because that is where the offence would be.
 * **The engine does not give instructions.** The notification text is written
-  in `balance/intelligence/`, so this still tests Python.
+  in `analysis/intelligence/`, so this still tests Python.
 
 What went is "no user-visible string outside the catalogue". Its premise was
 the split it enforced: prose in `copytext/`, keys in `render/`. An act now
@@ -75,7 +75,7 @@ IMPERATIVE = ("you should", "try to", "we recommend", "good time to",
 def test_the_engine_does_not_command(df_a, df_b):
     """The tone is descriptive. A recommendation slipping into a notification
     is what this catches."""
-    from balance.intelligence import evaluate_alerts, evaluate_positives
+    from analysis.intelligence import evaluate_alerts, evaluate_positives
 
     offenders = []
     for frame in (df_a, df_b):

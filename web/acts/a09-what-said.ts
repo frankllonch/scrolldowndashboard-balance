@@ -118,7 +118,7 @@ function summaryCard(day: ReplayDay): PhoneCard | null {
   const nudge = day.nudge;
   if (nudge?.fired && nudge.at_ms !== null) {
     // UTC, not local. The core reads every timestamp as UTC and drops the
-    // zone (`balance/events.py`), so a local reading here would put the nudge
+    // zone (`analysis/events.py`), so a local reading here would put the nudge
     // two hours away from the night band it belongs to.
     const at = new Date(nudge.at_ms);
     return {

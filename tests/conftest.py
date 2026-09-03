@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from balance.events import Timeline, load
+from analysis.events import Timeline, load
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 
@@ -74,13 +74,13 @@ def tl_b() -> Timeline:
 
 @pytest.fixture(scope="session")
 def df_a(tl_a):
-    from balance.metrics import daily_frame
-    from balance.score import add_score
+    from analysis.metrics import daily_frame
+    from analysis.score import add_score
     return add_score(daily_frame(tl_a))
 
 
 @pytest.fixture(scope="session")
 def df_b(tl_b):
-    from balance.metrics import daily_frame
-    from balance.score import add_score
+    from analysis.metrics import daily_frame
+    from analysis.score import add_score
     return add_score(daily_frame(tl_b))

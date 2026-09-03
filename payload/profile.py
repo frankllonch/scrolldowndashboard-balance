@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from balance.events import load
-from balance.intelligence import (
+from analysis.events import load
+from analysis.intelligence import (
     ALERT_BUDGET,
     emissions,
     evaluate_alerts,
@@ -19,7 +19,7 @@ from balance.intelligence import (
     nudge_summary,
     replay_nudge,
 )
-from balance.metrics import (
+from analysis.metrics import (
     blocks_frame,
     category_daily,
     daily_frame,
@@ -27,7 +27,7 @@ from balance.metrics import (
     totals,
     weekly_frame,
 )
-from balance.score import COMPONENTS, add_score
+from analysis.score import COMPONENTS, add_score
 
 from .scalars import nudge, plain, rows, signal, snake
 

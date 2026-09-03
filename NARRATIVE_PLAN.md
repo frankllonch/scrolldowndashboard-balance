@@ -9,7 +9,7 @@ frontend does no juggling. And the code should be easier to navigate than it is.
 Changing one section meant touching six files across two languages — the copy in
 `copytext/strings/product.py`, the markup in `render/acts/aNN_*.py`, the chart in
 `render/figures/*.py`, the pre-rendered cards in `render/states.py`, the CSS in
-`site/css/`, and the behaviour in `site/app.js`. The 236 KB `payload.json` carried
+`web/styles/`, and the behaviour in `site/app.js`. The 236 KB `payload.json` carried
 26 built Plotly figures and 6 acts of pre-rendered HTML.
 
 After: one TypeScript module per act, holding its markup, its copy and its chart.

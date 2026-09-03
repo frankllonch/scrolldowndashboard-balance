@@ -42,12 +42,12 @@ ENTERTAINMENT · NEWS · SHOPPING · OTHER
 ```
 
 `OTHER` covers a third of user A's attributed time and a fifth of user B's,
-so `balance/taxonomy.py` assigns six more on read: `CALLS`, `NAVIGATION`,
+so `analysis/taxonomy.py` assigns six more on read: `CALLS`, `NAVIGATION`,
 `PRODUCTIVITY`, `LEARNING`, `AI_TOOLS`, `RESEARCH`. The files are never
 edited, and a label the stream did assert always wins.
 
 `ADULT` and `GAMBLING` are treated as sensitive throughout the codebase
-(`SENSITIVE` in `balance/events.py`); they are the only ones that can justify
+(`SENSITIVE` in `analysis/events.py`); they are the only ones that can justify
 raising an alert. The rest are ordinary distraction.
 
 ## What the stream does and does not contain
@@ -55,12 +55,12 @@ raising an alert. The rest are ordinary distraction.
 - A `BLOCK` means an attempt was stopped. A `URL_VISIT` or an `APP_FOREGROUND`
   means content actually was shown.
 - Sessions are implicit: they are reconstructed from `SCREEN_ON` … `SCREEN_OFF`.
-  See `balance/events.py` for why that reconstruction is not a simple pairing.
+  See `analysis/events.py` for why that reconstruction is not a simple pairing.
 - Time per app or per site is not given. It is derived from event ordering: an
   app is in front from its `APP_FOREGROUND` until the next foreground change,
   block, screen-on or screen-off.
 
 ## Where the data lives
 
-`data/*.json`, one file per profile, wired in `PROFILES` in `balance/run.py`
+`data/*.json`, one file per profile, wired in `PROFILES` in `analysis/run.py`
 and `DATA` in `app.py`.

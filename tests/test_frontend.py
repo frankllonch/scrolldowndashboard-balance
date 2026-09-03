@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 #: The built sheet, which is what the browser gets. The sections it is
-#: concatenated from live in site/css/.
+#: concatenated from live in web/styles/.
 CSS = (ROOT / "docs" / "style.css").read_text()
 
 #: What the reveal animation is applied to. If any of these is hidden by a

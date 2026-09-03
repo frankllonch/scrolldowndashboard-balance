@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from balance.run import PROFILES, analyse, render_json, render_text
+from analysis.run import PROFILES, analyse, render_json, render_text
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -58,7 +58,7 @@ def test_every_profile_emits_a_weekly_digest(result):
 def test_the_cli_actually_starts():
     """Run as a subprocess: covers `argparse` and `__main__`."""
     r = subprocess.run(
-        [sys.executable, "-m", "balance.run", "--user", "A", "--format", "json"],
+        [sys.executable, "-m", "analysis.run", "--user", "A", "--format", "json"],
         cwd=ROOT, capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     data = json.loads(r.stdout)
@@ -68,7 +68,7 @@ def test_the_cli_actually_starts():
 
 def test_the_csv_dump_writes_both_frames(tmp_path):
     r = subprocess.run(
-        [sys.executable, "-m", "balance.run", "--user", "B",
+        [sys.executable, "-m", "analysis.run", "--user", "B",
          "--format", "json", "--csv", str(tmp_path)],
         cwd=ROOT, capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
@@ -79,10 +79,10 @@ def test_the_csv_dump_writes_both_frames(tmp_path):
 def test_the_cli_and_the_dashboard_compute_the_same_thing():
     """The two interfaces are adapters over the same core, not two
     implementations that can drift apart."""
-    from balance.events import load
-    from balance.intelligence import evaluate_alerts
-    from balance.metrics import daily_frame
-    from balance.score import add_score
+    from analysis.events import load
+    from analysis.intelligence import evaluate_alerts
+    from analysis.metrics import daily_frame
+    from analysis.score import add_score
 
     direct = add_score(daily_frame(load(ROOT / "data/events_user_b.json", "B")))
     via_cli = analyse("B", ROOT)["daily"]

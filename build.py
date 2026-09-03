@@ -8,9 +8,9 @@ rendered at build time, so what ships reads without script.
 
     python -m emit          data/*.json  →  docs/data.json
     npm run typecheck       the document against web/types/
-    prerender               docs/data.json + site/index.html  →  docs/index.html
+    prerender               docs/data.json + web/index.html  →  docs/index.html
     npm run bundle          web/main.ts  →  docs/app.js
-                            site/css/*   →  docs/style.css
+                            web/styles/*   →  docs/style.css
                             vendored plotly, copied
 
 Node is required. `npm install` once, then this.
@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-SITE = ROOT / "site"
+WEB = ROOT / "web"
 DOCS = ROOT / "docs"
 CACHE = ROOT / "node_modules" / ".cache"
 
@@ -40,7 +40,7 @@ def run(*command: str) -> str:
 
 def emit() -> Path:
     """The document. Everything the page is given, and nothing else."""
-    run(sys.executable, "-m", "emit")
+    run(sys.executable, "-m", "payload")
     return DOCS / "data.json"
 
 
@@ -53,7 +53,7 @@ def typecheck() -> None:
 def prerender() -> Path:
     """The page, with every section already in it."""
     run("npm", "run", "--silent", "prerender")
-    html = run("node", str(CACHE / "prerender.cjs"), str(SITE / "index.html"))
+    html = run("node", str(CACHE / "prerender.cjs"), str(WEB / "index.html"))
     page = DOCS / "index.html"
     page.write_text(html)
     return page
@@ -68,7 +68,7 @@ def bundle() -> Path:
 def stylesheet() -> Path:
     """One stylesheet out of many. The sections exist so the source is
     readable; the page still gets one file and one request."""
-    parts = sorted((SITE / "css").glob("*.css"))
+    parts = sorted((WEB / "styles").glob("*.css"))
     css = DOCS / "style.css"
     css.write_text("\n".join(p.read_text().rstrip("\n") for p in parts) + "\n")
     return css
@@ -78,7 +78,7 @@ def vendor_plotly() -> Path:
     """The cartesian build, committed rather than fetched. The page draws bar,
     scatter and heatmap, so the full bundle would ship 2.7 MB of traces it
     never uses."""
-    src = SITE / "vendor" / "plotly-cartesian.min.js"
+    src = WEB / "vendor" / "plotly-cartesian.min.js"
     if not src.exists():
         raise SystemExit(f"vendored plotly not found at {src}")
     (DOCS / "vendor").mkdir(parents=True, exist_ok=True)

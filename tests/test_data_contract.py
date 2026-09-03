@@ -17,7 +17,7 @@ import json
 
 import pytest
 
-from balance.events import BLOCK, CATEGORIES, SENSITIVE, load
+from analysis.events import BLOCK, CATEGORIES, SENSITIVE, load
 from conftest import DATA
 
 FIELDS = {"id", "event_type", "timestamp_millis", "package_name",

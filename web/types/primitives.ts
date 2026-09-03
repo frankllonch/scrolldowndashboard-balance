@@ -2,7 +2,7 @@
  * The vocabulary every other type is built from.
  *
  * Each union is asserted against the core in `tests/test_emit.py`: if
- * `CATEGORIES` in `balance/events.py` grows a member, that test fails until
+ * `CATEGORIES` in `analysis/events.py` grows a member, that test fails until
  * this file grows it too.
  */
 

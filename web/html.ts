@@ -2,7 +2,7 @@
  * The small builders the acts are made of.
  *
  * Strings rather than DOM nodes, for the same reason the Python did: the CSS
- * in `site/css/` is written against exactly this markup, the profile switch
+ * in `web/styles/` is written against exactly this markup, the profile switch
  * replaces whole sections at once, and a template literal reads closer to the
  * result than twenty `createElement` calls.
  *

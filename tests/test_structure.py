@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 #: Files whose size is part of the design, not an accident.
 BUDGETS = {
     "build.py": 105,
-    "site/index.html": 200,
+    "web/index.html": 200,
     "README.md": 60,
     "ARCHITECTURE.md": 120,
 }
@@ -31,8 +31,8 @@ def lines(path: Path) -> int:
 
 def sources() -> list[Path]:
     out = []
-    for pattern in ("balance/**/*.py", "emit/**/*.py", "tests/**/*.py",
-                    "web/**/*.ts", "site/css/*.css", "site/index.html",
+    for pattern in ("analysis/**/*.py", "payload/**/*.py", "tests/**/*.py",
+                    "web/**/*.ts", "web/styles/*.css", "web/index.html",
                     "build.py"):
         out += [p for p in ROOT.glob(pattern) if p.is_file()]
     return sorted(out)
@@ -83,25 +83,25 @@ def test_the_act_registry_is_ordered_and_unique():
                      .glob("a[0-9][0-9]-*.ts"))
     assert [m[1:3] for m in modules] == order, modules
 
-    shell = (ROOT / "site" / "index.html").read_text()
+    shell = (ROOT / "web" / "index.html").read_text()
     for act in order:
         assert f'id="act-{act}"' in shell, f"act {act} has no section"
         assert f"<!--act:{act}-->" in shell, f"act {act} has no marker"
 
 
 def test_the_core_imports_no_presentation():
-    """`balance/` computes. Nothing in it knows plotly or the page exists."""
-    for path in sorted((ROOT / "balance").rglob("*.py")):
+    """`analysis/` computes. Nothing in it knows a charting library or the page exists."""
+    for path in sorted((ROOT / "analysis").rglob("*.py")):
         source = path.read_text()
         for banned in ("import plotly", "from plotly", "import streamlit",
-                       "from render", "import render", "from emit",
-                       "import emit"):
+                       "from render", "import render", "from payload",
+                       "import payload"):
             assert banned not in source, f"{path.name} imports {banned}"
 
 
 def test_the_backend_builds_no_presentation():
-    """`emit/` hands over numbers. It draws nothing and words nothing."""
-    for path in sorted((ROOT / "emit").glob("*.py")):
+    """`payload/` hands over numbers. It draws nothing and words nothing."""
+    for path in sorted((ROOT / "payload").glob("*.py")):
         source = path.read_text()
         for banned in ("import plotly", "from plotly", "<div", "<p ",
                        "go.Figure"):
@@ -110,14 +110,14 @@ def test_the_backend_builds_no_presentation():
 
 def test_the_shell_carries_no_copy():
     """`index.html` is a skeleton. Every word in the page comes from `web/`."""
-    shell = (ROOT / "site" / "index.html").read_text()
+    shell = (ROOT / "web" / "index.html").read_text()
     text = re.sub(r"<[^>]*>", " ", re.sub(r"<!--.*?-->", " ", shell, flags=re.S))
     stray = [w for w in re.split(r"\s+", text) if re.search(r"[A-Za-z]", w)]
     assert not stray, f"text in the shell: {stray}"
 
 
 def test_the_page_loads_one_script_and_one_stylesheet():
-    shell = (ROOT / "site" / "index.html").read_text()
+    shell = (ROOT / "web" / "index.html").read_text()
     scripts = re.findall(r'<script src="([^"]+)"', shell)
     assert scripts == ["vendor/plotly-cartesian.min.js", "app.js"], scripts
     sheets = re.findall(r'<link rel="stylesheet"[^>]*href="([^"]+)"', shell)

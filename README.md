@@ -3,7 +3,7 @@
 A device event log, read end to end: what the phone recorded, what it computed,
 and what it said out loud. One scrolling page, twelve acts, two profiles.
 
-**Live:** <https://frankllonch.github.io/scrolldowndashboard-balance/>
+**Live:** <https://frankllonch.github.io/scrolldowndashboard-analysis/>
 
 ## Run it
 
@@ -17,18 +17,18 @@ npm run typecheck                 # the payload against web/types/
 .venv/bin/python -m http.server -d docs 8000
 ```
 
-`python -m balance.run --user B --format json` prints the same analysis without
+`python -m analysis.run --user B --format json` prints the same analysis without
 the page.
 
 ## Where to look
 
 | Path | What is in it |
 |---|---|
-| `balance/events.py` | screen reconstruction, pickups, time attribution |
-| `balance/metrics.py` | the daily and weekly frames |
-| `balance/score.py` | the 0 to 100 index, five weighted components |
-| `balance/intelligence/` | alerts, the silence budget, nudges, reinforcements |
-| `emit/` | the frames as one typed JSON document · the whole boundary |
+| `analysis/events.py` | screen reconstruction, pickups, time attribution |
+| `analysis/metrics.py` | the daily and weekly frames |
+| `analysis/score.py` | the 0 to 100 index, five weighted components |
+| `analysis/intelligence/` | alerts, the silence budget, nudges, reinforcements |
+| `payload/` | the frames as one typed JSON document · the whole boundary |
 | `web/types/` | what crosses it, declared |
 | `web/acts/` | one module per act, holding its markup and its words |
 | `web/charts/` | every figure, built in the browser |

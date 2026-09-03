@@ -13,7 +13,7 @@ import datetime as dt
 import pandas as pd
 import pytest
 
-from balance.metrics import WAKE_END, WAKE_START, daily_frame, weekly_frame
+from analysis.metrics import WAKE_END, WAKE_START, daily_frame, weekly_frame
 from conftest import DAY0, build, ev
 
 
@@ -187,7 +187,7 @@ def test_short_weeks_are_flagged(df_b):
 def test_loading_is_deterministic(tmp_path):
     """Same file, same result: the derivation is a pure function of the event
     log, with no external state and no dependency on execution time."""
-    from balance.events import load
+    from analysis.events import load
     from conftest import DATA
     a = daily_frame(load(DATA / "events_user_a.json", "A"))
     b = daily_frame(load(DATA / "events_user_a.json", "A"))
@@ -220,7 +220,7 @@ def test_the_time_bands_are_not_off_by_one():
     The list this was translated from was misaligned and labelled 03:00 as
     "morning" and 10:00 as "midday".
     """
-    from balance.metrics import _when
+    from analysis.metrics import _when
     from conftest import ts
     assert _when(ts(0, "03:00")).endswith("early morning")
     assert _when(ts(0, "10:00")).endswith("morning")

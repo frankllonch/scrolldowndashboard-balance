@@ -18,16 +18,16 @@ from pathlib import Path
 
 import pytest
 
-import emit
-from balance.events import CATEGORIES
+import payload as backend
+from analysis.events import CATEGORIES
 
 ROOT = Path(__file__).resolve().parents[1]
 TYPES = ROOT / "web" / "types"
 
 
 @pytest.fixture(scope="module")
-def payload() -> dict:
-    return emit.payload()
+def document() -> dict:
+    return backend.payload()
 
 
 def union(name: str) -> set[str]:
@@ -58,22 +58,22 @@ def walk(node, path="payload"):
 # The unions
 # ---------------------------------------------------------------------------
 
-def test_the_category_union_matches_the_core(payload):
+def test_the_category_union_matches_the_core(document):
     """`Category` in types.ts against `CATEGORIES` in events.py."""
     assert union("Category") == set(CATEGORIES)
 
 
-def test_every_category_emitted_is_in_the_union(payload):
+def test_every_category_emitted_is_in_the_union(document):
     declared = union("Category")
-    for path, value in walk(payload):
+    for path, value in walk(document):
         if path.endswith(".category"):
             assert value in declared, f"{path}: {value!r}"
 
 
-def test_every_block_type_and_decision_is_in_its_union(payload):
+def test_every_block_type_and_decision_is_in_its_union(document):
     types_, decisions, tones = (union("BlockType"), union("Decision"),
                                 union("Tone"))
-    for path, value in walk(payload):
+    for path, value in walk(document):
         if path.endswith(".block_type"):
             assert value in types_, f"{path}: {value!r}"
         if path.endswith(".decision"):
@@ -82,14 +82,14 @@ def test_every_block_type_and_decision_is_in_its_union(payload):
             assert value in tones, f"{path}: {value!r}"
 
 
-def test_weekdays_are_monday_first(payload):
-    for path, value in walk(payload):
+def test_weekdays_are_monday_first(document):
+    for path, value in walk(document):
         if path.endswith(".dow"):
             assert value in range(7), f"{path}: {value!r}"
 
 
-def test_every_day_is_an_iso_date(payload):
-    for path, value in walk(payload):
+def test_every_day_is_an_iso_date(document):
+    for path, value in walk(document):
         if path.endswith(".day") or path.endswith("Day"):
             if value is None:
                 continue
@@ -101,46 +101,46 @@ def test_every_day_is_an_iso_date(payload):
 # What makes it a data document
 # ---------------------------------------------------------------------------
 
-def test_the_document_is_json_without_nan(payload):
+def test_the_document_is_json_without_nan(document):
     """`json.dumps` writes bare NaN by default, which no parser accepts. A
     metric that does not exist is null."""
-    json.dumps(payload, allow_nan=False)
-    for path, value in walk(payload):
+    json.dumps(document, allow_nan=False)
+    for path, value in walk(document):
         if isinstance(value, float):
             assert math.isfinite(value), path
 
 
-def test_no_string_in_the_document_is_markup(payload):
+def test_no_string_in_the_document_is_markup(document):
     """Python computes; TypeScript draws. A tag crossing this line means the
     backend started rendering again."""
-    for path, value in walk(payload):
+    for path, value in walk(document):
         if isinstance(value, str):
             assert not re.search(r"</?[a-z][a-z0-9]*[ />]", value), \
                 f"{path}: {value!r}"
 
 
-def test_no_figure_or_copy_key_crosses_the_line(payload):
+def test_no_figure_or_copy_key_crosses_the_line(document):
     """The old payload carried built figures and pre-rendered acts. Nothing
     here may: the frontend owns presentation."""
     banned = {"figures", "acts", "templates", "ui", "traces", "layout"}
-    for path, _ in walk(payload):
+    for path, _ in walk(document):
         assert not (set(path.split(".")) & banned), path
 
 
-def test_both_profiles_carry_every_series(payload):
+def test_both_profiles_carry_every_series(document):
     expected = {"summary", "daily", "weekly", "apps", "sites", "categoryDaily",
                 "hourHeat", "blocks", "alerts", "positives", "nudges",
                 "nudgeSummary", "replay", "emissions", "anomalies",
                 "eventCounts", "defaultDay", "defaultWeek"}
-    for user, profile in payload["profiles"].items():
+    for user, profile in document["profiles"].items():
         assert set(profile) == expected, user
-        assert len(profile["daily"]) == payload["meta"]["days"], user
+        assert len(profile["daily"]) == document["meta"]["days"], user
 
 
-def test_the_block_tallies_agree_with_their_total(payload):
+def test_the_block_tallies_agree_with_their_total(document):
     """The counts are the only form the blocks cross in, so they have to add
     up on their own."""
-    for user, profile in payload["profiles"].items():
+    for user, profile in document["profiles"].items():
         blocks = profile["blocks"]
         for field in ("byDay", "byHour", "byWeek"):
             counted = sum(row["count"] for row in blocks[field])

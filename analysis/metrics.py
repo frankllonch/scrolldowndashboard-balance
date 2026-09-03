@@ -228,7 +228,7 @@ def totals(tl: Timeline, df: pd.DataFrame, kind: str) -> pd.DataFrame:
 
 
 def category_daily(df: pd.DataFrame) -> pd.DataFrame:
-    """Minutes per category and day (long format, ready for plotly)."""
+    """Minutes per category and day (long format: one row per pair)."""
     rows = []
     for d, cats in zip(df["day"], df["_cat_s"]):
         for c, s in cats.items():

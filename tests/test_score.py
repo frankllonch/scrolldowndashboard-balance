@@ -12,7 +12,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from balance.score import COMPONENTS, _band, add_score, contributions
+from analysis.score import COMPONENTS, _band, add_score, contributions
 
 
 def test_the_weights_sum_to_one():

@@ -1,21 +1,21 @@
 [project]
-name = "balance-takehome"
+name = "balance-board"
 version = "1.0.0"
 description = "From a device event log to metrics, a wellbeing index, alerts and reinforcements."
 requires-python = ">=3.12"
+# Python computes; it draws nothing. There is no charting library here: the
+# figures are built in the browser from the series `payload/` hands over.
 dependencies = [
     "pandas>=2.2",
     "numpy>=1.26",
-    "plotly>=5.20",
 ]
 
 [project.optional-dependencies]
-# `balance/` needs neither: the CLI runs on pandas alone. Plotly is a build
-# dependency of the page, and playwright drives the built page in a browser.
+# playwright drives the built page in a real browser; ruff is the linter.
 dev = ["pytest>=8", "playwright>=1.50", "ruff>=0.6"]
 
 [project.scripts]
-balance = "balance.run:main"
+balance = "analysis.run:main"
 
 [tool.ruff]
 line-length = 88
@@ -23,7 +23,7 @@ extend-exclude = ["docs", "data"]
 
 [tool.ruff.lint]
 # Correctness and import hygiene. Formatting is not enforced: the code is
-# hand-laid out and a formatter would fight the column lists in emit/.
+# hand-laid out and a formatter would fight the column lists in payload/.
 select = ["F", "E9", "I"]
 
 [tool.ruff.lint.per-file-ignores]
@@ -46,4 +46,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["balance"]
+packages = ["analysis", "payload"]

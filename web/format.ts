@@ -34,7 +34,7 @@ export function clock(hours: number | null | undefined): string {
  * A clock face from an epoch millisecond.
  *
  * UTC, because the core reads every timestamp as UTC and drops the zone
- * (`balance/events.py`). This is the exact form: `clock()` on a decimal hour
+ * (`analysis/events.py`). This is the exact form: `clock()` on a decimal hour
  * truncates, and 21.8833 h is 21:53, not 21:52.
  */
 export function clockAt(ms: number | null | undefined): string {

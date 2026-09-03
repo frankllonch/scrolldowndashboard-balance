@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import datetime as dt
 
-from balance.events import MAX_FOREGROUND_S
+from analysis.events import MAX_FOREGROUND_S
 from conftest import DAY0, build, ev, ts
 
 

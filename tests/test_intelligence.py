@@ -20,8 +20,8 @@ import json
 import re
 from pathlib import Path
 
-from balance.events import CATEGORIES
-from balance.intelligence import (
+from analysis.events import CATEGORIES
+from analysis.intelligence import (
     ALERT_BUDGET, ALERT_MIN_GAP_DAYS, POS_BUDGET_DAYS, emissions,
     evaluate_alerts, evaluate_positives, weekly_digest, month_replay,
     nudge_summary, replay_nudge,
@@ -199,7 +199,7 @@ def test_the_weekly_digest_is_rounded(df_b):
 def test_no_sensitive_content_ever_opened(tl_a, tl_b):
     """The claim the weekly digest makes, verified against the stream: there
     is no URL_VISIT nor APP_FOREGROUND with those categories."""
-    from balance.events import SENSITIVE
+    from analysis.events import SENSITIVE
     for tl in (tl_a, tl_b):
         opened = [e for e in tl.events
                   if e["event_type"] in ("URL_VISIT", "APP_FOREGROUND")
@@ -251,14 +251,14 @@ def test_the_decision_vocabulary_is_the_one_the_charts_expect():
     `Decision` union the frontend declares — so what is left to check here is
     that the vocabulary itself has not grown or moved.
     """
-    from balance.intelligence import Signal
+    from analysis.intelligence import Signal
 
     fresh = Signal(key="k", day=dt.date(2026, 5, 1), headline="h", body="t",
                    magnitude=1, persistence=1, actionability=1)
     assert fresh.decision == "candidate"
 
     spoken = set()
-    for source in (ROOT / "balance" / "intelligence").glob("*.py"):
+    for source in (ROOT / "analysis" / "intelligence").glob("*.py"):
         spoken |= set(re.findall(r'decision[^=\n]*=\s*\(?\s*"(\w+)"',
                                  source.read_text()))
     # "candidate" is the default in signals.py, which this glob also reads.

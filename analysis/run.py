@@ -1,10 +1,10 @@
 """
 CLI: the same engine as the page, without the page.
 
-    python -m balance.run                    # both profiles, text
-    python -m balance.run --user B           # B only
-    python -m balance.run --format json      # to pipe into jq
-    python -m balance.run --csv out/         # daily and weekly frames
+    python -m analysis.run                    # both profiles, text
+    python -m analysis.run --user B           # B only
+    python -m analysis.run --format json      # to pipe into jq
+    python -m analysis.run --csv out/         # daily and weekly frames
 
 If the only place the results can be read is a user interface, there is no way
 to tell an engine that computes from a screen with hand-written numbers. This
@@ -261,7 +261,7 @@ def render_json(r: dict) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
-        prog="python -m balance.run",
+        prog="python -m analysis.run",
         description="Derives metrics, index, alerts and nudges from a device "
                     "event log.")
     ap.add_argument("--user", choices=[*PROFILES, "all"], default="all",

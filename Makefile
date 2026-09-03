@@ -25,13 +25,13 @@ serve: build        ## build, then serve the page
 	$(VENV)/python -m http.server -d docs 8000
 
 run:                ## console analysis of both profiles
-	$(VENV)/python -m balance.run
+	$(VENV)/python -m analysis.run
 
 json:               ## the same analysis as JSON
-	$(VENV)/python -m balance.run --format json
+	$(VENV)/python -m analysis.run --format json
 
 csv:                ## dump the daily and weekly frames into out/
-	$(VENV)/python -m balance.run --csv out
+	$(VENV)/python -m analysis.run --csv out
 
 clean:
 	rm -rf .pytest_cache out **/__pycache__
