@@ -41,10 +41,10 @@ def _weeks(df: pd.DataFrame) -> pd.DataFrame:
     return w[w.days >= POS_MIN_WEEK_DAYS]
 
 
-def _pos(key, day, headline, text, evidence, audience="user") -> Signal:
-    return Signal(key=key, day=day, headline=headline, guardian_text=text,
+def _pos(key, day, headline, text, evidence) -> Signal:
+    return Signal(key=key, day=day, headline=headline, body=text,
                   magnitude=1.0, persistence=1.0, actionability=1.0,
-                  evidence=evidence, audience=audience, tone="reinforcement")
+                  evidence=evidence, tone="reinforcement")
 
 
 def _offline_record(df: pd.DataFrame) -> list[Signal]:
@@ -133,11 +133,11 @@ def _best_week(df: pd.DataFrame) -> list[Signal]:
 
 
 def _filter_calm(df: pd.DataFrame) -> list[Signal]:
-    """A clear drop in attempts towards sensitive content. Goes to the guardian.
+    """A clear drop in attempts towards sensitive content.
 
     It is the exact reverse of `sensitive_spike`, at the same granularity: no
-    figures, no objects, no categories. A guardian who only hears from the
-    product when something gets worse ends up reading the channel as a threat.
+    figures, no objects, no categories. A product that only speaks up when
+    something gets worse ends up being read as a threat.
     """
     out, w = [], _weeks(df)
     for i in range(1, len(w)):
@@ -149,8 +149,7 @@ def _filter_calm(df: pd.DataFrame) -> list[Signal]:
                 "This week the sensitive-content filter stepped in considerably "
                 "less than last week. No content opened, as in previous weeks.",
                 {"attempts this week": int(cur.sensitive),
-                 "attempts last week": int(prev.sensitive)},
-                audience="guardian"))
+                 "attempts last week": int(prev.sensitive)}))
     return out
 
 
@@ -158,8 +157,8 @@ POSITIVE_RULES = (_offline_record, _night_streak, _calm_week,
                   _focus_week, _best_week, _filter_calm)
 
 
-def evaluate_positives(df: pd.DataFrame, has_guardian: bool = True) -> list[Signal]:
-    """Candidate reinforcements, with a quota of one per week and audience.
+def evaluate_positives(df: pd.DataFrame) -> list[Signal]:
+    """Candidate reinforcements, with a quota of one per week.
 
     Whatever does not fit the quota is not discarded: it drops to the weekly
     summary, where the user sees the full picture without being interrupted.
@@ -167,18 +166,14 @@ def evaluate_positives(df: pd.DataFrame, has_guardian: bool = True) -> list[Sign
     signals: list[Signal] = []
     for rule in POSITIVE_RULES:
         signals.extend(rule(df))
-    if not has_guardian:
-        signals = [s for s in signals if s.audience != "guardian"]
 
-    last_sent: dict[str, date] = {}
+    last_sent: date | None = None
     for s in sorted(signals, key=lambda x: x.day):
-        prev = last_sent.get(s.audience)
-        if prev and (s.day - prev).days < POS_BUDGET_DAYS:
+        if last_sent and (s.day - last_sent).days < POS_BUDGET_DAYS:
             s.decision = "summary"
-            s.reason = (f"A reinforcement went to this audience less than "
-                        f"{POS_BUDGET_DAYS} days ago. It enters the weekly "
-                        f"summary instead.")
+            s.reason = (f"A reinforcement went out less than {POS_BUDGET_DAYS} "
+                        f"days ago. It enters the weekly summary instead.")
             continue
         s.decision, s.reason = "sent", "Measurable improvement over own history."
-        last_sent[s.audience] = s.day
+        last_sent = s.day
     return sorted(signals, key=lambda x: x.day)

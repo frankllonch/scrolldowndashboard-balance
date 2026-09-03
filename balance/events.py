@@ -39,7 +39,7 @@ CATEGORIES = [
 ]
 
 #: "Sensitive" categories: the only ones that can justify notifying a
-#: guardian. The rest are ordinary distraction.
+#: an alert. The rest are ordinary distraction.
 SENSITIVE = {"ADULT", "GAMBLING"}
 
 #: Categories treated as "distraction" for scoring purposes.

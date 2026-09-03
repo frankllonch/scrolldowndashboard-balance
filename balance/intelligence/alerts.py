@@ -54,7 +54,7 @@ def _night_drift(df: pd.DataFrame) -> list[Signal]:
             headline="The sleep schedule has shifted",
             # Purely descriptive. No recommendations: the product reports a
             # measured change, it does not tell anyone what to do about it.
-            guardian_text=(
+            body=(
                 # Wording note: this avoids the words "other" and "news",
                 # which collide with the OTHER and NEWS category names and
                 # would trip the privacy test for no real reason.
@@ -63,7 +63,7 @@ def _night_drift(df: pd.DataFrame) -> list[Signal]:
                 "remaining indicators are holding steady."),
             magnitude=_clamp((rec_m / base_m - DRIFT_RATIO) / 4 + .5),
             persistence=_clamp(above / DRIFT_RECENT),
-            actionability=1.0,      # a schedule is exactly what a guardian can negotiate
+            actionability=1.0,      # a schedule is something you can actually move
             evidence={
                 "recent night median (min)": round(float(rec_m), 1),
                 "reference night median (min)": round(float(base.median()), 1),
@@ -94,7 +94,7 @@ def _sensitive_spike(df: pd.DataFrame) -> list[Signal]:
             key="sensitive_spike",
             day=df.day.iloc[i],
             headline="The sensitive-content filter acted more than usual",
-            guardian_text=(
+            body=(
                 "This week the content filter stepped in more often than usual. "
                 "Every attempt was blocked and no content opened."),
             magnitude=_clamp((rec / max(base_rate, 1) - SPIKE_RATIO) / 5 + .5),
@@ -130,7 +130,7 @@ def _screen_jump(df: pd.DataFrame) -> list[Signal]:
             out.append(Signal(
                 key="screen_jump", day=df.day.iloc[i],
                 headline="Screen time has gone up",
-                guardian_text="Daily use has grown against previous weeks.",
+                body="Daily use has grown against previous weeks.",
                 magnitude=_clamp((rec / base - 1) * 2),
                 persistence=1.0, actionability=0.5,
                 evidence={"recent median (min)": round(float(rec)),
@@ -171,9 +171,9 @@ def _decide(signals: list[Signal]) -> list[Signal]:
     for s in sorted(episodes, key=lambda x: -x.priority):
         if s.actionability < 0.5:
             s.decision, s.reason = "summary", (
-                "The phone already resolved the incident; there is nothing a "
-                "guardian can do today that they cannot do on Sunday. It goes "
-                "to the weekly summary, not to a notification.")
+                "The phone already resolved the incident; there is nothing "
+                "to do today that cannot wait until Sunday. It goes to the "
+                "weekly summary, not to a notification.")
             continue
         if len(sent) >= ALERT_BUDGET:
             s.decision, s.reason = "discarded", (
@@ -201,11 +201,11 @@ def evaluate_alerts(df: pd.DataFrame) -> list[Signal]:
     return _decide(signals)
 
 
-def guardian_digest(df: pd.DataFrame, signals: list[Signal]) -> dict:
-    """The only thing leaving the device when there is no alert: a coarse digest.
+def weekly_digest(df: pd.DataFrame, signals: list[Signal]) -> dict:
+    """What the weekly summary says when no alert fired: a coarse digest.
 
     No apps, no domains, no categories, and the numbers rounded. The rounding is
-    not cosmetic: at this granularity the guardian makes exactly the same
+    not cosmetic: at this granularity the summary supports exactly the same
     decisions, and in exchange the aggregate stops being an identifier.
     """
     last7 = df.tail(7)

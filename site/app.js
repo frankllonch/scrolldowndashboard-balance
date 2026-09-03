@@ -119,15 +119,13 @@
   }
   function dayCards(day) {
     var ui = current().ui;
-    var gap = '<div class="empty">' + ui.empty + "</div>";
-    var blocks = [channel(ui.channel_user, day.user ? phone(day.user) : gap)];
-    if (current().summary.has_guardian) {
-      blocks.push(channel(ui.channel_guardian,
-        day.guardian ? phone(day.guardian) : gap));
-    }
-    blocks.push(channel(ui.channel_device, pairs(day.device) +
-      '<p class="caption">' + ui.device_caption + "</p>"));
-    return '<div class="grid cols-' + blocks.length + '">' + blocks.join("") +
+    var phones = day.user.length
+      ? day.user.map(phone).join("")
+      : '<div class="empty">' + ui.empty + "</div>";
+    return '<div class="grid cols-2">' +
+      channel(ui.channel_user, phones) +
+      channel(ui.channel_device, pairs(day.device) +
+        '<p class="caption">' + ui.device_caption + "</p>") +
       "</div>";
   }
   function applyDay(index) {

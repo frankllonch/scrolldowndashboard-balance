@@ -48,7 +48,7 @@ edited, and a label the stream did assert always wins.
 
 `ADULT` and `GAMBLING` are treated as sensitive throughout the codebase
 (`SENSITIVE` in `balance/events.py`); they are the only ones that can justify
-notifying a guardian. The rest are ordinary distraction.
+raising an alert. The rest are ordinary distraction.
 
 ## What the stream does and does not contain
 

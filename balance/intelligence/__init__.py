@@ -1,12 +1,13 @@
 """
-Layer 3 · from metric to decision: what gets surfaced, to whom, and what stays
+Layer 3 · from metric to decision: what gets surfaced, when, and what stays
 quiet.
 
-Two deliberately asymmetric surfaces. **Guardian alerts** are coarse,
-object-free and on a budget: the failure mode of a channel aimed at a parent
-is not missing an event, it is shouting until they stop reading, so every
-candidate earns its slot and the rest drop to the weekly summary. **User
-nudges** are on the device, carry detail, and have their own silence rules.
+Everything here runs on the phone and is read by the person holding it.
+**Alerts** are coarse, object-free and on a budget: the failure mode of a
+channel like this is not missing an event, it is interrupting until nobody
+reads it, so every candidate earns its slot and the rest drop to the weekly
+summary. **Nudges** are immediate, carry detail, and have their own silence
+rules.
 
     signals.py    the thresholds, and the two records everything passes around
     alerts.py     the three rules, and the budget that decides between them
@@ -22,7 +23,7 @@ from .alerts import (
     ALERT_MIN_GAP_DAYS,
     RULES,
     evaluate_alerts,
-    guardian_digest,
+    weekly_digest,
 )
 from .nudge import nudge_summary, replay_nudge
 from .positives import evaluate_positives
@@ -45,6 +46,6 @@ __all__ = [
     "NUDGE_MIN_REOPENS", "POS_BUDGET_DAYS", "POS_MIN_WEEK_DAYS",
     "POS_NIGHT_QUIET_MIN", "POS_OFFLINE_FLOOR_H", "POS_RECORD_MARGIN",
     "POS_STREAK_MILESTONES", "RULES", "NightNudge", "Signal", "emissions",
-    "evaluate_alerts", "evaluate_positives", "guardian_digest", "month_replay",
+    "evaluate_alerts", "evaluate_positives", "weekly_digest", "month_replay",
     "nudge_summary", "replay_nudge",
 ]

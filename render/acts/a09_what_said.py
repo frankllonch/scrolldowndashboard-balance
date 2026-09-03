@@ -1,7 +1,7 @@
 """Act 09 · the alert and nudge engine.
 
-Three destinations and only three: the user's screen, a guardian
-notification, the weekly summary. The day slider walks all thirty.
+Two destinations and only two: the user's own screen, and the weekly summary
+a held signal drops into. The day slider walks all thirty days.
 """
 
 from collections import Counter
@@ -27,21 +27,17 @@ def slider(days: list[dict], current: dict) -> str:
 
 
 def cards(ctx, day: dict) -> str:
-    guarded = ctx.profile["summary"]["has_guardian"]
-    blocks = [html.channel(t("engine.channel.user"), phone_or_gap(day["user"]))]
-    if guarded:
-        blocks.append(html.channel(t("engine.channel.guardian"),
-                                   phone_or_gap(day["guardian"])))
-    caption = t("device.caption") + (t("device.caption.guardian")
-                                     if guarded else "")
-    blocks.append(html.channel(
-        t("engine.channel.device"),
-        html.pairs(day["device"]) + f'<p class="caption">{caption}</p>'))
-    return html.grid(*blocks, cols=len(blocks))
+    return html.grid(
+        html.channel(t("engine.channel.user"), phones_or_gap(day["user"])),
+        html.channel(t("engine.channel.device"),
+                     html.pairs(day["device"])
+                     + f'<p class="caption">{t("device.caption")}</p>'),
+        cols=2)
 
 
-def phone_or_gap(card: dict | None) -> str:
-    return html.phone(card) if card else html.empty(t("engine.empty"))
+def phones_or_gap(cards: list[dict]) -> str:
+    return ("".join(html.phone(c) for c in cards) if cards
+            else html.empty(t("engine.empty")))
 
 
 def emissions(ctx) -> str:
@@ -55,15 +51,12 @@ def emissions(ctx) -> str:
 
 def notifications(ctx) -> str:
     s = ctx.profile["summary"]
-    guarded = s["has_guardian"]
-    unavailable = t("value.not_available")
     return html.kpis([
-        {"label": t("engine.kpi.guardian"),
-         "value": f"{s['alerts_sent']}" if guarded else unavailable,
-         "delta": (t("engine.kpi.guardian.delta", budget=s["alert_budget"])
-                   if guarded else t("value.no_guardian"))},
+        {"label": t("engine.kpi.alerts"),
+         "value": f"{s['alerts_sent']}",
+         "delta": t("engine.kpi.alerts.delta", budget=s["alert_budget"])},
         {"label": t("engine.kpi.summary"),
-         "value": f"{s['alerts_held']}" if guarded else unavailable,
+         "value": f"{s['alerts_held']}",
          "delta": t("engine.kpi.summary.delta")},
         {"label": t("engine.kpi.reinforcements"),
          "value": f"{s['positives_sent']}",

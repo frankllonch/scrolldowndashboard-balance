@@ -6,7 +6,6 @@ from balance.intelligence import ALERT_BUDGET
 
 from .fmt import clock, hm
 from .fmt import week_value as wk
-from .profiles import HAS_GUARDIAN
 
 
 def summary(user: str, bundle: dict) -> dict:
@@ -18,7 +17,6 @@ def summary(user: str, bundle: dict) -> dict:
     night_first = max(wk(d, "night_min", first), .01)
     return {
         "user": user,
-        "has_guardian": HAS_GUARDIAN[user],
         "days": len(d),
         "events": len(bundle["events"]),
         "intervals": bundle["n_intervals"],

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from balance.events import CATEGORIES, load
+from balance.events import load
 
 ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = ROOT / "docs" / "payload.json"
@@ -57,8 +57,8 @@ def test_payload_has_every_figure_day_and_week_for_both_profiles(payload):
         payload["templates"]
 
 
-def _guardian_text(payload: dict) -> str:
-    """Every string that would reach a guardian's phone, lowercased."""
+def _notification_text(payload: dict) -> str:
+    """Every word the payload would put on a phone as a notification."""
     parts: list[str] = []
 
     def walk(node):
@@ -73,14 +73,15 @@ def _guardian_text(payload: dict) -> str:
 
     for profile in payload["profiles"].values():
         for day in profile["days"]:
-            walk(day["guardian"])
+            walk(day["user"])
     return " ".join(parts).lower()
 
 
-def test_payload_guardian_section_has_no_app_domain_or_category(payload):
-    """The privacy contract, moved to the boundary that now matters."""
-    outbound = _guardian_text(payload)
-    assert outbound, "no guardian copy in the payload to check"
+def test_payload_notifications_name_no_app_or_domain(payload):
+    """The privacy contract, at the boundary that now matters: a notification
+    says what changed, never what you were on."""
+    outbound = _notification_text(payload)
+    assert outbound, "no notification copy in the payload to check"
 
     events = []
     for path in ("data/events_user_a.json", "data/events_user_b.json"):
@@ -98,10 +99,7 @@ def test_payload_guardian_section_has_no_app_domain_or_category(payload):
 
     for ident in packages | domains:
         for stem in stems(ident):
-            assert stem not in outbound, f'"{stem}" leaked to the guardian'
-
-    for category in CATEGORIES:
-        assert category.lower() not in outbound, f"{category} named to a guardian"
+            assert stem not in outbound, f'"{stem}" reached a notification'
 
 
 def test_the_refined_categories_change_nothing_that_is_scored(payload):

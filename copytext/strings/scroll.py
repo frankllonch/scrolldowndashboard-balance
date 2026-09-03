@@ -54,10 +54,14 @@ STRINGS: dict[str, str] = {
     # -- act 03 · choose a profile ------------------------------------------
     "fork.lede": "Both months are here. Read one, then the other.",
     "fork.sketch.A": (
-        "An adult with no guardian. A routine that holds for thirty days."
+        "Likely an adult with a stable relationship with their phone. "
+        "WhatsApp, Spotify and the news fill most of their days, consistent "
+        "across the whole month."
     ),
     "fork.sketch.B": (
-        "A minor with a guardian. A schedule that slides, week by week."
+        "Also an adult, and also mostly WhatsApp, Spotify, Maps and the "
+        "papers — but with the filter switched on, and leaning on it more "
+        "every week. The days hold. The nights slide."
     ),
     "fork.stat.screen": "screen / day",
     "fork.stat.index": "index",

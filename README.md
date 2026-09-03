@@ -31,10 +31,10 @@ the page.
 | `copytext/strings/` | every user-visible string |
 | `site/` | `index.html`, `css/`, `app.js`, hand-written, no build step |
 
-`tests/test_intelligence.py::test_the_guardian_payload_contains_no_apps_or_domains`
-and `tests/test_payload.py::test_payload_guardian_section_has_no_app_domain_or_category`
-are the privacy contract. Nothing about an app, a domain or a category reaches a
-guardian.
+`tests/test_intelligence.py::test_notifications_contain_no_apps_or_domains` and
+`tests/test_payload.py::test_payload_notifications_name_no_app_or_domain` are the
+privacy contract. A notification says what changed, never what you were on, and
+the weekly digest goes further: no category either.
 
 ## Also here
 

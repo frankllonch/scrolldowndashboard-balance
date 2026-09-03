@@ -34,8 +34,9 @@ def test_the_analysis_is_a_pure_function_of_the_log():
 
 def test_the_text_output_mentions_every_section(result):
     text = render_text(result)
-    for section in ("PERIOD AVERAGES", "BY WEEK", "GUARDIAN ALERTS",
-                    "REINFORCEMENTS", "NIGHT NUDGE", "EMISSIONS IN THE PERIOD"):
+    for section in ("PERIOD AVERAGES", "BY WEEK", "ALERTS", "REINFORCEMENTS",
+                    "NIGHT NUDGE", "WEEKLY SUMMARY",
+                    "EMISSIONS IN THE PERIOD"):
         assert section in text
 
 
@@ -47,11 +48,11 @@ def test_the_json_is_serialisable_and_free_of_numpy_types(result):
     assert isinstance(back["averages"]["screen_min"], float)
 
 
-def test_a_profile_without_a_guardian_emits_no_digest(result):
+def test_every_profile_emits_a_weekly_digest(result):
+    """The digest is on-device and unconditional: there is no recipient to
+    make it optional."""
     j = render_json(result)
-    if not j["has_guardian"]:
-        assert j["guardian_digest"] is None
-        assert all(p["audience"] == "user" for p in j["positives"])
+    assert j["weekly_digest"]["sensitive content opened"] == "none"
 
 
 def test_the_cli_actually_starts():

@@ -18,7 +18,6 @@ STRINGS: dict[str, str] = {
     "value.no_use": "no use",
     "value.no_change": "no change",
     "value.not_available": "n/a",
-    "value.no_guardian": "no guardian",
     "value.no_stretch": "no stretch",
     "value.does_not_fire": "does not fire",
 
@@ -158,7 +157,7 @@ STRINGS: dict[str, str] = {
 
     # -- Where your time goes ------------------------------------------------
     "tag.device_only": "device only",
-    "tag.never_sent": "never sent to a guardian",
+    "tag.never_sent": "never leaves the phone",
     "time.kpi.attributed": "Attributed time",
     "time.kpi.attributed.delta": "of {pct:.0f} % of screen",
     "time.kpi.apps": "Distinct apps",
@@ -194,7 +193,7 @@ STRINGS: dict[str, str] = {
     ),
 
     # -- what the phone stopped ---------------------------------------------
-    "tag.aggregate_only": "only the aggregate reaches a guardian",
+    "tag.aggregate_only": "only the aggregate is ever named",
     "blocks.none": "No blocks in the period.",
     "blocks.kpi.attempts": "Blocked attempts",
     "blocks.kpi.attempts.delta": "{per_day:.1f} per day",
@@ -222,8 +221,8 @@ STRINGS: dict[str, str] = {
         "a summary entry, not a phone call."
     ),
     "blocks.scope.body": (
-        "This screen stays on the device. A guardian sees the filter's state "
-        "and that <b>{sensitive} sensitive attempts were blocked and none "
-        "opened</b>. Nothing named."
+        "This screen stays on the device. The weekly summary carries the "
+        "filter's state and that <b>{sensitive} sensitive attempts were "
+        "blocked and none opened</b>. Nothing named."
     ),
 }

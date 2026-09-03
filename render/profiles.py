@@ -2,10 +2,6 @@
 
 DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
 
-#: Only profile B has a guardian assigned. A is an adult: the rules run all the
-#: same, but there is no recipient to notify.
-HAS_GUARDIAN = {"A": False, "B": True}
-
 #: Acts 01 to 04 sit on paper, act 05 on the warm olive between paper and
 #: night, the rest on near-black. See SURFACES in render/theme.py.
 LIGHT_FIGURES = {"score_line", "week_components"}

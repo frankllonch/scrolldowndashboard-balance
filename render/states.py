@@ -12,7 +12,6 @@ from copytext import t
 
 from . import theme
 from .fmt import clock, date, hm, ordinal
-from .profiles import HAS_GUARDIAN
 
 
 def phone_card(time: str, brand: str, eyebrow: str, headline: str, body: str,
@@ -22,14 +21,26 @@ def phone_card(time: str, brand: str, eyebrow: str, headline: str, body: str,
             "ctas": ctas or []}
 
 
-def user_card(state: dict) -> dict | None:
-    """What the person holding the phone would have seen that day."""
-    positives = [x for x in state["positives"] if x.audience == "user"]
+def alert_card(state: dict) -> dict | None:
+    """The alert, on the phone of the person it is about. Headline and text
+    only: no app, no domain, no category is ever named in a notification."""
+    signal = state["alert"]
+    if signal is None:
+        return None
+    return phone_card(
+        t("phone.time.alert"), t("phone.brand"), t("phone.eyebrow.alert"),
+        signal.headline, signal.body,
+        ctas=[{"label": t("phone.cta.weekly_summary"), "ghost": True}])
+
+
+def summary_card(state: dict) -> dict | None:
+    """The reinforcement, or failing that the night nudge."""
+    positives = state["positives"]
     if positives:
         x = positives[0]
         return phone_card(
             t("phone.time.summary"), t("phone.brand"),
-            t("phone.eyebrow.summary"), x.headline, x.guardian_text,
+            t("phone.eyebrow.summary"), x.headline, x.body,
             rows=[[k, v] for k, v in x.evidence.items()],
             ctas=[{"label": t("phone.cta.week"), "ghost": True}])
     nudge = state["nudge"]
@@ -45,23 +56,10 @@ def user_card(state: dict) -> dict | None:
     return None
 
 
-def guardian_card(user: str, state: dict) -> dict | None:
-    """What the guardian's phone would have shown. Headline and text only:
-    no app, no domain, no category ever crosses this boundary."""
-    if not HAS_GUARDIAN[user]:
-        return None
-    guardian_positives = [x for x in state["positives"]
-                          if x.audience == "guardian"]
-    signal = state["alert"] or (guardian_positives[0]
-                                if guardian_positives else None)
-    if signal is None:
-        return None
-    return phone_card(
-        t("phone.time.guardian"), t("phone.brand.guardian", user=user),
-        t("phone.eyebrow.alert") if signal.tone == "alert"
-        else t("phone.eyebrow.digest"),
-        signal.headline, signal.guardian_text,
-        ctas=[{"label": t("phone.cta.weekly_summary"), "ghost": True}])
+def user_cards(state: dict) -> list[dict]:
+    """Everything that would have appeared on the phone that day, in the order
+    it would have arrived."""
+    return [c for c in (alert_card(state), summary_card(state)) if c]
 
 
 def device_rows(row, state: dict) -> list[list[str]]:
@@ -84,17 +82,15 @@ def device_rows(row, state: dict) -> list[list[str]]:
     ]
 
 
-def day_labels(user: str) -> dict:
+def day_labels() -> dict:
     """The handful of strings the day slider needs when it rebuilds the cards
     in the browser. The page carries no copy of its own."""
     return {
         "channel_user": t("engine.channel.user"),
-        "channel_guardian": t("engine.channel.guardian"),
         "channel_device": t("engine.channel.device"),
         "empty": t("engine.empty"),
         "emitted_none": t("week.emitted.none"),
-        "device_caption": t("device.caption") + (
-            t("device.caption.guardian") if HAS_GUARDIAN[user] else ""),
+        "device_caption": t("device.caption"),
     }
 
 
@@ -104,8 +100,7 @@ def day_states(user: str, bundle: dict) -> list[dict]:
         "iso": state["day"].isoformat(),
         "label": date(state["day"]),
         "title": t("engine.outputs.title", date=date(state["day"])),
-        "user": user_card(state),
-        "guardian": guardian_card(user, state),
+        "user": user_cards(state),
         "device": device_rows(by_day.loc[state["day"]], state),
     } for state in bundle["replay"]]
 

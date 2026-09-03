@@ -33,8 +33,8 @@ page are two readers of the same core.
 | First unlock is the first from 06:00 | `metrics.py` | night tails read as mornings |
 | Truncated days leave every view | `metrics.py`, `daily_frame` | totals stop matching |
 | Browser time belongs to the domain | `events.py` | Chrome tops every ranking |
-| At most 2 guardian alerts per 30 days | `intelligence.py`, `_decide` | the channel burns out |
-| No app, domain or category reaches a guardian | `intelligence.py`, payload | the privacy line is gone |
+| At most 2 alerts per 30 days | `intelligence.py`, `_decide` | the channel burns out |
+| No app or domain reaches a notification | `intelligence.py`, payload | the privacy line is gone |
 | Numbers come from the frames, never from copy | `copytext/`, `render/` | a copy edit moves a figure |
 
 ## From event to metric

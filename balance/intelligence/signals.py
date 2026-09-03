@@ -21,7 +21,8 @@ SPIKE_RATIO, SPIKE_ABS_MIN = 2.5, 10
 #: can show it does NOT fire on this data.
 SCREEN_JUMP_RATIO, SCREEN_JUMP_ABS = 1.4, 60.0
 
-#: Guardian alert quota per 30 days, and minimum gap between two.
+#: Alert quota per 30 days, and minimum gap between two. The channel is
+#: finite: an app that interrupts freely stops being read.
 ALERT_BUDGET = 2
 ALERT_MIN_GAP_DAYS = 10
 
@@ -37,7 +38,7 @@ POS_NIGHT_QUIET_MIN = 5.0
 #: Weeks shorter than this generate no reinforcement: a three-day week always
 #: looks better than a seven-day one.
 POS_MIN_WEEK_DAYS = 5
-#: Reinforcement quota per audience.
+#: Minimum days between two reinforcements.
 POS_BUDGET_DAYS = 7
 
 #: Night nudge: arms 30 min after the band opens, and only from the second
@@ -56,15 +57,14 @@ class Signal:
     key: str
     day: date                   # first day the rule holds
     headline: str
-    guardian_text: str          # the exact wording a guardian would read
+    body: str                   # the exact wording the phone would show
     magnitude: float            # 0 to 1 · how far outside normal
     persistence: float          # 0 to 1 · how long it has been outside
-    actionability: float        # 0 to 1 · can the guardian do anything with it?
+    actionability: float        # 0 to 1 · is there anything to be done about it?
     evidence: dict = field(default_factory=dict)   # NEVER leaves the device
     decision: str = "candidate"                    # sent | summary | discarded
     reason: str = ""
     until: date | None = None   # last day of the episode, if it runs on
-    audience: str = "guardian"  # guardian | user
     tone: str = "alert"         # alert | reinforcement
 
     @property

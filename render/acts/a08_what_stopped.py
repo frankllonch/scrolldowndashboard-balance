@@ -1,4 +1,4 @@
-"""Act 08 · what the filter stopped, and what a guardian is told about it."""
+"""Act 08 · what the filter stopped, and how little of it is named."""
 
 import pandas as pd
 

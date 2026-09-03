@@ -13,7 +13,7 @@ explained in the README; the short version:
 * **Blocks do not score.** A BLOCK means the phone did its job: the content
   never opened. Penalising the attempt would punish the user for an impulse the
   product already handled, and would create the wrong incentive (turn the
-  protection off to raise your grade). Blocks feed the guardian alert and the
+  protection off to raise your grade). Blocks feed the alert rules and the
   nudge, not the score.
 
 * **The night carries a lot of weight for how little it takes up.** 60 minutes

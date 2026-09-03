@@ -50,7 +50,7 @@ def month_replay(df: pd.DataFrame, nudges: list[NightNudge],
             "positives": pos_today,
             "positives_so_far": sum(
                 len(v) for k, v in pos_by_day.items() if k <= day),
-            # running totals at that date, as the guardian would see them
+            # running totals at that date, as the phone would show them
             "alerts_so_far": sum(1 for s in sigs if s.decision == "sent"),
             "digest_so_far": sum(1 for s in sigs if s.decision == "summary"),
             "nudges_so_far": sum(1 for n in nudges if n.fired and n.day <= day),
@@ -64,8 +64,8 @@ def month_replay(df: pd.DataFrame, nudges: list[NightNudge],
 def emissions(replay: list[dict]) -> list[dict]:
     """A flat list of everything the phone emitted, in time order.
 
-    Three possible destinations and only three: the user's screen (nudge), a
-    guardian notification (alert) and the weekly summary (held signal).
+    Two possible destinations and only two: the user's screen, and the weekly
+    summary a held signal drops into. Nothing leaves the device.
     """
     out: list[dict] = []
     for r in replay:
@@ -78,20 +78,19 @@ def emissions(replay: list[dict]) -> list[dict]:
             })
         if r["alert"]:
             out.append({
-                "day": r["day"], "destination": "Guardian · notification",
+                "day": r["day"], "destination": "User · alert",
                 "type": r["alert"].key, "detail": r["alert"].headline,
             })
         if r["digest_entry"]:
             out.append({
-                "day": r["day"], "destination": "Guardian · weekly summary",
+                "day": r["day"], "destination": "Weekly summary",
                 "type": r["digest_entry"].key,
                 "detail": r["digest_entry"].headline,
             })
         for s in r.get("positives", []):
             out.append({
                 "day": r["day"],
-                "destination": ("User · reinforcement" if s.audience == "user"
-                                else "Guardian · reinforcement"),
+                "destination": "User · reinforcement",
                 "type": s.key, "detail": s.headline,
             })
     return sorted(out, key=lambda x: x["day"])

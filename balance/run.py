@@ -25,19 +25,19 @@ from .intelligence import (
     emissions,
     evaluate_alerts,
     evaluate_positives,
-    guardian_digest,
     month_replay,
     nudge_summary,
     replay_nudge,
+    weekly_digest,
 )
 from .metrics import blocks_frame, daily_frame, totals, weekly_frame
 from .score import add_score
 
-#: Input files and whether the profile has a guardian assigned. In production
+#: Input files. In production
 #: this would come from the account, not from a constant.
 PROFILES = {
-    "A": {"path": "data/events_user_a.json", "guardian": False},
-    "B": {"path": "data/events_user_b.json", "guardian": True},
+    "A": {"path": "data/events_user_a.json"},
+    "B": {"path": "data/events_user_b.json"},
 }
 
 
@@ -58,12 +58,11 @@ def analyse(user: str, root: Path) -> dict:
 
     nudges = replay_nudge(tl, df)
     alerts = evaluate_alerts(df)
-    positives = evaluate_positives(df, cfg["guardian"])
+    positives = evaluate_positives(df)
     replay = month_replay(df, nudges, positives)
 
     return {
         "user": user,
-        "has_guardian": cfg["guardian"],
         "timeline": tl,
         "daily": df,
         "weekly": weekly_frame(df),
@@ -74,7 +73,7 @@ def analyse(user: str, root: Path) -> dict:
         "positives": positives,
         "nudges": nudges,
         "nudge_summary": nudge_summary(nudges),
-        "digest": guardian_digest(df, alerts),
+        "digest": weekly_digest(df, alerts),
         "emissions": emissions(replay),
     }
 
@@ -103,7 +102,6 @@ def render_text(r: dict) -> str:
     add(_rule(f"PROFILE {r['user']}"))
     add(f"  {len(tl.events):,} events · {len(df)} complete days "
         f"· {len(tl.intervals)} screen stretches")
-    add(f"  guardian assigned: {'yes' if r['has_guardian'] else 'no'}")
     if tl.anomalies:
         for k, v in tl.anomalies.items():
             add(f"  anomaly: {k} ×{v}")
@@ -141,16 +139,14 @@ def render_text(r: dict) -> str:
     add("  * short week: generates no reinforcements and enters no comparisons")
     add("")
 
-    add(_rule("GUARDIAN ALERTS"))
-    if not r["has_guardian"]:
-        add("  profile with no guardian: rules run, there is no recipient")
-    elif not r["alerts"]:
+    add(_rule("ALERTS"))
+    if not r["alerts"]:
         add("  no rule fired in the period")
     for s in r["alerts"]:
         add(f"  [{s.decision:<10}] {s.day}  {s.key}  priority {s.priority:.2f}")
         add(f"               {s.headline}")
         if s.decision == "sent":
-            add(f"               \"{s.guardian_text}\"")
+            add(f"               \"{s.body}\"")
             add(f"               active {s.days_true} days, until {s.until}")
         else:
             add(f"               reason: {s.reason}")
@@ -160,9 +156,8 @@ def render_text(r: dict) -> str:
     if not r["positives"]:
         add("  none in the period")
     for s in r["positives"]:
-        dest = "user" if s.audience == "user" else "guardian"
-        add(f"  [{s.decision:<10}] {s.day}  {s.key} → {dest}")
-        add(f"               \"{s.guardian_text}\"")
+        add(f"  [{s.decision:<10}] {s.day}  {s.key}")
+        add(f"               \"{s.body}\"")
     add("")
 
     add(_rule("NIGHT NUDGE (replayed over history)"))
@@ -178,12 +173,9 @@ def render_text(r: dict) -> str:
         f"{ns['minutes at stake per nudged night']:>9.0f} min")
     add("")
 
-    add(_rule("DIGEST THAT WOULD LEAVE THE DEVICE"))
-    if r["has_guardian"]:
-        for k, v in r["digest"].items():
-            add(f"  {k:<34} {v:>24}")
-    else:
-        add("  profile with no guardian: nothing leaves the device")
+    add(_rule("WEEKLY SUMMARY"))
+    for k, v in r["digest"].items():
+        add(f"  {k:<34} {v:>24}")
     add("")
 
     add(_rule("EMISSIONS IN THE PERIOD"))
@@ -220,7 +212,6 @@ def render_json(r: dict) -> dict:
     df, w = r["daily"], r["weekly"]
     return _plain({
         "user": r["user"],
-        "has_guardian": r["has_guardian"],
         "days": len(df),
         "anomalies": dict(r["timeline"].anomalies),
         "averages": {
@@ -248,19 +239,18 @@ def render_json(r: dict) -> dict:
         "alerts": [
             {"key": s.key, "day": s.day, "until": s.until,
              "decision": s.decision, "priority": s.priority,
-             "audience": s.audience, "tone": s.tone,
-             "headline": s.headline, "text": s.guardian_text,
+             "tone": s.tone, "headline": s.headline, "text": s.body,
              "reason": s.reason, "evidence": s.evidence}
             for s in r["alerts"]
         ],
         "positives": [
             {"key": s.key, "day": s.day, "decision": s.decision,
-             "audience": s.audience, "headline": s.headline,
-             "text": s.guardian_text, "evidence": s.evidence}
+             "headline": s.headline, "text": s.body,
+             "evidence": s.evidence}
             for s in r["positives"]
         ],
         "nudge": r["nudge_summary"],
-        "guardian_digest": r["digest"] if r["has_guardian"] else None,
+        "weekly_digest": r["digest"],
         "emissions": r["emissions"],
     })
 

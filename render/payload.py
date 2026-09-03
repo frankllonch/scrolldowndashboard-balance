@@ -32,7 +32,7 @@ from balance.score import COMPONENTS, add_score, contributions
 from copytext import t
 
 from . import figures, theme
-from .profiles import DATA, HAS_GUARDIAN, surface_for
+from .profiles import DATA, surface_for
 from .states import day_labels, day_states, week_states
 from .summary import finding, summary
 
@@ -48,7 +48,7 @@ def compute(user: str) -> dict:
     # daily frame, or the totals stop matching.
     days = set(df["day"])
     nudges = replay_nudge(tl, df)
-    positives = evaluate_positives(df, HAS_GUARDIAN[user])
+    positives = evaluate_positives(df)
     replay = month_replay(df, nudges, positives)
 
     weekly = weekly_frame(df)
@@ -235,7 +235,7 @@ def assemble() -> tuple[dict, dict]:
             "figures": {k: as_json(f, k) for k, f
                         in profile_figures(user, bundle, default_day).items()},
             "days": day_states(user, bundle),
-            "ui": day_labels(user),
+            "ui": day_labels(),
             "weeks": weeks,
             "default_day": default_day.isoformat(),
             "default_week": weeks[-2]["week"] if len(weeks) > 1

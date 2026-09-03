@@ -74,12 +74,12 @@ with sync_playwright() as p:
     fork = page.evaluate("""() => ({
         profile: document.documentElement.dataset.profile,
         at: window.scrollY, act4: document.getElementById('act-04').offsetTop,
-        guardian: !!document.querySelector('[data-slot="day.cards"]').textContent.match(/Guardian/),
+        cards: document.querySelectorAll('[data-slot="day.cards"] .phone').length,
         plots: document.querySelectorAll('#act-04 .js-plotly-plot, #act-09 .js-plotly-plot').length,
     })""")
     check("fork switches to B", fork["profile"] == "B")
     check("fork scrolls to act 04", abs(fork["at"] - fork["act4"]) < 40, f'{fork["at"]} vs {fork["act4"]}')
-    check("B shows a guardian channel", fork["guardian"])
+    check("B shows the day's notifications", fork["cards"] >= 1, fork["cards"])
     check("part two redrew", fork["plots"] >= 8, fork["plots"])
 
     # --- the pill ----------------------------------------------------------

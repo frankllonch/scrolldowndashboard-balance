@@ -117,7 +117,7 @@ def first_word_is_a_command(text: str) -> str | None:
     return None
 
 
-def test_no_imperatives_in_user_or_guardian_copy():
+def test_no_imperatives_in_notification_copy():
     """Nothing the product shows a person tells them what to do."""
     offenders = [(k, first_word_is_a_command(v)) for k, v in STRINGS.items()
                  if k.startswith("phone.") and first_word_is_a_command(v)]
@@ -129,9 +129,9 @@ def test_the_engine_does_not_command_either(tl_a, tl_b, df_a, df_b):
     from balance.intelligence import evaluate_alerts, evaluate_positives, replay_nudge
     offenders = []
     for user, timeline, frame in (("A", tl_a, df_a), ("B", tl_b, df_b)):
-        signals = evaluate_alerts(frame) + evaluate_positives(frame, user == "B")
+        signals = evaluate_alerts(frame) + evaluate_positives(frame)
         for signal in signals:
-            for field in ("headline", "guardian_text"):
+            for field in ("headline", "body"):
                 hit = first_word_is_a_command(getattr(signal, field, ""))
                 if hit:
                     offenders.append(f"{user}/{signal.key}.{field}: {hit}")
