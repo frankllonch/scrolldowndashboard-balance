@@ -26,10 +26,9 @@ const copy = {
   eyebrow: "Alerts, nudges, reinforcements",
   title: "The intelligence acting",
 
-  lede: "Slide through each day and see below what was notified to you, and "
-    + "what the phone worked out and kept to itself.",
-  caption: "Every variable the rules read, each as a share of its own maximum "
-    + "so the shapes compare. The rail below zero is what the phone emitted.",
+  lede: "Slide through each day and see below what was notified to you, and what the phone worked out and kept to itself.",
+  caption: "Every variable the rules read, each as a share of its own maximum so the shapes compare. "
+  + "The rail below zero is what the phone emitted.",
 
   sliderLabel: "Day of the period",
   outputs: (date: string) => `Outputs on ${date}`,
@@ -88,8 +87,7 @@ const copy = {
     perNight: "Per night",
   },
 
-  next: "That is the whole month, and everything the phone did with it. Now "
-    + "the finding.",
+  next: "That is the whole month, and everything the phone did with it. Now the finding.",
 };
 
 /** The alert, on the phone of the person it is about. Headline and text only:

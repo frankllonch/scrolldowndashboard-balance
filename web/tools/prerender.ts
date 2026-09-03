@@ -24,11 +24,8 @@ import type { Payload } from "../types/index";
 
 /** The standfirst doubles as the page description. */
 const DESCRIPTION =
-  "Balance makes a phone that helps people build a healthier relationship "
-  + "with their device — it blocks distraction, understands how someone "
-  + "actually uses their phone, and helps keep younger users safer online. "
-  + "Not a dumbphone, not anti-tech: technology that serves your life instead "
-  + "of hijacking it.";
+  "Balance makes a phone that helps people build a healthier relationship with their device — it blocks distraction, understands how someone actually uses their phone, and helps keep younger users safer online. "
+  + "Not a dumbphone, not anti-tech: technology that serves your life instead of hijacking it.";
 
 /** The shell with every section written into it. */
 export function render(shell: string, payload: Payload): string {

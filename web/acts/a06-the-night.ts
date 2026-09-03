@@ -34,16 +34,11 @@ const copy = {
     + `<b>${sleepLoss.toFixed(0)} minutes less rest, every night</b>.`,
 
   userANote: (lastUse: string) =>
-    "You only see user B's usage here, because A slept remarkably well "
-    + "throughout the whole of May: zero minutes between 23:00 and 06:00 on "
-    + `all thirty days, last screen at ${lastUse} on average.`,
+    `You only see user B's usage here, because A slept remarkably well throughout the whole of May: zero minutes between 23:00 and 06:00 on all thirty days, last screen at ${lastUse} on average.`,
 
   weightNote: (night: number, screen: number) =>
-    "The night-time usage increase is the main reason your wellbeing score has "
-    + `dropped so much. Sleep! It is the smallest number on this page — `
-    + `${night.toFixed(0)} min a day against ${screen.toFixed(0)} of screen — `
-    + "and it carries 20 % of the index, because an hour at 01:00 comes out of "
-    + "your rest and an hour at 17:00 does not.",
+    "The night-time usage increase is the main reason your wellbeing score has dropped so much. "
+    + `Sleep! It is the smallest number on this page — ${night.toFixed(0)} min a day against ${screen.toFixed(0)} of screen — and it carries 20 % of the index, because an hour at 01:00 comes out of your rest and an hour at 17:00 does not.`,
 
   next: "Now you know when. The next question is what.",
 };

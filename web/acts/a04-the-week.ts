@@ -28,8 +28,7 @@ const copy = {
   range: (start: string, end: string, days: number) =>
     `${start} to ${end} · ${days} days`,
   rangePartial:
-    "  ·  short week: the averages are per day, but comparing it against "
-    + "seven-day weeks is less reliable.",
+    "  ·  short week: the averages are per day, but comparing it against seven-day weeks is less reliable.",
   partialFootnote: "Weeks marked with * are shorter than seven days.",
   daysTitle: (week: number) => `The days of week ${week}`,
   emittedTitle: (week: number) => `What the phone emitted in week ${week}`,
@@ -52,19 +51,13 @@ const copy = {
   emissionColumns: ["Date", "Destination", "Type", "Detail"],
 
   readingA: (blocks: number) =>
-    "Nothing here really moves. Your screen time, your unlocks and your "
-    + "nights sit in the same place in week 4 as they did in week 1, and the "
-    + `filter barely has to step in — ${thousands(blocks)} attempts in the `
-    + "whole month, all of them ordinary distraction.",
+    "Nothing here really moves. "
+    + `Your screen time, your unlocks and your nights sit in the same place in week 4 as they did in week 1, and the filter barely has to step in — ${thousands(blocks)} attempts in the whole month, all of them ordinary distraction.`,
   readingB: (first: number, last: number) =>
-    "Your night usage varies noticeably from week to week, but your general "
-    + "usage stays high every week. And as the month goes along the blocks get "
-    + `more recurrent — ${first.toFixed(0)} a day in week 1, `
-    + `${last.toFixed(0)} by week 4 — every time you try harder to find where `
-    + "the blocking fails.",
+    "Your night usage varies noticeably from week to week, but your general usage stays high every week. "
+    + `And as the month goes along the blocks get more recurrent — ${first.toFixed(0)} a day in week 1, ${last.toFixed(0)} by week 4 — every time you try harder to find where the blocking fails.`,
 
-  next: "Now zoom in. A week is thirty days seen from a distance — here is a "
-    + "single day.",
+  next: "Now zoom in. A week is thirty days seen from a distance — here is a single day.",
 };
 
 /** The nine measures the against-the-period table walks. */

@@ -127,8 +127,7 @@ export const hover = {
     `%{x|%a %d %b}<br>%{y:.0f} late-night min<extra>User ${user}</extra>`,
   category: (label: string) => `%{y:.0f} min<extra>${label}</extra>`,
   topBars:
-    "<b>%{y}</b><br>%{x:.0f} min in total<br>%{customdata[0]} openings · " +
-    "%{customdata[1]:.1f} min per opening<br>%{customdata[2]}<extra></extra>",
+    "<b>%{y}</b><br>%{x:.0f} min in total<br>%{customdata[0]} openings · %{customdata[1]:.1f} min per opening<br>%{customdata[2]}<extra></extra>",
   heat: "%{y} · %{x}:00<br>%{z:.0f} min<extra></extra>",
   blocksCategory: (label: string) => `%{y:.0f}<extra>${label}</extra>`,
   blocksHour: (name: string) => `%{x}:00 → %{y:.0f}<extra>${name}</extra>`,

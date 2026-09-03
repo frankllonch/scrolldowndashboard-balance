@@ -16,12 +16,9 @@ const copy = {
 
   sketch: {
     A: "Likely an adult with a stable relationship with their phone. "
-      + "WhatsApp, Spotify and the news fill most of their days, consistent "
-      + "across the whole month.",
-    B: "Also an adult, and also mostly WhatsApp, Spotify, Maps and the "
-      + "papers — but with a more erratic pattern. A lot of tries to access "
-      + "blocked sites. The days hold steady. The nights slide and sleep is "
-      + "lost.",
+    + "WhatsApp, Spotify and the news fill most of their days, consistent across the whole month.",
+    B: "Also an adult, and also mostly WhatsApp, Spotify, Maps and the papers — but with a more erratic pattern. "
+    + "A lot of tries to access blocked sites. The days hold steady. The nights slide and sleep is lost.",
   },
 
   screen: "screen / day",

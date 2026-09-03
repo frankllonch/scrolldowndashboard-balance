@@ -30,8 +30,7 @@ const copy = {
     switchesDelta: (apps: number) => `${apps.toFixed(0)} distinct apps`,
   },
 
-  baseline: "Against this user's own 14-day median. The first two weeks have "
-    + "no history.",
+  baseline: "Against this user's own 14-day median. The first two weeks have no history.",
 
   readingA: (weekday: number, weekend: number, lastUse: string) =>
     `A working week with a weekend in it: ${weekday.toFixed(0)} min on `
@@ -48,8 +47,7 @@ const copy = {
     + `not sitting down with it (${ratio.toFixed(1)} times more than A's rate `
     + "of usage).",
 
-  next: "The daytime looks ordinary enough. But what happens when we turn "
-    + "the lights off?",
+  next: "The daytime looks ordinary enough. But what happens when we turn the lights off?",
 };
 
 function present(rows: DailyRow[], key: "first_pickup_h" | "last_use_h"): number[] {

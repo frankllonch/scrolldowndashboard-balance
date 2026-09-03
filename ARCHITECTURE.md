@@ -101,8 +101,10 @@ dist/                          ── the built site · five files, one request 
 
 `dist/` is build output and is not in the repository: the workflow in
 `.github/workflows/` builds it on every push and publishes that. Nothing here
-is edited by hand — a change made in `dist/` is gone at the next build. The
-arrows say where each file comes from; go there instead.
+is edited by hand — a change made in `dist/` is gone at the next build. It is
+also gitignored, so an editor's search will not look in it: search `web/`
+instead, where every sentence on the page is written. The arrows say which
+file produces which.
 
 The page needs four of the five. `data.json` is fetched rather than bundled so
 the browser caches it apart from the code, and `index.html` already contains

@@ -56,8 +56,7 @@ const copy = {
     + `state and that <b>${sensitive} sensitive attempts were blocked and none `
     + "opened</b>. Nothing named.",
 
-  next: "The phone knew all of this. Here is what it decided to say about it, "
-    + "and what it kept to itself.",
+  next: "The phone knew all of this. Here is what it decided to say about it, and what it kept to itself.",
 };
 
 function sensitiveTotal(profile: Profile): number {

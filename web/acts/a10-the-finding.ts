@@ -18,14 +18,11 @@ const copy = {
 
   body: (shift: number, first: number, last: number, pickFirst: number,
          pickLast: number) =>
-    `The last screen moves ${shift.toFixed(0)} minutes later, the first `
-    + `unlock stays put, and the window closes from ${first.toFixed(1)} h to `
-    + `${last.toFixed(1)} h. Unlocks after midnight go `
-    + `${pickFirst.toFixed(1)} to ${pickLast.toFixed(1)}. A records zero night `
-    + "minutes over the same thirty days.",
+    `The last screen moves ${shift.toFixed(0)} minutes later, the first unlock stays put, and the window closes from ${first.toFixed(1)} h to ${last.toFixed(1)} h. `
+    + `Unlocks after midnight go ${pickFirst.toFixed(1)} to ${pickLast.toFixed(1)}. `
+    + "A records zero night minutes over the same thirty days.",
 
-  next: "One obvious objection: surely a plain screen-time rule would have "
-    + "caught this too?",
+  next: "One obvious objection: surely a plain screen-time rule would have caught this too?",
 };
 
 function hero(value: string, label: string): string {

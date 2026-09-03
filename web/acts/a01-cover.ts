@@ -14,22 +14,17 @@ const copy = {
   title: "Balance board",
 
   standfirst:
-    "Balance makes a phone that helps people build a healthier relationship "
-    + "with their device — it blocks distraction, understands how someone "
-    + "actually uses their phone, and helps keep younger users safer online. "
-    + "Not a dumbphone, not anti-tech: technology that serves your life "
-    + "instead of hijacking it.",
+    "Balance makes a phone that helps people build a healthier relationship with their device — it blocks distraction, understands how someone actually uses their phone, and helps keep younger users safer online. "
+    + "Not a dumbphone, not anti-tech: technology that serves your life instead of hijacking it.",
 
   purpose:
-    "This dashboard takes in the raw behavioural output of two Balance "
-    + "Phones, with two very different users, across the whole of May 2026. "
-    + "The goal is to turn that data into meaning and answer one question: "
-    + "<b>so what?</b>",
+    "This dashboard takes in the raw behavioural output of two Balance Phones, with two very different users, across the whole of May 2026. "
+    + "The goal is to turn that data into meaning and answer one question: <b>so what?</b>",
 
   intro:
-    "Two adults, thirty days each. A holds steady; B loses control as the "
-    + "month goes on — not from using the phone more, but from using it later "
-    + "and later. Everything below is why.",
+    "Two adults, thirty days each. "
+    + "A holds steady; B loses control as the month goes on — not from using the phone more, but from using it later and later. "
+    + "Everything below is why.",
 
   profiles: "profiles",
   events: "events",

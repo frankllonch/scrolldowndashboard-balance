@@ -15,9 +15,8 @@ const copy = {
   title: "Under the hood",
 
   lede: "Every number on this page is a pure function of one event log. "
-    + "Nothing was estimated, nothing was fetched, and the browser never sees "
-    + "an event — the whole pipeline runs before the page is written. Open any "
-    + "of these to see how a given figure was reached.",
+  + "Nothing was estimated, nothing was fetched, and the browser never sees an event — the whole pipeline runs before the page is written. "
+  + "Open any of these to see how a given figure was reached.",
 
   userColumn: (user: UserId) => `User ${user}`,
 
@@ -31,10 +30,8 @@ const copy = {
       ["Intelligence", "The daily rows into alerts, nudges and reinforcements"],
       ["Render", "All of the above into figures, acts and this page"],
     ],
-    note: "The layers only ever point downwards: none of them knows the page "
-      + "exists, and none of them imports a charting library. That is why the "
-      + "command line and this dashboard can be two readers of the same "
-      + "numbers rather than two implementations of them.",
+    note: "The layers only ever point downwards: none of them knows the page exists, and none of them imports a charting library. "
+    + "That is why the command line and this dashboard can be two readers of the same numbers rather than two implementations of them.",
   },
 
   stream: {
@@ -72,8 +69,7 @@ const copy = {
       ["A screen-on while the screen is already on.",
        `A depth counter, giving the union: ${screenA.toFixed(1)} h for A.`],
       ["The file ends mid-day.",
-       "That day leaves every average, but still counts towards the night "
-       + "before."],
+       "That day leaves every average, but still counts towards the night before."],
       ["A day opens at 00:20, the tail of the night before.",
        "First unlock means the first from 06:00."],
       ["A screen stretch runs through midnight.", "Split at the boundary."],
@@ -110,8 +106,8 @@ const copy = {
   index: {
     title: "The index",
     columns: ["Component", "Value scoring 100", "Value scoring 0", "Weight"],
-    note: "Blocks do not score. Docking points for an attempt the filter "
-      + "already stopped charges the user for the product working.",
+    note: "Blocks do not score. "
+    + "Docking points for an attempt the filter already stopped charges the user for the product working.",
   },
 };
 

@@ -45,18 +45,16 @@ const copy = {
     + `spent ${thousands(messaging)} min reaching people across `
     + `${messagingApps} apps. Your distraction share is `
     + `${distract.toFixed(0)} %, barely above A's ${distractA.toFixed(0)} %. `
-    + "What you spend your time on is completely ordinary. How much of it, and "
-    + "when, is not.",
+    + "What you spend your time on is completely ordinary. How much of it, and when, is not.",
 
   chrome: (opens: number, minutes: number) =>
     `Chrome shows ${opens.toFixed(0)} openings and ${minutes.toFixed(0)} min: `
     + "browser time goes to the domain.",
 
   distractExplain:
-    "<b>How is distraction measured?</b> Not by how many apps you open. It is "
-    + "the share of your attributed time that landed in social, entertainment "
-    + "or gaming. Thirty apps for two minutes each is not distraction by this "
-    + "definition; one hour of one app is.",
+    "<b>How is distraction measured?</b> Not by how many apps you open. "
+    + "It is the share of your attributed time that landed in social, entertainment or gaming. "
+    + "Thirty apps for two minutes each is not distraction by this definition; one hour of one app is.",
 
   blockedAbsent: (names: string, attempts: string, through: string) =>
     `This chart only shows what actually opened, which is why ${names} are `
