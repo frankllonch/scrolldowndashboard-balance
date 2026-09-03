@@ -32,8 +32,13 @@ export interface DailyRow {
   glances: number;
   pickups_per_wake_hour: number;
   first_pickup_h: number | null;
+  /** Epoch milliseconds. The hour above is what the charts plot; a clock face
+   *  is written from this, because truncating a decimal hour to minutes loses
+   *  one. */
+  first_pickup_ms: number | null;
 
   last_use_h: number | null;
+  last_use_ms: number | null;
   /** Minutes between 23:00 and 06:00 the next morning. */
   night_min: number;
   night_pickups: number;

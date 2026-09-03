@@ -126,6 +126,9 @@ export interface Profile {
   /** Things the stream does that the metrics would otherwise get wrong,
    *  counted rather than dropped in silence. */
   anomalies: Record<string, number>;
+  /** How many of each event type the log carries. The events themselves never
+   *  cross: the page names the types and counts them, nothing more. */
+  eventCounts: Record<string, number>;
   /** The day the walkthrough opens on: the first alert, else the last day. */
   defaultDay: Day;
   /** The week the sliders open on: the last full one. */

@@ -29,7 +29,11 @@ Python holds only the numbers.
       one on both sides and compares them trace by trace: same numbers, same
       titles, same surfaces, same series names and colours. That test is
       transitional and goes with `render/` at the cutover.
-- [ ] **4 · Acts.** One module each, carrying markup and copy.
+- [x] **4 · Acts.** One module each, carrying its own markup and copy.
+      `tests/test_acts.py` compares every act body against the one Python
+      writes: 20 of 24 byte-identical after normalising whitespace, and the
+      four that differ are two deliberate divergences named in that test.
+      It goes with `render/` at the cutover.
 - [ ] **5 · Cutover.** `bundle.js` becomes `app.js`; `render/`, `copytext/` and
       `page.py` are deleted; `build.py` runs `python -m emit` and `npm run build`.
 - [ ] **6 · The map.** An `ARCHITECTURE.md` that says "want to change X? it is

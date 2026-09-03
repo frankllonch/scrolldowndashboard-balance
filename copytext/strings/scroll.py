@@ -48,7 +48,7 @@ STRINGS: dict[str, str] = {
         "single day."
     ),
     "act.05.next": (
-        "The daytimelook ordinary enough. But what happens when we turn "
+        "The daytime looks ordinary enough. But what happens when we turn "
         "the lights off?"
     ),
     "act.06.next": "Now you know when. The next question is what.",
@@ -147,9 +147,10 @@ STRINGS: dict[str, str] = {
         "across the whole month."
     ),
     "fork.sketch.B": (
-        "Also an adult, and also mostly WhatsApp, Spotify, Maps and the papers"
-        "— but with a more erratic pattern. A lot of tries to acces blocked sites. "
-        "The days hold steady. The nights slide and sleep is lost."
+        "Also an adult, and also mostly WhatsApp, Spotify, Maps and the "
+        "papers — but with a more erratic pattern. A lot of tries to access "
+        "blocked sites. The days hold steady. The nights slide and sleep is "
+        "lost."
     ),
     "fork.stat.screen": "screen / day",
     "fork.stat.index": "index",

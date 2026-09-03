@@ -131,7 +131,7 @@ def test_both_profiles_carry_every_series(payload):
     expected = {"summary", "daily", "weekly", "apps", "sites", "categoryDaily",
                 "hourHeat", "blocks", "alerts", "positives", "nudges",
                 "nudgeSummary", "replay", "emissions", "anomalies",
-                "defaultDay", "defaultWeek"}
+                "eventCounts", "defaultDay", "defaultWeek"}
     for user, profile in payload["profiles"].items():
         assert set(profile) == expected, user
         assert len(profile["daily"]) == payload["meta"]["days"], user

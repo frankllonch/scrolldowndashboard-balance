@@ -3,7 +3,7 @@
  */
 
 import { axis as unit, annotation, hover, series, title } from "../copy/figures";
-import { clock, rollingMean } from "../format";
+import { clockAt, clockOf, rollingMean } from "../format";
 import { MONO, userColor, type Surface } from "../theme";
 import type { DailyRow, UserId } from "../types/index";
 import { directLabel, frame } from "./frame";
@@ -133,7 +133,8 @@ export function daySpan(s: Surface, rows: DailyRow[], user: UserId): Figure {
       marker: { color: colour, opacity: 0.55,
                 line: { color: s.card, width: 1.2 } },
       name: series.dayWithPhone,
-      customdata: rows.map((r) => [clock(r.first_pickup_h), clock(r.last_use_h)]),
+      customdata: rows.map((r) => [clockAt(r.first_pickup_ms),
+                                   clockAt(r.last_use_ms)]),
       hovertemplate: hover.daySpan,
     },
     {
@@ -147,7 +148,7 @@ export function daySpan(s: Surface, rows: DailyRow[], user: UserId): Figure {
   return frame(s, data, {
     title: { text: title.daySpan(user) },
     yaxis: { title: { text: unit.localTime }, range: [low, high],
-             tickvals: ticks, ticktext: ticks.map((h) => clock(h % 24)) },
+             tickvals: ticks, ticktext: ticks.map((h) => clockOf(h, 0)) },
     xaxis: { tickformat: "%d %b" },
     // Inside the plotting area, not beside it: to the right of the axis the
     // card's own edge cuts the label off.

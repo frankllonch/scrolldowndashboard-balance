@@ -27,8 +27,30 @@ export function clock(hours: number | null | undefined): string {
   if (hours === null || hours === undefined || !Number.isFinite(hours)) {
     return NO_USE;
   }
-  const whole = Math.floor(hours) % 24;
-  return `${pad(whole)}:${pad(Math.floor((hours % 1) * 60))}`;
+  return clockOf(Math.floor(hours), Math.floor((hours % 1) * 60));
+}
+
+/**
+ * A clock face from an epoch millisecond.
+ *
+ * UTC, because the core reads every timestamp as UTC and drops the zone
+ * (`balance/events.py`). This is the exact form: `clock()` on a decimal hour
+ * truncates, and 21.8833 h is 21:53, not 21:52.
+ */
+export function clockAt(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined) return NO_USE;
+  const at = new Date(ms);
+  return clockOf(at.getUTCHours(), at.getUTCMinutes());
+}
+
+/**
+ * A clock face from an hour and a minute.
+ *
+ * Where both are already known, this is the one to use: going through the
+ * float above and truncating back out loses a minute to binary rounding.
+ */
+export function clockOf(hours: number, minutes: number): string {
+  return `${pad(((hours % 24) + 24) % 24)}:${pad(minutes)}`;
 }
 
 /** Minutes as hours and minutes: "2h 02m", or "47 min" under the hour. */

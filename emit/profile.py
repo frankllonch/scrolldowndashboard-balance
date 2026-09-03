@@ -40,8 +40,13 @@ DAILY_COLUMNS = (
     "day", "dow", "is_weekend", "week", "coverage_h", "is_partial",
     "screen_min", "screen_wake_s", "offline_wake_h", "sessions",
     "median_session_s", "longest_session_s",
-    "pickups", "glances", "pickups_per_wake_hour", "first_pickup_h",
-    "last_use_h", "night_min", "night_pickups", "night_end_h",
+    "pickups", "glances", "pickups_per_wake_hour",
+    # Both the hour and the millisecond: the hour is what the charts plot, the
+    # millisecond is what a clock face is written from. Truncating 21.8833 h to
+    # minutes loses one, and the page shows the clock.
+    "first_pickup_h", "first_pickup_ms",
+    "last_use_h", "last_use_ms",
+    "night_min", "night_pickups", "night_end_h",
     "longest_offline_h", "longest_offline_when",
     "distinct_apps", "distinct_sites", "app_switches",
     "switches_per_screen_hour", "distract_share",
@@ -240,6 +245,7 @@ def profile(user: str, bundle: dict) -> dict:
                        "type": e["type"], "detail": e["detail"]}
                       for e in bundle["emissions"]],
         "anomalies": {k: int(v) for k, v in bundle["timeline"].anomalies.items()},
+        "eventCounts": event_counts(bundle["timeline"]),
         "defaultDay": plain(default_day),
         "defaultWeek": int(weeks[-2] if len(weeks) > 1 else weeks[-1]),
     }
@@ -273,6 +279,20 @@ def block_counts(blocks: pd.DataFrame) -> dict:
         "top": [{"target": target, "block_type": kind, "count": int(n)}
                 for (target, kind), n in top.items()],
     }
+
+
+def event_counts(timeline) -> dict:
+    """How many of each event type the log carries.
+
+    The events themselves do not cross the boundary — 2.4 MB of them, and the
+    page never shows one — but the schema section names each type and says how
+    many there were, so the tally does.
+    """
+    counts: dict[str, int] = {}
+    for event in timeline.events:
+        kind = event["event_type"]
+        counts[kind] = counts.get(kind, 0) + 1
+    return dict(sorted(counts.items()))
 
 
 def replay_day(r: dict) -> dict:
