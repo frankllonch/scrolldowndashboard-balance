@@ -5,11 +5,8 @@ investigation is finished). What follows is steps 4–10, saved to pick up later
 
 ## Open questions before writing
 
-1. **Person B's framing.** The draft text describes "a teenager with a phone addiction,
-   gaming gambling or pornography". The data does not support it: r(usage, blocks) = 0.954,
-   B's inventory is Spotify / WhatsApp / Maps / Gmail / Calendar / Kindle / El País / BBC,
-   social media totals under 20 minutes, and every "leak" app first opened on 18 May — one
-   day when the filter stopped. Decide which story the page tells before any copy is written.
+1. **Person B's framing.** Settled. B is an adult; the sketch is rewritten and the
+   guardian channel is gone. See the "Single recipient" commit.
 2. **Code navigation.** Which part was hard to navigate ("costa navegar codi")? Needed to
    know what to restructure.
 
