@@ -18,7 +18,7 @@ const ESCAPES: Record<string, string> = {
 };
 
 /** For a value out of the document. Never for copy. */
-export function esc(value: string | number): string {
+function esc(value: string | number): string {
   return String(value).replace(/[&<>"']/g, (c) => ESCAPES[c] ?? c);
 }
 

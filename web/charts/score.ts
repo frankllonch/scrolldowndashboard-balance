@@ -6,14 +6,18 @@ import {
   DOW, annotation, axis as unit, hover, series, title, weekLabel,
 } from "../copy/figures";
 import { MONO, userColor, type Surface } from "../theme";
-import type { DailyRow, UserId, WeeklyRow } from "../types/index";
+import type {
+  ComponentKey, DailyRow, UserId, WeeklyRow,
+} from "../types/index";
 import { directLabel, frame } from "./frame";
 import type { Annotation, Figure, Trace } from "./plotly";
 import type { Frames } from "./series";
 
 /** The five index components, their weights, and what each one is called.
- *  Mirrors `COMPONENTS` in `balance/score.py`. */
-export const COMPONENTS = [
+ *  Mirrors `COMPONENTS` in the core's `score.py`. */
+export const COMPONENTS: ReadonlyArray<{
+  key: ComponentKey; label: string; good: number; bad: number; weight: number;
+}> = [
   { key: "screen_min", label: "Screen time", good: 90, bad: 360, weight: 0.25 },
   { key: "pickups", label: "Fragmentation", good: 15, bad: 60, weight: 0.20 },
   { key: "night_min", label: "Protected night", good: 0, bad: 60, weight: 0.20 },
@@ -21,7 +25,7 @@ export const COMPONENTS = [
     weight: 0.15 },
   { key: "distract_share", label: "Intent", good: 0.10, bad: 0.50,
     weight: 0.20 },
-] as const;
+];
 
 /** Both people's index, every day, with the 7-day mean on top. */
 export function scoreLine(s: Surface, frames: Frames): Figure {

@@ -17,7 +17,7 @@ import type { Category, UserId } from "./types/index";
 export type SurfaceName = "light" | "dusk" | "dark";
 
 /** A colour stop on a continuous scale: position 0–1, then the colour. */
-export type ColorStop = [number, string];
+type ColorStop = [number, string];
 
 export interface Surface {
   name: SurfaceName;
@@ -123,20 +123,6 @@ export const CATEGORY_COLOR: Record<Category, string> = {
 
 /** The order categories stack in. Never the ranking. */
 export const CATEGORY_ORDER = Object.keys(CATEGORY_COLOR) as Category[];
-
-export const BLOCK_TYPE_COLOR = {
-  APP: "#3987e5",
-  URL: "#c98500",
-  NUDITY: "#e66767",
-} as const;
-
-/** Status colours: reserved, never reused as "series 4". */
-export const STATUS = {
-  good: "#0ca30c",
-  warn: "#fab219",
-  serious: "#ec835a",
-  critical: "#e5484d",
-} as const;
 
 /**
  * The colour that belongs to a profile.

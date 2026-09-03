@@ -148,9 +148,11 @@ export function blocksByHour(s: Surface, blocks: Blocks,
     }
     return counts;
   };
+  // Both hues come from the category palette, so the split here reads as the
+  // same two things it does in every other chart on the page.
   const data: Trace[] = [
-    [series.ordinary, tally(false), "#3987e5"],
-    [series.sensitive, tally(true), "#e66767"],
+    [series.ordinary, tally(false), CATEGORY_COLOR.SOCIAL_MEDIA],
+    [series.sensitive, tally(true), CATEGORY_COLOR.ADULT],
   ].map(([name, counts, color]) => ({
     type: "bar", x: hours, y: counts as number[], name: name as string,
     marker: { color: color as string, line: { color: s.card, width: 1.2 } },

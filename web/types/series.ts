@@ -13,24 +13,18 @@ export interface DailyRow {
   dow: Weekday;
   is_weekend: boolean;
   week: number;
-  /** Hours of the day the log actually covers. Below 24 on a truncated day. */
-  coverage_h: number;
   /** A day the file cuts short. It leaves every average but still counts
    *  towards the night before it. */
   is_partial: boolean;
 
   screen_min: number;
-  screen_wake_s: number;
-  offline_wake_h: number;
   sessions: number;
   median_session_s: number;
-  longest_session_s: number;
 
   /** A screen-on with an unlock behind it. */
   pickups: number;
   /** A screen-on with no unlock: it lit, it never opened. */
   glances: number;
-  pickups_per_wake_hour: number;
   first_pickup_h: number | null;
   /** Epoch milliseconds. The hour above is what the charts plot; a clock face
    *  is written from this, because truncating a decimal hour to minutes loses
@@ -49,23 +43,16 @@ export interface DailyRow {
   longest_offline_when: string | null;
 
   distinct_apps: number;
-  distinct_sites: number;
-  app_switches: number;
   switches_per_screen_hour: number;
   /** Social + entertainment + gaming over attributed time, 0 to 1. */
   distract_share: number;
 
   blocks: number;
   blocks_sensitive: number;
-  blocks_adult: number;
-  blocks_gambling: number;
-  blocks_nudity: number;
 
   /** This user's own rolling 14-day median. Null over the first two weeks. */
   screen_min_baseline: number | null;
   pickups_baseline: number | null;
-  night_min_baseline: number | null;
-  blocks_baseline: number | null;
 
   /** Each component scored 0 to 100 before weighting. */
   score_screen_min: number;
@@ -107,20 +94,12 @@ export interface WeeklyRow {
   blocks_sensitive: number;
   score: number;
 
-  /** The same measures a week earlier, and the change. Null in week 1. */
-  screen_min_prev: number | null;
   screen_min_delta: number | null;
-  pickups_prev: number | null;
   pickups_delta: number | null;
-  night_min_prev: number | null;
   night_min_delta: number | null;
-  blocks_prev: number | null;
   blocks_delta: number | null;
-  score_prev: number | null;
   score_delta: number | null;
-  distract_share_prev: number | null;
   distract_share_delta: number | null;
-  longest_offline_h_prev: number | null;
   longest_offline_h_delta: number | null;
 
   /** Component scores averaged over the week. */

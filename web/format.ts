@@ -11,7 +11,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 
 /** What to say where a metric genuinely does not exist. User A has no night
  *  band at all, and printing 0 would be a claim the data does not make. */
-export const NO_USE = "no use";
+const NO_USE = "no use";
 
 function pad(n: number): string {
   return n < 10 ? `0${n}` : String(n);

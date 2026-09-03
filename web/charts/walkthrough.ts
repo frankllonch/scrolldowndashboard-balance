@@ -149,8 +149,3 @@ export function trackedSeries(s: Surface, rows: DailyRow[],
                     font: { family: MONO, size: 10, color: s.muted } }],
   }, 560);
 }
-
-/** The cursor is the only thing that moves when the day slider does. */
-export function cursorUpdate(day: Day): Record<string, unknown> {
-  return { "shapes[1].x0": day, "shapes[1].x1": day };
-}

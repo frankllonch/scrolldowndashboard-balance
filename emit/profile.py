@@ -37,10 +37,9 @@ DATA = {"A": "data/events_user_a.json", "B": "data/events_user_b.json"}
 #: Columns of the daily frame that cross the boundary. The frame carries 67;
 #: these are the ones the page reads. Anything else is an intermediate.
 DAILY_COLUMNS = (
-    "day", "dow", "is_weekend", "week", "coverage_h", "is_partial",
-    "screen_min", "screen_wake_s", "offline_wake_h", "sessions",
-    "median_session_s", "longest_session_s",
-    "pickups", "glances", "pickups_per_wake_hour",
+    "day", "dow", "is_weekend", "week", "is_partial",
+    "screen_min", "sessions", "median_session_s",
+    "pickups", "glances",
     # Both the hour and the millisecond: the hour is what the charts plot, the
     # millisecond is what a clock face is written from. Truncating 21.8833 h to
     # minutes loses one, and the page shows the clock.
@@ -48,12 +47,9 @@ DAILY_COLUMNS = (
     "last_use_h", "last_use_ms",
     "night_min", "night_pickups", "night_end_h",
     "longest_offline_h", "longest_offline_when",
-    "distinct_apps", "distinct_sites", "app_switches",
-    "switches_per_screen_hour", "distract_share",
-    "blocks", "blocks_sensitive", "blocks_adult", "blocks_gambling",
-    "blocks_nudity",
-    "screen_min_baseline", "pickups_baseline", "night_min_baseline",
-    "blocks_baseline",
+    "distinct_apps", "switches_per_screen_hour", "distract_share",
+    "blocks", "blocks_sensitive",
+    "screen_min_baseline", "pickups_baseline",
     "score", "score_7d",
 ) + tuple(f"score_{col}" for col, *_ in COMPONENTS)
 
@@ -64,10 +60,11 @@ WEEKLY_COLUMNS = (
     "best_offline_when", "distinct_apps", "switches_per_screen_hour",
     "distract_share", "blocks", "blocks_total", "blocks_sensitive", "score",
 ) + tuple(
-    f"{col}_{suffix}"
+    # The change, but not the previous value: the one table that shows a
+    # previous week reads that week's own row.
+    f"{col}_delta"
     for col in ("screen_min", "pickups", "night_min", "blocks", "score",
                 "distract_share", "longest_offline_h")
-    for suffix in ("prev", "delta")
 ) + tuple(f"score_{col}" for col, *_ in COMPONENTS)
 
 

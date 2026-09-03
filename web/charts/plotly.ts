@@ -47,13 +47,13 @@ export interface Trace {
   cliponaxis?: boolean;
 }
 
-export interface Font {
+interface Font {
   family?: string;
   size?: number;
   color?: string | string[];
 }
 
-export interface Line {
+interface Line {
   color?: string;
   width?: number;
   dash?: string;
@@ -61,7 +61,7 @@ export interface Line {
   smoothing?: number;
 }
 
-export interface Marker {
+interface Marker {
   color?: string | string[] | number[];
   size?: number | number[];
   symbol?: string;
@@ -108,7 +108,7 @@ export interface Axis {
   automargin?: boolean;
 }
 
-export interface Shape {
+interface Shape {
   type: "line" | "rect";
   x0?: number | string;
   x1?: number | string;

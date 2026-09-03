@@ -71,15 +71,3 @@ export function directLabel(x: string | number, y: number, text: string,
     font: { family: MONO, size: 11, color },
   };
 }
-
-/** A horizontal reference line with its value written at the left. */
-export function hline(s: Surface, y: number, label: string):
-    { shape: import("./plotly").Shape; annotation: Annotation } {
-  return {
-    shape: { type: "line", xref: "paper", x0: 0, x1: 1, y0: y, y1: y,
-             line: { color: s.ink, width: 1.6, dash: "dot" } },
-    annotation: { xref: "paper", x: 0, y, text: label, showarrow: false,
-                  xanchor: "left", yanchor: "bottom", yshift: 4,
-                  font: { family: MONO, size: 10, color: s.ink2 } },
-  };
-}

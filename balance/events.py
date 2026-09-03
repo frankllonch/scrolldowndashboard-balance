@@ -151,16 +151,6 @@ class Timeline:
     days: list[date]
     anomalies: Counter = field(default_factory=Counter)
 
-    # -- filtering helpers ---------------------------------------------------
-    def intervals_on(self, d: date) -> list[Interval]:
-        return [i for i in self.intervals if i.day == d]
-
-    def usages_on(self, d: date) -> list[Usage]:
-        return [u for u in self.usages if u.day == d]
-
-    def blocks_on(self, d: date) -> list[Block]:
-        return [b for b in self.blocks if b.day == d]
-
 
 # ---------------------------------------------------------------------------
 # Reconstruction

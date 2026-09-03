@@ -121,6 +121,3 @@ export function explain(key: string): string {
   }
   throw new Error(`no explanation for figure ${key}`);
 }
-
-/** Every key with a line, so a test can check none is unreachable. */
-export const EXPLAINED = Object.keys(EXPLANATIONS);

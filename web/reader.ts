@@ -19,7 +19,7 @@ let painted: string | null = null;
  * exception: it borrows figures drawn for the dark ground and dims them, so
  * act 06 is the only one that needs re-pointing, in or out.
  */
-export function paintSurface(id: string, force = false): void {
+function paintSurface(id: string, force = false): void {
   if (id === painted && !force) return;
   painted = id;
   root.dataset.surface = `a${id}`;
@@ -103,7 +103,7 @@ export function watchResize(): void {
 
 /** Where the reader is, as an act plus how far into it, so the switch can put
  *  them back after part two changes height. */
-export interface Anchor {
+interface Anchor {
   section: HTMLElement;
   into: number;
 }
