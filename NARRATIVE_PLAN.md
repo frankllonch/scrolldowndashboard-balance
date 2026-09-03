@@ -25,8 +25,10 @@ Python holds only the numbers.
 - [x] **2 · Scaffolding.** npm, `tsc --strict` (with `noUncheckedIndexedAccess`
       and `exactOptionalPropertyTypes`), esbuild. Output goes to `docs/bundle.js`
       for now so it cannot clobber the `docs/app.js` still serving the page.
-- [ ] **3 · Figures.** The 26 charts, from Python to TypeScript. Plotly stays, so
-      this is a port with something to compare against.
+- [x] **3 · Figures.** All 35 figures ported. `tests/test_figures.py` builds each
+      one on both sides and compares them trace by trace: same numbers, same
+      titles, same surfaces, same series names and colours. That test is
+      transitional and goes with `render/` at the cutover.
 - [ ] **4 · Acts.** One module each, carrying markup and copy.
 - [ ] **5 · Cutover.** `bundle.js` becomes `app.js`; `render/`, `copytext/` and
       `page.py` are deleted; `build.py` runs `python -m emit` and `npm run build`.
