@@ -57,6 +57,26 @@ const WEEK_MEASURES = {
   blocks: { heading: title.weekBlocks, unit: "" },
 } as const;
 
+/** The two measures the day bars step through, against their own baseline. */
+const DAILY_MEASURES = {
+  screen_min: { baseline: "screen_min_baseline", title: title.dayScreen,
+                unit: unit.minutes },
+  pickups: { baseline: "pickups_baseline", title: title.dayPickups,
+             unit: unit.unlocks },
+} as const;
+
+/** The two rankings, and which list each one ranks. */
+const RANKINGS = {
+  apps: { series: "apps", title: title.apps },
+  sites: { series: "sites", title: title.domains },
+} as const;
+
+/** The two week-by-day panels. */
+const WEEK_DAYS = {
+  screen_min: title.weekDaysScreen,
+  night_min: title.weekDaysNight,
+} as const;
+
 /** The five measures both profiles are compared on. */
 const COMPARE_MEASURES = {
   screen_min: { heading: title.screenPerDay, unit: unit.minutes },
@@ -65,6 +85,15 @@ const COMPARE_MEASURES = {
   blocks: { heading: title.blocksPerDay, unit: unit.blocks },
   night_pickups: { heading: title.nightPickups, unit: unit.unlocks },
 } as const;
+
+/** The part of a figure key after the family name, if the family knows it.
+ *  A key naming something that is not there returns nothing, and the mount is
+ *  left empty rather than drawn wrong. */
+function pick<T extends object>(table: T, name: string | undefined):
+    keyof T | undefined {
+  return name && name in table ? (name as keyof T) : undefined;
+}
+
 
 function frames(payload: Payload): Frames {
   const out: Frames = {};
@@ -98,16 +127,16 @@ export function build(key: string, payload: Payload, profile: Profile,
       return target ? scoreBreakdown(s, target.daily, who) : null;
     }
     case "compare": {
-      const measure = rest[0] as keyof typeof COMPARE_MEASURES | undefined;
-      if (!measure || !(measure in COMPARE_MEASURES)) return null;
+      const measure = pick(COMPARE_MEASURES, rest[0]);
+      if (!measure) return null;
       const { heading, unit: label } = COMPARE_MEASURES[measure];
       return compareLine(s, frames(payload), measure, heading, label);
     }
     case "week_components":
       return weekComponents(s, profile.weekly, selection.week);
     case "week_evolution": {
-      const measure = rest[0] as keyof typeof WEEK_MEASURES | undefined;
-      if (!measure || !(measure in WEEK_MEASURES)) return null;
+      const measure = pick(WEEK_MEASURES, rest[0]);
+      if (!measure) return null;
       const { heading, unit: label } = WEEK_MEASURES[measure];
       return weekEvolution(s, profile.weekly, measure, heading, label, user,
                            selection.week);
@@ -115,26 +144,18 @@ export function build(key: string, payload: Payload, profile: Profile,
     case "week_days": {
       // `week_days.night_min.3` names its own week, so one mount can be
       // re-pointed as the slider moves without rebuilding the page.
-      const measure = rest[0];
+      const measure = pick(WEEK_DAYS, rest[0]);
+      if (!measure) return null;
       const week = rest[1] ? Number(rest[1]) : selection.week;
-      if (measure !== "screen_min" && measure !== "night_min") return null;
-      const heading = measure === "screen_min"
-        ? title.weekDaysScreen(week) : title.weekDaysNight(week);
-      return weekDays(s, profile.daily, week, measure, heading, unit.min, user);
+      return weekDays(s, profile.daily, week, measure, WEEK_DAYS[measure](week),
+                      unit.min, user);
     }
     case "daily_bars": {
-      const measure = rest[0];
-      if (measure === "screen_min") {
-        return dailyBarsVsBaseline(s, profile.daily, "screen_min",
-                                   "screen_min_baseline",
-                                   title.dayScreen(user), unit.minutes, user);
-      }
-      if (measure === "pickups") {
-        return dailyBarsVsBaseline(s, profile.daily, "pickups",
-                                   "pickups_baseline",
-                                   title.dayPickups(user), unit.unlocks, user);
-      }
-      return null;
+      const measure = pick(DAILY_MEASURES, rest[0]);
+      if (!measure) return null;
+      const spec = DAILY_MEASURES[measure];
+      return dailyBarsVsBaseline(s, profile.daily, measure, spec.baseline,
+                                 spec.title(user), spec.unit, user);
     }
     case "hour_heat":
       return hourHeat(s, profile.hourHeat, user);
@@ -143,14 +164,10 @@ export function build(key: string, payload: Payload, profile: Profile,
       // where it belongs to that act and is drawn for its ground.
       return daySpan(s, profile.daily, user);
     case "top_bars": {
-      const which = rest[0];
-      if (which === "apps") {
-        return topBars(s, profile.apps, title.apps(user));
-      }
-      if (which === "sites") {
-        return topBars(s, profile.sites, title.domains(user));
-      }
-      return null;
+      const which = pick(RANKINGS, rest[0]);
+      if (!which) return null;
+      const spec = RANKINGS[which];
+      return topBars(s, profile[spec.series], spec.title(user));
     }
     case "category_area":
       return categoryArea(s, profile.categoryDaily, title.categories(user));

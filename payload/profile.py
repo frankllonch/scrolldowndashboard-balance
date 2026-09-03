@@ -48,6 +48,17 @@ WEEKLY_COLUMNS = (
 USAGE_COLUMNS = ("key", "label", "category", "minutes", "opens", "min_per_open")
 
 
+def bookend_weeks(weekly: pd.DataFrame) -> tuple[int, int]:
+    """The first week and the last full one.
+
+    The month does not divide into sevens: the last week is a two-day tail,
+    and comparing against it would read a short week's averages as a week's.
+    Everything that says "week 1 against week 4" means these two.
+    """
+    weeks = list(weekly.index)
+    return weeks[0], (weeks[-2] if len(weeks) > 1 else weeks[-1])
+
+
 def week_value(df: pd.DataFrame, col: str, week: int) -> float:
     """One measure averaged over one week. The summary compares the first
     against the last, so it asks for the same thing a dozen times."""
@@ -90,10 +101,8 @@ def summary(run: Analysis) -> dict:
     and the "no use" for a metric user A genuinely does not have are all
     decisions the frontend makes, because they are all wording.
     """
-    d, w = run.daily, run.weekly
-    first = w.index[0]
-    last = w.index[-2] if len(w.index) > 1 else w.index[-1]
-    timeline = run.timeline
+    d, timeline = run.daily, run.timeline
+    first, last = bookend_weeks(run.weekly)
     screen_h = sum(i.seconds for i in timeline.intervals) / 3600
     attributed_h = sum(u.seconds for u in timeline.usages) / 3600
     end_first, end_last = (week_value(d, "night_end_h", first),
@@ -166,7 +175,6 @@ def profile(run: Analysis) -> dict:
     """
     # Where the walkthrough opens: the day something was said, else the last.
     # A reader who never touches the slider should land on the interesting day.
-    weeks = list(run.weekly.index)
     default_day = next((r["day"] for r in run.replay if r["alert"]),
                        run.replay[-1]["day"])
     return {
@@ -192,9 +200,7 @@ def profile(run: Analysis) -> dict:
         "anomalies": {k: int(v) for k, v in run.timeline.anomalies.items()},
         "eventCounts": event_counts(run.timeline),
         "defaultDay": plain(default_day),
-        # The last full week. The final one is a two-day tail, and opening on
-        # it would show a short week's averages as if they were a week's.
-        "defaultWeek": int(weeks[-2] if len(weeks) > 1 else weeks[-1]),
+        "defaultWeek": int(bookend_weeks(run.weekly)[1]),
     }
 
 

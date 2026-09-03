@@ -7,6 +7,7 @@ One row per day and user. Everything the dashboard draws comes from here.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from datetime import date, timedelta
 from statistics import median
 
@@ -15,8 +16,8 @@ import pandas as pd
 from .events import (
     DISTRACTING,
     SENSITIVE,
-    Interval,
     Timeline,
+    Usage,
     app_label,
     midnight_ms,
     to_dt,
@@ -35,34 +36,39 @@ from .windows import (
 )
 
 
-def daily_frame(tl: Timeline) -> pd.DataFrame:
-    """One row per day with every base metric."""
-    by_day_iv: dict[date, list[Interval]] = defaultdict(list)
-    for iv in tl.intervals:
-        by_day_iv[iv.day].append(iv)
+def _by_day(items: Iterable) -> dict[date, list]:
+    """Anything with a `.day`, grouped by it."""
+    out: dict[date, list] = defaultdict(list)
+    for item in items:
+        out[item.day].append(item)
+    return out
 
-    by_day_use = defaultdict(list)
-    for u in tl.usages:
-        by_day_use[u.day].append(u)
 
-    by_day_block = defaultdict(list)
-    for b in tl.blocks:
-        by_day_block[b.day].append(b)
+def _switches_per_day(usages: list[Usage]) -> Counter:
+    """Foreground moves between two different apps, counted per day.
 
-    # App switches: a real foreground transition between different packages.
-    # The counter resets every day. Without that, the first app of the morning
-    # counts as a switch from the last one of the night before, which added one
-    # false switch per day (~5 % of the total) and, worse, made a "switch" span
-    # eight hours of sleep.
-    switches_by_day: Counter = Counter()
-    last_key_by_day: dict[date, str] = {}
-    for u in sorted(tl.usages, key=lambda x: x.start_ms):
+    The counter resets at midnight. Without that the first app of the morning
+    counts as a switch from the last one of the night before, which added one
+    false switch a day (~5 % of the total) and, worse, made a "switch" span
+    eight hours of sleep.
+    """
+    switches: Counter = Counter()
+    previous: dict[date, str] = {}
+    for u in sorted(usages, key=lambda x: x.start_ms):
         if u.kind != "app":
             continue
-        prev = last_key_by_day.get(u.day)
-        if prev is not None and u.key != prev:
-            switches_by_day[u.day] += 1
-        last_key_by_day[u.day] = u.key
+        if previous.get(u.day) not in (None, u.key):
+            switches[u.day] += 1
+        previous[u.day] = u.key
+    return switches
+
+
+def daily_frame(tl: Timeline) -> pd.DataFrame:
+    """One row per day with every base metric."""
+    by_day_iv = _by_day(tl.intervals)
+    by_day_use = _by_day(tl.usages)
+    by_day_block = _by_day(tl.blocks)
+    switches_by_day = _switches_per_day(tl.usages)
 
     file_start = tl.events[0]["timestamp_millis"]
     file_end = tl.events[-1]["timestamp_millis"]
@@ -79,6 +85,7 @@ def daily_frame(tl: Timeline) -> pd.DataFrame:
 
         w0, w1 = _window_ms(d, WAKE_START, WAKE_END)
         screen_wake_s = sum(_overlap_s(i.start_ms, i.end_ms, w0, w1) for i in ivs)
+        offline_wake_s = max(0.0, (w1 - w0) / 1000 - screen_wake_s)
 
         # the night is measured over ALL stretches, not only this day's: the
         # night of day d runs until 06:00 the next day.
@@ -128,8 +135,8 @@ def daily_frame(tl: Timeline) -> pd.DataFrame:
             "screen_s": screen_s,
             "screen_min": screen_s / 60,
             "screen_wake_s": screen_wake_s,
-            "offline_wake_s": max(0.0, (w1 - w0) / 1000 - screen_wake_s),
-            "offline_wake_h": max(0.0, (w1 - w0) / 1000 - screen_wake_s) / 3600,
+            "offline_wake_s": offline_wake_s,
+            "offline_wake_h": offline_wake_s / 3600,
             "sessions": len(ivs),
             "longest_session_s": max((i.seconds for i in ivs), default=0),
             # a real median: with even n, the mean of the two middle values
