@@ -56,6 +56,12 @@ h3.sub {
   margin: 0 0 2.4rem 0;
 }
 
+/* A lede usually opens an act. Where one closes a block instead, it needs the
+   same air above it that it gives below. */
+* + .lede {
+  margin-top: 2.4rem;
+}
+
 .note {
   border-left: 3px solid var(--accent);
   background: var(--card);

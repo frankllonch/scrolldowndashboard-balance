@@ -48,8 +48,8 @@ STRINGS: dict[str, str] = {
         "single day."
     ),
     "act.05.next": (
-        "The days look ordinary enough. So look at the hours the days do not "
-        "cover."
+        "The daytimelook ordinary enough. But what happens when we turn "
+        "the lights off?"
     ),
     "act.06.next": "Now you know when. The next question is what.",
     "act.07.next": "That is what got through. Here is what did not.",
@@ -84,32 +84,14 @@ STRINGS: dict[str, str] = {
         "<b>so what?</b>"
     ),
 
-    # -- act 01 · the summary up front --------------------------------------
-    "summary.title": "The short version",
-    "summary.1.label": "Two adults, same phone, very different months",
-    "summary.1.body": (
-        "A scores {a_score:.0f} out of 100 and barely moves all month. B "
-        "starts at {b_first:.0f} and ends at {b_last:.0f}. Everything below is "
-        "the story of those {drop:.0f} points."
-    ),
-    "summary.2.label": "It is not that B is on the phone more",
-    "summary.2.body": (
-        "B's screen time only moves {screen:+.0f} % over the month. What "
-        "moves is <b>when</b>: late-night use multiplies by {night:.0f}, "
-        "bedtime slides from {bed_first} to {bed_last}, and the alarm does "
-        "not move. That is {sleep:.0f} minutes of sleep a night, gone."
-    ),
-    "summary.3.label": "The filter worked, and one day it did not",
-    "summary.3.body": (
-        "B's phone blocked {blocks:,} attempts, {sensitive} of them adult or "
-        "gambling, and none of it ever opened. Except on {outage}, when the "
-        "filter went quiet for about {hours:.0f} hours and everything it had "
-        "been holding back walked straight in."
+    "cover.intro": (
+        "Two adults, thirty days each. A holds steady all month; B loses "
+        "{drop:.0f} points off the same index — not from using the phone "
+        "more, but from using it later and later. Everything below is why."
     ),
     "cover.stat.profiles": "profiles",
     "cover.stat.events": "events",
     "cover.stat.days": "days each",
-    "cover.scroll": "Scroll",
 
     # -- act 02 · A single wellbeing score -------------------------------------
     "overview.lede": (

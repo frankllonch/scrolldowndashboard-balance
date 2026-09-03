@@ -23,18 +23,6 @@ details .grid {
   margin-top: 3rem;
 }
 
-.scroll-cue {
-  font-family: var(--mono);
-  font-size: .66rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 4rem 0 0 0;
-}
-
-.scroll-cue::after {
-  content: " ↓";
-}
 
 .fork-act {
   min-height: 88vh;
