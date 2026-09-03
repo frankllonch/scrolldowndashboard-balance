@@ -1,52 +1,119 @@
 # Architecture
 
-The event file is the system of record. Everything else is a pure function of
-it, computed at build time, so the browser never sees an event.
+The event log is the system of record. Everything else is a pure, deterministic
+function of it, computed at build time, so the browser never sees an event.
 
-Two halves, one boundary. Python computes; TypeScript draws. Everything that
-crosses is declared in `web/types/` and checked from both sides.
+Two halves and one boundary. **Python computes. TypeScript draws.** Nothing that
+crosses between them is HTML, a figure or a word — it is numbers, and its shape
+is declared once in `web/types/` and checked from both sides.
+
+## Where everything is
 
 ```
-data/*.json              the log · immutable
+data/*.json                    the log · immutable · the only input
   │
-  ├─ analysis/events.py     layer 0 · screen, pickups, time attribution
-  ├─ analysis/windows.py             day, night and waking windows
-  ├─ analysis/metrics.py    layer 1 · daily_frame(), weekly_frame()
-  ├─ analysis/score.py      layer 2 · the 0 to 100 index
-  └─ analysis/intelligence/ layer 3 · signals, alerts, nudge, positives, replay
-       │
-       ├─ analysis/run.py   adapter · the command line
-       └─ payload/            adapter · the frames as one typed JSON document
-            │
-            ▼
-       docs/data.json      ─── the boundary. No HTML, no figures, no copy ───
-            │
-            ▼
-       web/                the page: types, charts, acts, copy, interaction
-            │
-            └─ build.py  →  docs/  →  GitHub Pages
+  ▼
+analysis/                      ── computes. Draws nothing. Knows no page. ──
+  events.py       336   layer 0 · screen stretches, real unlocks, time attribution
+  windows.py       92             what counts as a day, a night, waking hours
+  taxonomy.py      50             what the stream calls OTHER, and what it is
+  metrics.py      302   layer 1 · one row per day, one per week
+  score.py         77   layer 2 · the 0 to 100 index · five weighted components
+  intelligence/         layer 3 · what to say, when to stay quiet
+    signals.py     94             thresholds, and the two records passed around
+    alerts.py     230             the three rules, and the budget that silences
+    positives.py  179             reinforcements: what to say when nothing is wrong
+    nudge.py       78             the on-device night nudge, replayed
+    replay.py      96             the state at the close of each day
+  run.py          297   adapter · the same engine on the command line
+  │
+  ▼
+payload/                       ── packages it. Formats nothing. ──
+  profile.py      306   one profile's frames, laid out flat
+  scalars.py       92   pandas and core objects into JSON-safe values
+  __init__.py      57   the document, and the finding it adds up to
+  │
+  ▼
+docs/data.json    163 KB  ═══ THE BOUNDARY · no HTML, no figures, no copy ═══
+  │
+  ▼
+web/                           ── draws it. Owns every word. ──
+  index.html            the shell: twelve empty sections and two script tags
+  main.ts          48   boot · load, draw, bind
+  document.ts      32   fetching the document, and reaching one profile in it
+  theme.ts        140   palette and three surfaces: paper, dusk, near-black
+  format.ts       126   wording a number: clocks, durations, dates, percentages
+  html.ts         160   the markup builders every act is made of
+  page.ts          67   composing the twelve sections, and the rail
+  types/                ═══ the contract ═══
+    primitives.ts  36     days, categories, decisions · the vocabulary
+    series.ts     150     one row per day, per week, per app, per cell
+    signals.ts     77     what the phone worked out and what it emitted
+    index.ts      151     the summaries, and the document itself
+    contract.ts    34     compiles the emitted file against all of the above
+  charts/               ═══ every figure ═══
+    plotly.ts     212     the slice of Plotly this project uses, typed by hand
+    frame.ts       73     the layout every figure starts from
+    series.ts     186     one line or one bar per day
+    score.ts      207     the index: the curve, the breakdown, the weekly panels
+    composition.ts 169    where the time and the blocks went
+    walkthrough.ts 151    the month on one axis, with the event rail under it
+    index.ts      166     figure key → builder → which ground it sits on
+  acts/                 ═══ one file per section of the page ═══
+    act.ts         53     what an act is, and what it is handed
+    a01-cover.ts   58     what Balance is, and why to read on
+    a02-two-people 133    both profiles, and what the index actually is
+    a03-choose.ts  63     the fork: a real choice, full screen
+    a04-the-week  272     five weeks on a slider
+    a05-a-day     160     one month of days, on one screen
+    a06-the-night 112     the 23:00 to 06:00 band
+    a07-where-... 189     apps, domains, categories
+    a08-what-...  152     what the filter stopped
+    a09-what-said 264     the alert and nudge engine, day by day
+    a10-the-...    60     the finding
+    a11-the-...    90     what a screen-time rule would have missed
+    a12-under-... 194     schema, derivations, the pipeline itself
+  copy/                 ═══ the words that are not about one section ═══
+    explain.ts    123     the line under every chart, by figure key
+    figures.ts    148     titles, axes, series names, hover templates
+    units.ts       29     units, and the phrases standing in for absent values
+  interaction/          ═══ what the page does once it is on screen ═══
+    dom.ts         41     every selector the page depends on, in one file
+    plots.ts       44     build a figure and draw it into its mount
+    reader.ts     121     the travelling surface, the rail, resize, scroll
+    sliders.ts    166     the week and the day, continuous thumbs, discrete data
+    switch.ts      81     changing profile without losing the reader's place
+  styles/        1434   ten stylesheets, concatenated into one at build time
+  vendor/               plotly, cartesian build only, committed not fetched
+  tools/prerender.ts    writes every section into the page at build time
+  │
+  ▼
+build.py          101   python -m payload · typecheck · prerender · bundle
+  │
+  ▼
+docs/                          ── the built site · GitHub Pages serves this ──
+  index.html      39 KB  every section already in it: the page reads without JS
+  data.json      163 KB  the document
+  app.js          75 KB  the bundle
+  style.css       28 KB  the ten stylesheets, joined
+  vendor/       1450 KB  plotly
 ```
 
-Want to change something? The section it belongs to is one file:
+`docs/` is build output. Editing it loses the change on the next build; edit
+`web/`. The name is GitHub Pages' requirement, not a description.
+
+## To change something, open one file
 
 | To change | Open |
 |---|---|
-| What a section says, or the charts it mounts | `web/acts/aNN-*.ts` |
+| What a section says, or which charts it mounts | `web/acts/aNN-*.ts` |
 | The line under a chart | `web/copy/explain.ts` |
 | How a chart is drawn | `web/charts/` |
 | The palette, or which ground an act sits on | `web/theme.ts`, `web/charts/index.ts` |
-| What a slider does | `web/sliders.ts` |
-| What crosses from Python | `web/types/`, then `payload/` |
-| A metric, a threshold, a rule | `analysis/` |
+| What a slider does | `web/interaction/sliders.ts` |
 | Spacing, type, colour tokens | `web/styles/` |
-
-No module is longer than 350 lines; where a concern outgrew that it became a
-package or a folder whose index re-exports the same names, so no caller
-changed.
-
-Nothing in `analysis/` imports plotly or knows the page exists, and nothing in
-`payload/` builds a figure or writes markup. The command line and the page are
-two readers of the same core.
+| A metric, a threshold, a rule | `analysis/` |
+| What crosses the boundary | `web/types/`, then `payload/profile.py` |
 
 ## Invariants
 
@@ -57,58 +124,41 @@ two readers of the same core.
 | First unlock is the first from 06:00 | `metrics.py` | night tails read as mornings |
 | Truncated days leave every view | `metrics.py`, `daily_frame` | totals stop matching |
 | Browser time belongs to the domain | `events.py` | Chrome tops every ranking |
-| At most 2 alerts per 30 days | `intelligence.py`, `_decide` | the channel burns out |
-| No app or domain reaches a notification | `intelligence.py`, `payload/` | the privacy line is gone |
+| At most 2 alerts per 30 days | `alerts.py`, `_decide` | the channel burns out |
+| No app or domain reaches a notification | `intelligence/`, `payload/` | the privacy line is gone |
 | Numbers come from the frames, never from copy | `web/`, `test_copy.py` | a copy edit moves a figure |
-| Nothing but data crosses the boundary | `payload/`, `test_emit.py` | Python starts rendering again |
-
-## From event to metric
-
-| Metric | How it is derived |
-|---|---|
-| Screen time | Union of on-to-off intervals, split at midnight |
-| Real pickup | A screen-on with an unlock before the next one |
-| Glance | A screen-on with no unlock |
-| Time per app | Foreground to the next change or screen off, capped at 45 min |
-| Time per domain | The same, with the time moved off the browser |
-| Night band | 23:00 to 06:00 the next morning |
-| Longest break | Longest screen-free gap between 07:00 and 23:00 |
-| App switch | A move between two different apps, reset daily |
-| Distraction share | Social, entertainment and gaming over attributed time |
-| Your normal | Rolling median of this user's last 14 days |
+| Nothing but data crosses the boundary | `payload/`, `test_payload.py` | Python starts rendering again |
+| No file over 350 lines | `test_structure.py` | a file starts doing two things |
 
 ## How to make the likely changes
 
 **Add a daily metric.** Compute it per day in `daily_frame()`, aggregate it in
 `weekly_frame()` if it belongs in the weekly panel, name it in
-`payload/profile.py`'s column list, and declare it in `web/types/series.ts`. The
-type check fails until both sides agree, which is the point.
+`payload/profile.py`'s column list, and declare it in `web/types/series.ts`.
+The type check fails until both sides agree, which is the point.
 
 **Add an alert rule.** Write `_your_rule(df) -> list[Signal]` in
 `intelligence/alerts.py`, put its thresholds in `intelligence/signals.py`, and
-register it in `RULES`. The silence budget in
-`_decide` applies to it automatically; give it an honest `actionability` or it
-will crowd out something that deserves the slot.
+register it in `RULES`. The silence budget applies to it automatically; give it
+an honest `actionability` or it will crowd out something that deserves the slot.
 
-**Add a reinforcement.** Same shape, in `intelligence/positives.py`. One a week reaches
-the user at most.
+**Add a reinforcement.** Same shape, in `intelligence/positives.py`. One a week
+reaches the reader at most.
 
-**Change the index weights.** `COMPONENTS` in `score.py`. The weights must sum
-to 1; `tests/test_score.py` asserts it, and `tests/test_data_contract.py`
-asserts the published figures, so a weight change will show up as a failing
-number rather than a silent drift.
+**Change the index weights.** `COMPONENTS` in `score.py`, and the mirror of it
+in `web/charts/score.ts`. The weights must sum to 1; `tests/test_score.py`
+asserts it and `tests/test_data_contract.py` asserts the published figures, so a
+weight change shows up as a failing number rather than a silent drift.
 
-**Add an act to the page.** Write `web/acts/aNN-name.ts` exporting an `Act`
-with its own `copy` object and a `build(ctx)`, add it to `ACTS` in
-`web/acts/index.ts`, and add a `<section>` with its `<!--act:NN-->` marker to
-`web/index.html`. Its words live in that file: one section, one place. Acts
-in part 2 are rebuilt when the reader switches profile.
+**Add an act.** Write `web/acts/aNN-name.ts` exporting an `Act` with its own
+`copy` object and a `build(ctx)`, add it to `ACTS` in `web/acts/index.ts`, and
+add a `<section>` with its `<!--act:NN-->` marker to `web/index.html`. Its words
+live in that file: one section, one place.
 
 **Add a figure.** A builder in the right family under `web/charts/`, a case in
 `build()` in `web/charts/index.ts`, a line in `web/copy/explain.ts`, and a
 `chart("key", explain("key"))` mount in the act. A figure with no line does not
-build. If it needs a series the document does not carry, add that first: the
-column list in `payload/profile.py` and the type in `web/types/`.
+build. If it needs a series the document does not carry, add that first.
 
 ## Known limits
 

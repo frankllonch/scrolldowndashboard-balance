@@ -5,13 +5,13 @@
  * them on the one they were reading: that is the comparison.
  */
 
-import type { Selection } from "./charts/index";
-import { act, all, one, root } from "./dom";
-import { PART_TWO, bodies } from "./page";
-import { drawWithin } from "./plots";
-import { anchor, repaint, restore } from "./reader";
-import { bindSliders, held, restoreSliders } from "./sliders";
-import type { Payload } from "./types/index";
+import type { Selection } from "../charts/index";
+import { act, all, one, root } from "../interaction/dom";
+import { PART_TWO, bodies } from "../page";
+import { drawWithin } from "../interaction/plots";
+import { anchor, repaint, restore } from "../interaction/reader";
+import { bindSliders, held, restoreSliders } from "../interaction/sliders";
+import type { Payload } from "../types/index";
 
 export async function applyProfile(payload: Payload, selection: Selection,
                                    user: string,

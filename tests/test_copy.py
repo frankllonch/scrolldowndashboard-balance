@@ -9,8 +9,8 @@ Two invariants survive the move, and one does not.
   in `analysis/intelligence/`, so this still tests Python.
 
 What went is "no user-visible string outside the catalogue". Its premise was
-the split it enforced: prose in `copytext/`, keys in `render/`. An act now
-holds its own words on purpose, and one file per section is the point.
+the split it enforced — words in one place, markup in another — and an act now
+holds its own words on purpose.
 """
 
 from __future__ import annotations

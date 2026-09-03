@@ -8,12 +8,12 @@
  */
 
 import type { Selection } from "./charts/index";
-import { currentProfile, root } from "./dom";
-import { load, profile as profileOf } from "./payload";
-import { drawWithin } from "./plots";
-import { progressBar, watchActs, watchResize } from "./reader";
-import { bindSliders } from "./sliders";
-import { applyProfile, bindSwitches, requested, skipTheFork } from "./switch";
+import { currentProfile, root } from "./interaction/dom";
+import { load, profile as profileOf } from "./document";
+import { drawWithin } from "./interaction/plots";
+import { progressBar, watchActs, watchResize } from "./interaction/reader";
+import { bindSliders } from "./interaction/sliders";
+import { applyProfile, bindSwitches, requested, skipTheFork } from "./interaction/switch";
 
 async function start(): Promise<void> {
   const payload = await load();

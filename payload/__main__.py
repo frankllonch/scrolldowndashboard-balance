@@ -1,4 +1,4 @@
-"""`python -m emit` writes the document."""
+"""`python -m payload` writes the document."""
 
 from __future__ import annotations
 

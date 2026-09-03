@@ -84,22 +84,54 @@ It only ever moves something out of `OTHER`, and nothing it assigns is in
 `DISTRACTING`, so no published figure moves: the CLI output is still
 byte-identical. The files are never edited.
 
-## The copy package is `copytext`, not `copy`
+## Python computes, TypeScript draws
 
-A top-level `copy/` package shadows the stdlib module of that name, and the
-project root is on `sys.path`. Importing pandas then dies inside pyarrow with
-`module 'copy' has no attribute 'deepcopy'`. Everything else about the rule
-holds: one keyed catalogue, no user-visible string outside it.
+The backend used to build the figures and the HTML too, which meant one section
+of the page lived in six files across two languages. Now `payload/` hands over
+numbers and `web/` owns every pixel and every word. The shape of the handover
+is declared once in `web/types/` and checked from both sides: `npm run
+typecheck` compiles the emitted document against it, and `tests/test_payload.py`
+asserts no string in it is markup.
 
-## The plotly theme is hoisted out of the figures
+## An act owns its own words
 
-Plotly writes the whole template into every figure it serialises. Across 59
-figures that was 95 KB of the payload repeating itself, so the build strips it
-and the page re-attaches one copy at plot time. 271 KB to 176 KB.
+The words used to live in a keyed catalogue, apart from the markup that used
+them. One file per section instead, holding both. A missing argument is now a
+compile error rather than a lookup failure, and the two interpolators the
+catalogue needed — `str.format` and Plotly's `%{...}` fight over braces — are
+gone with it.
 
 ## The page is built, not mounted
 
-`render/page.py` writes the acts into `docs/index.html` at build time rather
-than leaving the browser to inject them. Part 2 also ships per profile in the
-payload so the switch has something to swap, but the document that arrives is
-already complete.
+`web/tools/prerender.ts` writes every section into `docs/index.html` at build
+time rather than leaving the browser to inject them. What arrives is complete
+and reads without script; what the bundle adds is the plots and the
+interaction.
+
+## Blocks cross as tallies
+
+Nothing on the page shows a single blocked attempt: every view of them is a
+count by day, hour, week or target. Sending 1,167 rows and grouping them in the
+browser would put the arithmetic on the wrong side of the boundary.
+
+## Hours cross as hours
+
+A clock face, a "2h 02m" and the "no use" standing in for a metric user A
+genuinely lacks are all wording, and wording is the frontend's. The document
+used to carry `first_pickup_h` and `first_pickup_clock` — the same fact twice,
+once as a number and once as a decision about how to say it. The millisecond
+travels beside the hour for one reason: truncating 21.8833 h to minutes loses
+one, and the page shows the clock.
+
+## esbuild, not Vite
+
+TypeScript needs compiling, which the repo had avoided entirely. One dev
+dependency and a sub-second build was the smallest thing that worked; a dev
+server with hot reload was more configuration than a static page earns.
+
+## Plotly stays
+
+Swapping the chart library during the rewrite would have meant redesigning
+twenty-six figures with nothing to check the result against. Keeping it made
+the port mechanical and verifiable: every figure was built on both sides and
+compared trace by trace before the Python was deleted.

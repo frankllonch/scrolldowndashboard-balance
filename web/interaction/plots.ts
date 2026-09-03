@@ -7,12 +7,12 @@
  * make one. It can.
  */
 
-import { build, type Selection } from "./charts/index";
-import { CONFIG } from "./charts/frame";
-import { plotly } from "./charts/plotly";
-import { all } from "./dom";
-import { profile as profileOf } from "./payload";
-import type { Payload } from "./types/index";
+import { build, type Selection } from "../charts/index";
+import { CONFIG } from "../charts/frame";
+import { plotly } from "../charts/plotly";
+import { all } from "../interaction/dom";
+import { profile as profileOf } from "../document";
+import type { Payload } from "../types/index";
 
 /** A mount Plotly has already drawn into carries its own data. */
 type Drawn = HTMLElement & { data?: unknown };

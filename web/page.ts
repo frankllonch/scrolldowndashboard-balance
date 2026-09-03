@@ -9,7 +9,7 @@
 import { ACTS, perProfile, type Act, type Context } from "./acts/index";
 import { PARTS } from "./copy/units";
 import type { Payload, Profile, UserId } from "./types/index";
-import { profile as profileOf } from "./payload";
+import { profile as profileOf } from "./document";
 
 /**
  * The line handing the reader to the next act.

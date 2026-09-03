@@ -8,15 +8,15 @@
  * lands on a whole step, and so do the arrow keys.
  */
 
-import { plotly } from "./charts/plotly";
-import { dayPanel, weekPanel } from "./acts/index";
-import { act, all, fill, fillAll, one, slider } from "./dom";
-import { draw, drawn } from "./plots";
-import { profile as profileOf } from "./payload";
-import { weekLabel } from "./copy/figures";
-import { userColor, surface } from "./theme";
-import type { Payload } from "./types/index";
-import type { Selection } from "./charts/index";
+import { plotly } from "../charts/plotly";
+import { dayPanel, weekPanel } from "../acts/index";
+import { act, all, fill, fillAll, one, slider } from "../interaction/dom";
+import { draw, drawn } from "../interaction/plots";
+import { profile as profileOf } from "../document";
+import { weekLabel } from "../copy/figures";
+import { userColor, surface } from "../theme";
+import type { Payload } from "../types/index";
+import type { Selection } from "../charts/index";
 
 const SETTLE_MS = 90;
 

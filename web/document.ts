@@ -1,9 +1,9 @@
 /**
- * Loading the document at runtime.
+ * The document: everything Python handed over, fetched at runtime.
  *
- * `contract.ts` imports the same file statically so the compiler can check
- * its shape; nothing imports that module at runtime, so the 177 KB stays out
- * of the bundle and is fetched and cached on its own.
+ * `types/contract.ts` imports the same file statically so the compiler can
+ * check its shape. Nothing imports that module at runtime, so the 164 KB
+ * stays out of the bundle and is fetched and cached on its own.
  */
 
 import type { Payload, Profile, UserId } from "./types/index";

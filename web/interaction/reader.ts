@@ -5,10 +5,10 @@
  * viewport owns the page's tokens.
  */
 
-import { plotly } from "./charts/plotly";
-import { act, all, one, root } from "./dom";
-import { drawn } from "./plots";
-import { PART_TWO } from "./page";
+import { plotly } from "../charts/plotly";
+import { act, all, one, root } from "../interaction/dom";
+import { drawn } from "../interaction/plots";
+import { PART_TWO } from "../page";
 
 let painted: string | null = null;
 

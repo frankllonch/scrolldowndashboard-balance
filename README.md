@@ -24,18 +24,17 @@ the page.
 
 | Path | What is in it |
 |---|---|
-| `analysis/events.py` | screen reconstruction, pickups, time attribution |
-| `analysis/metrics.py` | the daily and weekly frames |
-| `analysis/score.py` | the 0 to 100 index, five weighted components |
-| `analysis/intelligence/` | alerts, the silence budget, nudges, reinforcements |
+| `data/` | the event logs · the only input |
+| `analysis/` | events → metrics → the index → the rules. Draws nothing |
 | `payload/` | the frames as one typed JSON document · the whole boundary |
-| `web/types/` | what crosses it, declared |
-| `web/acts/` | one module per act, holding its markup and its words |
+| `web/types/` | what crosses that boundary, declared |
+| `web/acts/` | one file per section, holding its markup and its words |
 | `web/charts/` | every figure, built in the browser |
-| `site/` | the shell and the stylesheet, hand-written |
+| `web/interaction/` | sliders, the profile switch, the travelling surface |
+| `docs/` | the built site. Output — edit `web/`, not this |
 
 Python computes; TypeScript draws. Nothing crossing between them is HTML, a
-figure or a word — `tests/test_emit.py` asserts it, and `npm run typecheck`
+figure or a word — `tests/test_payload.py` asserts it, and `npm run typecheck`
 compiles the emitted document against `web/types/`, so a field one side renames
 fails the build rather than a chart. And
 `test_intelligence.py::test_notifications_contain_no_apps_or_domains` is the

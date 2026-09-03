@@ -6,8 +6,8 @@
  * page expects a number, the build fails here rather than at a blank chart.
  */
 
-import raw from "../docs/data.json";
-import type { Payload } from "./types/index";
+import raw from "../../docs/data.json";
+import type { Payload } from "./index";
 
 /**
  * A JSON import types every string as `string`, so assigning it straight to

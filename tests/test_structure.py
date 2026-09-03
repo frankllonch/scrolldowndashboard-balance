@@ -14,7 +14,7 @@ BUDGETS = {
     "build.py": 105,
     "web/index.html": 200,
     "README.md": 60,
-    "ARCHITECTURE.md": 120,
+    "ARCHITECTURE.md": 175,
 }
 
 #: No file in the repo goes past this. Where a concern outgrew it, it became a
