@@ -7,3 +7,5 @@ out/
 .claude/
 private/
 screenshots/
+
+node_modules/

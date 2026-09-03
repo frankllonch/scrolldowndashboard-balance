@@ -1,0 +1,14 @@
+{
+  "name": "balance-board",
+  "private": true,
+  "description": "Static scroll over one month of Balance Phone events.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild web/main.ts --bundle --format=iife --target=es2019 --minify --outfile=docs/bundle.js",
+    "check": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  }
+}

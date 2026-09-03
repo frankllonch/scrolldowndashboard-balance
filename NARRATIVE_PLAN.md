@@ -1,36 +1,50 @@
-# Narrative rewrite — done, and what is left
+# Rewriting the frontend in TypeScript
 
-Steps 1–12 are complete. This file now records what was decided, so the reasoning
-survives the commits.
+The brief: Python processes data and returns it structured; TypeScript does all
+the representation; every input typed; the backend holds the intelligence and the
+frontend does no juggling. And the code should be easier to navigate than it is.
 
-## Settled
+## Why it was hard to navigate
 
-- **Person B is an adult.** r(usage, blocks) = 0.954, and every "leak" app was blocked
-  on all 30 days, a median of 14 times a day. They opened only inside one ~22-hour
-  window on 18 May when the filter stopped firing. Both profile sketches rewritten.
-- **No guardian.** The product notifies the person holding the phone and nobody else.
-  Alerts land on the user's own screen; the weekly digest stays on the device.
-- **Every chart carries a line** explaining what it shows, resolved in `html.chart()`
-  from the figure key, so a new chart cannot ship without one.
-- **The wellbeing score is explained where the reader meets it**, including the two
-  questions the names invite: fragmentation counts unlocks, not apps; distraction is
-  a share of time by category, not a count of apps.
-- **Weeks read Monday to Sunday.** A week is still the Nth block of seven days — the
-  log opens on a Friday — but the bars are sorted by weekday.
-- **Each act hands off to the next** (`act.NN.next`), appended to the act body so the
-  bridge survives a profile switch.
-- **The pill wears each person's colour**, with a darker step of the same hue on the
-  pale card where the chart hues fall under 3:1.
+Changing one section meant touching six files across two languages — the copy in
+`copytext/strings/product.py`, the markup in `render/acts/aNN_*.py`, the chart in
+`render/figures/*.py`, the pre-rendered cards in `render/states.py`, the CSS in
+`site/css/`, and the behaviour in `site/app.js`. The 236 KB `payload.json` carried
+26 built Plotly figures and 6 acts of pre-rendered HTML.
 
-## Still open
+After: one TypeScript module per act, holding its markup, its copy and its chart.
+Python holds only the numbers.
 
-1. **Which part of the code is hard to navigate?** ("costa navegar codi") Needed before
-   any restructuring — nothing has been done here.
-2. **Reading time.** The page is now ~2,760 words, about 14 minutes. The prose budget
-   in `tests/test_prose.py` is 2,800 and is nearly spent. Adding more explanation means
-   either cutting elsewhere or deciding the page is a report, not a scroll.
+## Phases
+
+- [x] **1 · The contract.** `web/types/` declares the whole payload shape; `emit/`
+      produces it. Checked from both sides: `npm run typecheck` compiles the
+      emitted document against the declarations, and `tests/test_emit.py` asserts
+      the values sit inside the unions, that no string is markup, and that no
+      figure or copy key crosses the line.
+- [x] **2 · Scaffolding.** npm, `tsc --strict` (with `noUncheckedIndexedAccess`
+      and `exactOptionalPropertyTypes`), esbuild. Output goes to `docs/bundle.js`
+      for now so it cannot clobber the `docs/app.js` still serving the page.
+- [ ] **3 · Figures.** The 26 charts, from Python to TypeScript. Plotly stays, so
+      this is a port with something to compare against.
+- [ ] **4 · Acts.** One module each, carrying markup and copy.
+- [ ] **5 · Cutover.** `bundle.js` becomes `app.js`; `render/`, `copytext/` and
+      `page.py` are deleted; `build.py` runs `python -m emit` and `npm run build`.
+- [ ] **6 · The map.** An `ARCHITECTURE.md` that says "want to change X? it is
+      here", replacing the current one.
+
+## Decided
+
+- npm + esbuild, not Vite: one dev dependency, sub-second builds.
+- Plotly stays. Swapping the chart library would mean redesigning 26 figures with
+  nothing to check the result against.
+- Blocks cross as tallies, not 1,167 rows. Nothing displays a single attempt, and
+  counting belongs on the side that owns the arithmetic.
+- Hours cross as numbers. The clock face, "2h 02m" and the "no use" for a metric
+  user A genuinely lacks are all wording.
 
 ## Constraint
 
-`docs/` is build output. `build.py` regenerates it from `site/` and `render/`, so hand
-edits to `docs/style.css`, `docs/app.js` or `docs/index.html` are lost. Edit `site/`.
+`docs/` is build output. Editing `docs/style.css`, `docs/app.js` or
+`docs/index.html` by hand loses the change on the next build. Edit `site/`, and
+after phase 5, `web/`.
