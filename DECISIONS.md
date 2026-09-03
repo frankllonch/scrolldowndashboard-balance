@@ -1,7 +1,5 @@
 # Decisions
 
-One entry per decision, with the reason that survives being written down.
-Anything longer than ten lines was commentary, not a decision.
 
 ## The screen is a depth counter
 
@@ -73,13 +71,6 @@ switch it off. Blocks feed the rules and the digest instead.
 The index is measured against fixed bands; the comparison against oneself, a
 rolling 14-day median, sits next to it rather than inside it. A relative score
 would give someone at a constant six hours a day full marks for consistency.
-
-## Five things left out on purpose
-
-Not the same as missing. A score relative to the user; penalising blocks;
-notifying the sensitive spike; app and domain rankings for the guardian, which
-is the flashiest part of the analysis and the one that breaks the privacy line;
-and screen-time nudges, which interrupt without changing anything.
 
 ## `OTHER` is a gap, not a category
 

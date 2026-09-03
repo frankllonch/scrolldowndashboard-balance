@@ -58,7 +58,7 @@ STRINGS: dict[str, str] = {
     "category.PRODUCTIVITY": "Productivity",
     "category.LEARNING": "Learning",
     "category.AI_TOOLS": "AI tools",
-    "category.REFERENCE": "Reference",
+    "category.REFERENCE": "Research",
     "category.OTHER": "Other",
 
     # -- figures: the month walkthrough -------------------------------------

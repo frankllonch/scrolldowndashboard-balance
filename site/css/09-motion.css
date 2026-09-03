@@ -10,29 +10,55 @@
    ======================================================================= */
 
 @keyframes reveal {
-  from { opacity: .001; transform: translateY(16px); }
-  to   { opacity: 1; transform: none; }
+  from {
+    opacity: .001;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes fade {
-  from { opacity: .001; }
-  to   { opacity: 1; }
+  from {
+    opacity: .001;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
 
   /* The surface shift, and only under this guard: asked for less motion,
      the tokens still swap, they just swap at once. */
-  body { transition: background-color .6s ease, color .6s ease; }
-  .vignette { transition: opacity .6s ease; }
-  .rail a { transition: color .25s ease; }
-  .kpi, .chart, details, .scroller, .phone {
+  body {
+    transition: background-color .6s ease, color .6s ease;
+  }
+
+  .vignette {
+    transition: opacity .6s ease;
+  }
+
+  .rail a {
+    transition: color .25s ease;
+  }
+
+  .kpi,
+  .chart,
+  details,
+  .scroller,
+  .phone {
     transition: border-color .16s ease;
   }
 
   @supports (animation-timeline: view()) {
+
     .act-head,
-    .act-body > *,
+    .act-body>*,
     .fork-card {
       animation: reveal linear both;
       animation-timeline: view();
@@ -48,20 +74,45 @@
     }
 
     /* The number arrives behind its own label. */
-    .hero-number, .stat-value {
+    .hero-number,
+    .stat-value {
       animation: reveal linear both;
       animation-timeline: view();
       animation-range: entry 8% entry 48%;
     }
 
     /* KPI cards stagger across the strip. */
-    .kpi { animation: reveal linear both; animation-timeline: view(); }
-    .kpi:nth-child(1) { animation-range: entry 0% entry 36%; }
-    .kpi:nth-child(2) { animation-range: entry 3% entry 39%; }
-    .kpi:nth-child(3) { animation-range: entry 6% entry 42%; }
-    .kpi:nth-child(4) { animation-range: entry 9% entry 45%; }
-    .kpi:nth-child(5) { animation-range: entry 12% entry 48%; }
-    .kpi:nth-child(6) { animation-range: entry 15% entry 51%; }
-    .kpi:nth-child(7) { animation-range: entry 18% entry 54%; }
+    .kpi {
+      animation: reveal linear both;
+      animation-timeline: view();
+    }
+
+    .kpi:nth-child(1) {
+      animation-range: entry 0% entry 36%;
+    }
+
+    .kpi:nth-child(2) {
+      animation-range: entry 3% entry 39%;
+    }
+
+    .kpi:nth-child(3) {
+      animation-range: entry 6% entry 42%;
+    }
+
+    .kpi:nth-child(4) {
+      animation-range: entry 9% entry 45%;
+    }
+
+    .kpi:nth-child(5) {
+      animation-range: entry 12% entry 48%;
+    }
+
+    .kpi:nth-child(6) {
+      animation-range: entry 15% entry 51%;
+    }
+
+    .kpi:nth-child(7) {
+      animation-range: entry 18% entry 54%;
+    }
   }
 }

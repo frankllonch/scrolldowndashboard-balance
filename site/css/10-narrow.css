@@ -3,8 +3,13 @@
    ======================================================================= */
 
 @media (max-width: 900px) {
-  .rail { display: none; }
-  main { margin-left: 0; }
+  .rail {
+    display: none;
+  }
+
+  main {
+    margin-left: 0;
+  }
 }
 
 /* =======================================================================
@@ -13,61 +18,170 @@
    ======================================================================= */
 
 @media (max-width: 720px) {
-  body { font-size: 16px; }
+  body {
+    font-size: 16px;
+  }
 
-  .act { padding: 4rem 1.15rem; }
-  .act-head { margin-bottom: 1.6rem; }
+  .act {
+    padding: 4rem 1.15rem;
+  }
+
+  .act-head {
+    margin-bottom: 1.6rem;
+  }
 
   /* Side-by-side is what pushed the page to 620px at 375. */
   /* minmax(0, 1fr), never a bare 1fr: a bare track has an auto minimum, so a
      chart that renders a few pixels too wide pushes the column out and the
      page with it. */
-  .grid.cols-2, .grid.cols-3, .grid.cols-4, .fork {
+  .grid.cols-2,
+  .grid.cols-3,
+  .grid.cols-4,
+  .fork {
     grid-template-columns: minmax(0, 1fr);
   }
-  .grid { gap: 1rem; }
 
-  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .kpi { min-height: 4.8rem; padding: .7rem .8rem; }
-  .kpi-value { font-size: 1.25rem; }
-  .kpi:nth-child(odd) { margin-left: 0; }
-  .kpi:nth-child(n + 3) { margin-top: -1.5px; }
+  .grid {
+    gap: 1rem;
+  }
+
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kpi {
+    min-height: 4.8rem;
+    padding: .7rem .8rem;
+  }
+
+  .kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .kpi:nth-child(odd) {
+    margin-left: 0;
+  }
+
+  .kpi:nth-child(n + 3) {
+    margin-top: -1.5px;
+  }
 
   /* Plotly gets a shorter box; its own margins do the rest. */
-  .chart, .grid .chart { min-height: 260px; padding: .35rem .3rem; }
-  .chart.tall { min-height: 420px; }
+  .chart,
+  .grid .chart {
+    min-height: 260px;
+    padding: .35rem .3rem;
+  }
 
-  .lede { font-size: 1.05rem; }
-  .note { padding: .9rem 1rem; }
-  .hero-number { font-size: 3.2rem; }
-  .hero-number.huge { font-size: 3.6rem; }
-  .hero-sub { max-width: none; }
-  .stat-value { font-size: 2rem; }
+  .chart.tall {
+    min-height: 420px;
+  }
+
+  .lede {
+    font-size: 1.05rem;
+  }
+
+  .note {
+    padding: .9rem 1rem;
+  }
+
+  .hero-number {
+    font-size: 3.2rem;
+  }
+
+  .hero-number.huge {
+    font-size: 3.6rem;
+  }
+
+  .hero-sub {
+    max-width: none;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
 
   /* The fork stays a real choice: two cards, both reachable in one screen. */
-  .fork-act { min-height: auto; }
-  .fork { gap: 1rem; }
-  .fork-card { padding: 1.2rem 1.1rem 1rem 1.1rem; }
-  .fork-sketch { font-size: 1rem; margin: .2rem 0 1rem 0; max-width: none; }
-  .fork-stats { gap: .5rem; }
-  .fork-stats .stat { padding-left: .6rem; }
-  .fork-stats .stat-value { font-size: 1.25rem; }
-  .fork-stats .stat-label { font-size: .56rem; letter-spacing: .06em; }
-  .fork-cta { margin-top: 1rem; }
+  .fork-act {
+    min-height: auto;
+  }
 
-  .cover { min-height: 84vh; min-height: 84svh; }
-  .cover .grid { margin-top: 2rem; }
-  .scroll-cue { margin-top: 2.4rem; }
+  .fork {
+    gap: 1rem;
+  }
+
+  .fork-card {
+    padding: 1.2rem 1.1rem 1rem 1.1rem;
+  }
+
+  .fork-sketch {
+    font-size: 1rem;
+    margin: .2rem 0 1rem 0;
+    max-width: none;
+  }
+
+  .fork-stats {
+    gap: .5rem;
+  }
+
+  .fork-stats .stat {
+    padding-left: .6rem;
+  }
+
+  .fork-stats .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .fork-stats .stat-label {
+    font-size: .56rem;
+    letter-spacing: .06em;
+  }
+
+  .fork-cta {
+    margin-top: 1rem;
+  }
+
+  .cover {
+    min-height: 84vh;
+    min-height: 84svh;
+  }
+
+  .cover .grid {
+    margin-top: 2rem;
+  }
+
+  .scroll-cue {
+    margin-top: 2.4rem;
+  }
 
   /* The slider label sits over the track so the track keeps the width. */
   .slider {
-    grid-template-columns: auto 1fr; padding: .7rem .9rem; gap: .4rem 1rem;
+    grid-template-columns: auto 1fr;
+    padding: .7rem .9rem;
+    gap: .4rem 1rem;
   }
-  .slider input[type="range"] { grid-column: 1 / -1; grid-row: 2; }
 
-  .phone, .empty { max-width: none; }
-  .channel + .channel { margin-top: 1.4rem; }
+  .slider input[type="range"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 
-  th, td { white-space: nowrap; padding: .5rem .6rem; }
-  details { padding: 0 .9rem; }
+  .phone,
+  .empty {
+    max-width: none;
+  }
+
+  .channel+.channel {
+    margin-top: 1.4rem;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+    padding: .5rem .6rem;
+  }
+
+  details {
+    padding: 0 .9rem;
+  }
 }

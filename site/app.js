@@ -38,7 +38,8 @@
       spec.columns.map(function (c) { return "<th>" + c + "</th>"; }).join("") +
       "</tr></thead><tbody>" + spec.rows.map(function (row) {
         return "<tr>" + row.map(function (v) {
-          return "<td>" + esc(v) + "</td>"; }).join("") + "</tr>";
+          return "<td>" + esc(v) + "</td>";
+        }).join("") + "</tr>";
       }).join("") + "</tbody></table></div>";
   }
   function pairs(rows) {
@@ -55,7 +56,8 @@
       card.headline + '</p><p class="phone-p">' + card.body + "</p>" +
       pairs(card.rows) + card.ctas.map(function (c) {
         return '<div class="phone-cta' + (c.ghost ? " ghost" : "") + '">' +
-          c.label + "</div>"; }).join("") + "</div></div>";
+          c.label + "</div>";
+      }).join("") + "</div></div>";
   }
   function channel(label, inner) {
     return '<div class="channel"><p class="eyebrow">' + label + "</p>" + inner +
@@ -222,8 +224,10 @@
          rotation, and it is the card's content box. */
       $$(".js-plotly-plot").forEach(function (el) {
         var pad = getComputedStyle(el);
-        Plotly.relayout(el, { width: el.clientWidth -
-          parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight) });
+        Plotly.relayout(el, {
+          width: el.clientWidth -
+            parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight)
+        });
       });
     }, 160);
   }

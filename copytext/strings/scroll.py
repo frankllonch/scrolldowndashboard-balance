@@ -9,24 +9,24 @@ STRINGS: dict[str, str] = {
     "part.2": "One person's month",
     "part.3": "The analysis",
 
-    "act.01.eyebrow": "Balance · May 2026",
-    "act.01.title": "Device behaviour",
+    "act.01.eyebrow": "Balance Phone · May 2026",
+    "act.01.title": "Balance board",
     "act.02.eyebrow": "Both profiles, thirty days",
-    "act.02.title": "Two people, one phone",
+    "act.02.title": "A single wellbeing score",
     "act.03.eyebrow": "Pick one",
     "act.03.title": "Choose a profile",
     "act.04.eyebrow": "Week by week",
-    "act.04.title": "The week",
+    "act.04.title": "The week's summary",
     "act.05.eyebrow": "Hour by hour",
     "act.05.title": "A day in the life",
     "act.06.eyebrow": "23:00 to 06:00",
-    "act.06.title": "The night",
+    "act.06.title": "What happens at night",
     "act.07.eyebrow": "Apps, domains, categories",
-    "act.07.title": "Where the time goes",
+    "act.07.title": "Where your time goes",
     "act.08.eyebrow": "The filter",
     "act.08.title": "What the phone stopped",
     "act.09.eyebrow": "Alerts, nudges, reinforcements",
-    "act.09.title": "What the phone said",
+    "act.09.title": "The intelligence acting",
     "act.10.eyebrow": "The reveal",
     "act.10.title": "The finding",
     "act.11.eyebrow": "The negative control",
@@ -36,15 +36,14 @@ STRINGS: dict[str, str] = {
 
     # -- act 01 · cover -----------------------------------------------------
     "cover.standfirst": (
-        "One device event log, read end to end: what the phone recorded, what "
-        "it computed, and what it said out loud."
+        "One month of usage by two very different users, who used it better? "
     ),
     "cover.stat.profiles": "profiles",
     "cover.stat.events": "events",
     "cover.stat.days": "days each",
     "cover.scroll": "Scroll",
 
-    # -- act 02 · two people, one phone -------------------------------------
+    # -- act 02 · A single wellbeing score -------------------------------------
     "overview.lede": "Two kinds of profile, the same thirty days.",
     "overview.hook": (
         "Watch B. The index falls from {first:.0f} to {last:.0f} while screen "
@@ -85,6 +84,6 @@ STRINGS: dict[str, str] = {
     "control.body": (
         "<code>screen_jump</code> is implemented, reads the same frames, and "
         "fires on neither profile. {screen:+.0f} % is under any threshold "
-        "worth setting. The night band is ×{night:.0f}."
+        "worth setting. What happens at night band is ×{night:.0f}."
     ),
 }

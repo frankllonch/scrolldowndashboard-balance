@@ -43,7 +43,7 @@ ENTERTAINMENT · NEWS · SHOPPING · OTHER
 
 `OTHER` covers a third of user A's attributed time and a fifth of user B's,
 so `balance/taxonomy.py` assigns six more on read: `CALLS`, `NAVIGATION`,
-`PRODUCTIVITY`, `LEARNING`, `AI_TOOLS`, `REFERENCE`. The files are never
+`PRODUCTIVITY`, `LEARNING`, `AI_TOOLS`, `RESEARCH`. The files are never
 edited, and a label the stream did assert always wins.
 
 `ADULT` and `GAMBLING` are treated as sensitive throughout the codebase

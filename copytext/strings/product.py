@@ -156,7 +156,7 @@ STRINGS: dict[str, str] = {
         "rest; an hour at 17:00 does not."
     ),
 
-    # -- where the time goes ------------------------------------------------
+    # -- Where your time goes ------------------------------------------------
     "tag.device_only": "device only",
     "tag.never_sent": "never sent to a guardian",
     "time.kpi.attributed": "Attributed time",
