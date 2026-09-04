@@ -151,3 +151,35 @@ h3.sub {
   content: " ↓";
   color: var(--accent);
 }
+
+/* A note that answers the line above it. The arrow sits in the margin at the
+   turn, so the eye follows from the caption into the answer rather than
+   reading it as the next thing on the page. */
+.aside {
+  position: relative;
+  margin: .6rem 0 0 1.6rem;
+  padding-left: 1.2rem;
+  border-left: 1.5px solid var(--rule);
+  max-width: 58ch;
+}
+
+.aside::before {
+  content: "\21B3";
+  position: absolute;
+  left: -1.15rem;
+  top: -.15rem;
+  color: var(--accent);
+  font-size: .95rem;
+  line-height: 1;
+}
+
+.aside p {
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.aside p + p {
+  margin-top: .7rem;
+}

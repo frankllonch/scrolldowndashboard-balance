@@ -100,6 +100,17 @@ export function empty(text: string): string {
   return `<div class="empty">${text}</div>`;
 }
 
+/**
+ * A note hanging off the line above it.
+ *
+ * Smaller and set in, with an arrow at the turn, so it reads as an answer to
+ * what was just said rather than as the next thing on the page.
+ */
+export function aside(paragraphs: string[]): string {
+  const body = paragraphs.map((p) => `<p>${p}</p>`).join("");
+  return `<aside class="aside">${body}</aside>`;
+}
+
 export function channel(label: string, inner: string): string {
   return `<div class="channel">${eyebrow(label)}${inner}</div>`;
 }

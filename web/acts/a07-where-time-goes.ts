@@ -6,7 +6,7 @@ import { explain } from "../copy/explain";
 import { unit } from "../copy/units";
 import { pct, shortDate, thousands } from "../format";
 import { mean } from "../stats";
-import { caption, chart, grid, kpis, note, tags } from "../html";
+import { aside, caption, chart, grid, kpis, note, tags } from "../html";
 import type { Profile, UsageTotal } from "../types/index";
 import { other, type Act, type Context } from "./act";
 
@@ -62,8 +62,8 @@ const copy = {
     + `${through}.`,
 
   leakExplain: (days: number, median: number, outage: string, hours: number) =>
-    "<b>So why are they here at all? Were they downloaded that day?</b> No. "
-    + `They were on the phone all month, and the filter blocked them on every one of the ${days} days, a median of ${median.toFixed(0)} times a day. `
+    "<b>So why are they here at all? Were they downloaded that day?</b> "
+    + `They look to have been on the phone the whole time: the filter blocked them on every one of the ${days} days, a median of ${median.toFixed(0)} times a day, which it could not do to something that was not installed. `
     + `Every minute they ever got comes from one window on ${outage}, when distraction blocking went quiet for about ${hours.toFixed(0)} hours. `
     + "It came back the next morning and they were never opened again.",
 
@@ -164,10 +164,11 @@ function reading(ctx: Context): string {
     + caption(copy.blockedAbsent(blocked.names, blocked.attempts,
                                  blocked.through))
     + (outage
-        ? note(copy.leakExplain(outage.leaked_days, outage.leaked_median,
-                                shortDate(outage.outage_day),
-                                outage.outage_hours))
-          + note(copy.leakScope(outage.sensitive_during), "good")
+        ? aside([
+          copy.leakExplain(outage.leaked_days, outage.leaked_median,
+                           shortDate(outage.outage_day), outage.outage_hours),
+          copy.leakScope(outage.sensitive_during),
+        ])
         : "");
 }
 
