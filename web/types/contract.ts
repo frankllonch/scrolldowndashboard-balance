@@ -2,7 +2,7 @@
  * The check that the two halves still agree.
  *
  * `npm run typecheck` compiles this file against the emitted document. If
- * `emit.py` renames a field, drops one, or starts sending a string where the
+ * `payload/` renames a field, drops one, or starts sending a string where the
  * page expects a number, the build fails here rather than at a blank chart.
  */
 
@@ -16,7 +16,7 @@ import type { Payload } from "./index";
  * everything else checked: field names, nullability, and number against
  * string, which is the drift that actually happens.
  *
- * Membership of the unions is asserted in `tests/test_emit.py`, on the side
+ * Membership of the unions is asserted in `tests/test_payload.py`, on the side
  * that produces the values.
  */
 type Loose<T> =

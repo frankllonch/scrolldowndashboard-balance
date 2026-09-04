@@ -4,9 +4,8 @@
  * Two destinations and only two: the user's own screen, and the weekly summary
  * a held signal drops into. Nothing leaves the device.
  *
- * The day slider walks all thirty days, and the cards behind it are built here
- * rather than shipped pre-rendered. Python pre-rendered them because the
- * browser held no copy; it holds it now.
+ * The day slider walks all thirty days, and the cards behind it are built
+ * here rather than carried in the document.
  */
 
 import { explain } from "../copy/explain";

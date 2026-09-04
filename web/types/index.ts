@@ -3,7 +3,7 @@
  *
  * Python computes; TypeScript draws. Everything crossing that line is
  * declared here, and both sides are held to it: `npm run typecheck` compiles
- * the emitted document against these declarations, and `tests/test_emit.py`
+ * the emitted document against these declarations, and `tests/test_payload.py`
  * asserts the values sit inside the unions in `primitives.ts`.
  *
  *     primitives.ts  the vocabulary: days, categories, decisions

@@ -1,11 +1,9 @@
 /**
  * Every word that appears inside a chart.
  *
- * Typed functions rather than a keyed catalogue. The Python this replaces
- * needed two interpolators, because `str.format` and Plotly's `%{...}` fight
- * over braces; a template literal and `%{...}` do not, so the whole mechanism
- * goes away — and a missing argument is now a compile error instead of a
- * `MissingCopy` at build time.
+ * Typed functions rather than a keyed catalogue, so a missing argument is a
+ * compile error rather than a blank in the sentence. A template literal and
+ * Plotly's `%{...}` do not fight over braces, so both can sit in one string.
  */
 
 import type { Category, UserId } from "../types/index";

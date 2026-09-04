@@ -1,10 +1,9 @@
 /**
  * The layout every figure starts from, and the two things every builder does.
  *
- * Python registered this as a global Plotly template and mutated the default
- * between figures. Here it is a function of the surface, so a builder's colours
- * are whatever it was handed and nothing depends on the order figures are made
- * in.
+ * A function of the surface rather than a registered global, so a builder's
+ * colours are whatever it was handed and nothing depends on the order the
+ * figures happen to be made in.
  */
 
 import { MONO, SANS, type Surface } from "../theme";

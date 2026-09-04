@@ -3,8 +3,7 @@
  *
  * An act owns its markup, its copy and which figures it mounts. That is the
  * whole point of the shape: changing what the week section says means opening
- * `a04-the-week.ts` and nothing else. The Python this replaces spread one
- * section across six files in two languages.
+ * `a04-the-week.ts` and nothing else.
  */
 
 import type { Payload, Profile, UserId } from "../types/index";

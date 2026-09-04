@@ -1,9 +1,9 @@
 /**
  * The four summaries the acts keep asking for.
  *
- * `mean` was written three times and `median` twice before this existed, once
- * per act that needed one. They are here so the page has one answer to "what
- * is the average", not three that could disagree at the edges.
+ * Here rather than in each act that needs one, so the page has a single
+ * answer to "what is the average" instead of several that could disagree at
+ * the edges.
  */
 
 /** Zero for an empty list: an act that averages nothing is showing a metric

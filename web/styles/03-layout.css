@@ -130,10 +130,6 @@ h3.sub {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.grid.cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 /* --------------------------------------------------------- numbers, KPIs */
 /* The handoff at the close of an act. It sits apart from the act's own prose:
    the reader has finished here, and this is the reason to keep going. */

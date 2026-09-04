@@ -58,20 +58,3 @@
   padding-bottom: .15rem;
 }
 
-.fork-cta-button {
-  background: var(--accent);
-  color: var(--bg);
-  border: 1.5px solid var(--rule);
-  font-family: var(--mono);
-  font-size: .7rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  font-weight: 600;
-  padding: .7rem 1.2rem;
-  cursor: pointer;
-  margin-right: .8rem;
-}
-
-.fork-cta-button:hover {
-  background: #fff;
-}

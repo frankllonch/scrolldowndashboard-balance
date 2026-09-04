@@ -1,11 +1,8 @@
 /**
  * Every figure on the page, by the key its mount point names.
  *
- * This replaces two Python modules at once: the half of `payload.py` that
- * built figures, and `profiles.py`, which held the surface each was drawn for.
- * They are together here because they are one decision — what a figure is and
- * what ground it sits on — and splitting them meant reading two files to
- * answer one question.
+ * What a figure is and what ground it sits on are one decision, so they live
+ * in one file. Splitting them means reading two to answer one question.
  */
 
 import { axis as unit, title } from "../copy/figures";
@@ -35,7 +32,7 @@ const DUSK = new Set(["hour_heat", "day_span", "daily_bars.screen_min",
 
 /** Which of the three grounds a figure is drawn for. A figure carries its
  *  surface's colours from the moment it is built, so this decides them. */
-export function surfaceFor(key: string): SurfaceName {
+function surfaceFor(key: string): SurfaceName {
   if (LIGHT.has(key) || LIGHT_PREFIXES.some((p) => key.startsWith(p))) {
     return "light";
   }

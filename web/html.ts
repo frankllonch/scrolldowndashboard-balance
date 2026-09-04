@@ -1,18 +1,18 @@
 /**
  * The small builders the acts are made of.
  *
- * Strings rather than DOM nodes, for the same reason the Python did: the CSS
- * in `web/styles/` is written against exactly this markup, the profile switch
- * replaces whole sections at once, and a template literal reads closer to the
- * result than twenty `createElement` calls.
+ * Strings rather than DOM nodes: the CSS in `web/styles/` is written against
+ * exactly this markup, the profile switch replaces whole sections at once, and
+ * a template literal reads closer to the result than twenty `createElement`
+ * calls.
  *
  * Copy arrives already worded and is trusted — the catalogue carries `<b>` and
  * `<code>` on purpose. Anything that came from the data is escaped.
  */
 
-//: `&#x27;` rather than `&#39;` for the apostrophe: both render the same, and
-//: this is the form Python's `html.escape` writes, which keeps the migration
-//: diff empty rather than merely equivalent.
+//: `&#x27;` rather than `&#39;` for the apostrophe. Both render the same; this
+//: is the form most tooling emits, so a diff against generated markup stays
+//: quiet.
 const ESCAPES: Record<string, string> = {
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;",
 };

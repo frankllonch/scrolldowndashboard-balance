@@ -1,9 +1,8 @@
 /**
  * Act 04 · the week. First interaction of the page: five weeks on a slider.
  *
- * The panels are built when the slider moves, not five times up front. Python
- * precomputed all of them into the payload because the browser held no copy
- * and could not word a KPI; that whole module is gone.
+ * The panels are built when the slider moves, not five times up front and
+ * carried in the document.
  */
 
 import { explain } from "../copy/explain";

@@ -78,7 +78,7 @@ function applyDay(payload: Payload, selection: Selection): void {
  * What the readout says while the thumb is moving.
  *
  * Asked of the act that owns the panel, so the preview during a drag and the
- * heading it settles on are the same words. They used to be written twice.
+ * heading it settles on are the same words.
  */
 function readout(payload: Payload, selection: Selection, kind: "week" | "day",
                  index: number): string {

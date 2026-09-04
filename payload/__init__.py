@@ -37,7 +37,7 @@ def finding(summaries: dict) -> dict:
 
 
 def payload() -> dict:
-    """Everything the browser is given. See `web/types.ts` for the shape."""
+    """Everything the browser is given. See `web/types/` for the shape."""
     runs = {user: analyse(user) for user in PROFILES}
     profiles = {user: profile(run) for user, run in runs.items()}
     default = next(iter(PROFILES))

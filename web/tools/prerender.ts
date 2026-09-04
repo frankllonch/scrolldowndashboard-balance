@@ -1,9 +1,8 @@
 /**
  * Writing the page.
  *
- * Every section is rendered here, at build time, so the document that ships is
- * complete and readable before a single line of script runs. This is the last
- * thing the Python side did that TypeScript had not taken over.
+ * Every section is rendered here, at build time, so the page that ships is
+ * complete and readable before a single line of script runs.
  */
 
 /** The two node globals this tool needs. Declaring them beats a dependency on

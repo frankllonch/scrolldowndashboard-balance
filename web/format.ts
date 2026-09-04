@@ -1,9 +1,9 @@
 /**
  * Wording a number.
  *
- * All of this used to happen in Python, which meant the document carried both
- * `first_pickup_h` and `first_pickup_clock` — the same fact twice, once as a
- * number and once as a decision about how to say it. Now it crosses once.
+ * The document carries hours, minutes and shares; the words for them are
+ * decided here. A fact crosses the boundary once, as a number, and how to say
+ * it is not the backend's business.
  */
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",

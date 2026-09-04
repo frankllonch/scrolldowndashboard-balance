@@ -6,10 +6,9 @@
  * — a user, a content category — keep their identity across all three and
  * only move in lightness, so a stack keeps its shape when the ground changes.
  *
- * A surface is a value here, not module state: `surface("light")` returns one
- * and builders take it as an argument. The Python this replaces rebound module
- * globals, which meant reading a builder told you nothing about which palette
- * it would get.
+ * A surface is a value, not module state: `surface("light")` returns one and
+ * builders take it as an argument, so reading a builder tells you which
+ * palette it gets.
  */
 
 import type { Category, UserId } from "./types/index";

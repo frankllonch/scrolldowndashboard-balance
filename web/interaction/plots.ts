@@ -1,10 +1,9 @@
 /**
  * Getting a figure onto the page.
  *
- * A mount names the figure it wants; this builds it and draws it. Python used
- * to ship 35 built figures and a template per surface in the payload — 59 KB
- * of layout, and a second copy of the palette — because the browser could not
- * make one. It can.
+ * A mount names the figure it wants; this builds it and draws it. Nothing is
+ * shipped pre-built: 35 figures and a template per surface would be 59 KB of
+ * layout in the document, and a second copy of the palette.
  */
 
 import { build, type Selection } from "../charts/index";
