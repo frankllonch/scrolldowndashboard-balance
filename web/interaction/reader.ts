@@ -48,29 +48,72 @@ export function progressBar(): void {
 
 /** Which act owns the middle of the viewport: the surface, the rail's current
  *  item, and whether the profile switch means anything here. */
+/**
+ * The act holding the middle of the viewport, or nothing between two.
+ *
+ * Measured rather than remembered. The observer below is a good trigger and a
+ * bad judge: on a jump it reports several acts at once, in an order that is
+ * not the order they sit on the page, and taking the last one left the ground
+ * painted for a section the reader had already scrolled past.
+ */
+function owner(sections: HTMLElement[]): HTMLElement | undefined {
+  const middle = window.innerHeight / 2;
+  return sections.find((section) => {
+    const box = section.getBoundingClientRect();
+    return box.top <= middle && box.bottom >= middle;
+  });
+}
+
+function holdsMiddle(section: HTMLElement): boolean {
+  const middle = window.innerHeight / 2;
+  const box = section.getBoundingClientRect();
+  return box.top <= middle && box.bottom >= middle;
+}
+
 export function watchActs(): void {
+  const sections = all<HTMLElement>(".act");
   const links = new Map<string, HTMLElement>();
   for (const link of all("[data-rail]")) {
     if (link.dataset.rail) links.set(link.dataset.rail, link);
   }
   let active: HTMLElement | null = null;
-  const watcher = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      const id = entry.target.id.slice(4);
-      paintSurface(id);
-      // The pill is only true where it does something: part one has the fork,
-      // part three reads both profiles at once.
-      const pill = document.getElementById("profile-pill");
-      if (pill) pill.hidden = !PART_TWO.includes(id);
-      const link = links.get(id);
-      if (!link || link === active) continue;
-      active?.removeAttribute("aria-current");
-      active = link;
-      link.setAttribute("aria-current", "true");
-    }
-  }, { rootMargin: "-45% 0px -45% 0px" });
-  for (const section of all(".act")) watcher.observe(section);
+  let held: HTMLElement | null = null;
+
+  const settle = () => {
+    const section = owner(sections);
+    if (!section) return;          // between two acts: whoever had it keeps it
+    held = section;
+    const id = section.id.slice(4);
+    paintSurface(id);
+    // The pill is only true where it does something: part one has the fork,
+    // part three reads both profiles at once.
+    const pill = document.getElementById("profile-pill");
+    if (pill) pill.hidden = !PART_TWO.includes(id);
+    const link = links.get(id);
+    if (!link || link === active) return;
+    active?.removeAttribute("aria-current");
+    active = link;
+    link.setAttribute("aria-current", "true");
+  };
+
+  // Two triggers, because neither is enough on its own. The observer catches
+  // a jump that lands somewhere new. It does not fire when the boundary
+  // between two acts drifts across its band — both stay intersecting, and the
+  // middle changes hands with nothing to say so. That is what the scroll
+  // handler is for, and it costs one rectangle while the answer holds.
+  const watcher = new IntersectionObserver(settle,
+                                           { rootMargin: "-45% 0px -45% 0px" });
+  for (const section of sections) watcher.observe(section);
+
+  let queued = false;
+  window.addEventListener("scroll", () => {
+    if (queued || (held && holdsMiddle(held))) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      settle();
+    });
+  }, { passive: true });
 }
 
 /**
