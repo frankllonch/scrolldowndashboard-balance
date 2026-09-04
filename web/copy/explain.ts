@@ -34,10 +34,10 @@ const EXPLANATIONS: Record<string, string> = {
     "The same seven days, counting only what happened after 23:00. Most weeks this should be a flat row of nothing.",
 
   "daily_bars.screen_min":
-    "Your screen time on every day of the month, against your own rolling 14-day median — not against the other user, and not against a target. "
+    "Your screen time on every day of the month, against your own rolling 14-day median "
     + "The first two weeks have no history to compare with yet.",
   "daily_bars.pickups":
-    "The same thirty days, counting unlocks instead of minutes. "
+    "Your unlocks on every day of the month. "
     + "A day can sit under your median for time and over it for unlocks: that is a day you checked the phone a lot without settling into it.",
 
   hour_heat:

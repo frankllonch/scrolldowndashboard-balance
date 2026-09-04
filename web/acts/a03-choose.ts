@@ -26,7 +26,7 @@ const copy = {
   nights: "nights with a nudge",
   cta: "Read this month",
 
-  next: "Start where the shape is easiest to see: a week at a time.",
+  next: "Let's start with the weekly summary.",
 };
 
 function card(profile: Profile): string {

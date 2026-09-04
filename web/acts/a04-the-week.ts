@@ -57,7 +57,7 @@ const copy = {
     "Your night usage varies noticeably from week to week, but your general usage stays high every week. "
     + `And as the month goes along the blocks get more recurrent — ${first.toFixed(0)} a day in week 1, ${last.toFixed(0)} by week 4 — every time you try harder to find where the blocking fails.`,
 
-  next: "Now zoom in. A week is thirty days seen from a distance — here is a single day.",
+  next: "Now let's zoom in and look closer. What happened day by day?",
 };
 
 /** The nine measures the against-the-period table walks. */

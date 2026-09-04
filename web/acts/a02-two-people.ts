@@ -44,11 +44,10 @@ const copy = {
   scoreNote: (fragGood: number, fragBad: number) =>
     "Two things the names get asked about. "
     + `<b>Fragmentation</b> is not about how many apps you use — it counts how many times a day you pick the phone up: ${fragGood} unlocks scores 100, ${fragBad} scores 0. `
-    + "And <b>intent</b> is how distraction is measured: the share of your attributed time that went to social, entertainment or gaming. "
-    + "Opening thirty apps for two minutes each is not distraction by this definition; one hour of TikTok is.",
+    + "And <b>intent</b> is how distraction is measured: the share of your attributed time that went to social, entertainment or gaming. ",
   scoreBlocks:
     "Blocked attempts do not score at all. "
-    + "A block means the phone did its job and nothing opened; docking you for it would charge you for the product working, and would reward switching the filter off.",
+    + "A block means the phone did its job and nothing opened.",
 
   columns: ["Component", "Value scoring 100", "Value scoring 0", "Weight"],
 
@@ -60,7 +59,7 @@ const copy = {
     sensitive: (user: UserId) => `${user} · sensitive`,
   },
 
-  next: "Two months, two very different shapes. Pick one and read it from the inside.",
+  next: "Same month for both users. Pick one and read it from the inside.",
 };
 
 /** The index, and one line on who this month belonged to. */
