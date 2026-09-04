@@ -88,6 +88,7 @@ export interface Summary {
   outage?: FilterOutage;
 }
 
+/** The stretch where blocking went quiet for the apps that got through. */
 export interface FilterOutage {
   /** Days on which the leaked apps were blocked at all. */
   leaked_days: number;
@@ -97,6 +98,9 @@ export interface FilterOutage {
   outage_day: Day;
   /** How long it lasted, measured at hour resolution. */
   outage_hours: number;
+  /** Adult and gambling attempts blocked inside that same window, while the
+   *  distraction list blocked nothing. The log does not say why. */
+  sensitive_during: number;
 }
 
 /** What the whole month adds up to: the reveal, and its negative control. */

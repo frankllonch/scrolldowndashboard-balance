@@ -63,11 +63,14 @@ const copy = {
 
   leakExplain: (days: number, median: number, outage: string, hours: number) =>
     "<b>So why are they here at all? Were they downloaded that day?</b> No. "
-    + `They were on the phone all month, and the filter blocked them on every `
-    + `one of the ${days} days, a median of ${median.toFixed(0)} times a day. `
-    + `Every minute they ever got comes from a single window on ${outage}, `
-    + `when the filter stopped firing for about ${hours.toFixed(0)} hours. It `
-    + "came back the next morning and they were never opened again.",
+    + `They were on the phone all month, and the filter blocked them on every one of the ${days} days, a median of ${median.toFixed(0)} times a day. `
+    + `Every minute they ever got comes from one window on ${outage}, when distraction blocking went quiet for about ${hours.toFixed(0)} hours. `
+    + "It came back the next morning and they were never opened again.",
+
+  leakScope: (sensitive: number) =>
+    "<b>And it was not the whole filter.</b> "
+    + `Adult and gambling blocking never stopped — it turned away ${sensitive} attempts inside that same window, while not one distraction block fired. `
+    + "Why one list went quiet and the other did not, the log does not say. It records what the phone did, not why it did it.",
 
   next: "That is what got through. Here is what did not.",
 };
@@ -160,10 +163,12 @@ function reading(ctx: Context): string {
     "warn")
     + caption(copy.blockedAbsent(blocked.names, blocked.attempts,
                                  blocked.through))
-    + (outage ? note(copy.leakExplain(outage.leaked_days,
-                                      outage.leaked_median,
-                                      shortDate(outage.outage_day),
-                                      outage.outage_hours)) : "");
+    + (outage
+        ? note(copy.leakExplain(outage.leaked_days, outage.leaked_median,
+                                shortDate(outage.outage_day),
+                                outage.outage_hours))
+          + note(copy.leakScope(outage.sensitive_during), "good")
+        : "");
 }
 
 export const act: Act = {

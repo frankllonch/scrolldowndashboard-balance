@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from analysis.events import Timeline
+from analysis.events import SENSITIVE, Timeline
 from analysis.intelligence import ALERT_BUDGET
 from analysis.pipeline import Analysis
 from analysis.score import COMPONENTS
@@ -67,13 +67,20 @@ def week_value(df: pd.DataFrame, col: str, week: int) -> float:
 
 def filter_outage(run: Analysis) -> dict:
     """The apps that appear in the usage frame despite being blocked, and the
-    hole in the filter that let them in.
+    stretch of quiet that let them in.
 
     An app that is both used and blocked is the anomaly: the filter had an
     opinion about it every day, and for one stretch the opinion did not fire.
-    That stretch is the longest gap between two of its blocks. The block frame
-    is at hour resolution, so the gap is measured from the top of the hour the
-    last block landed in and slightly overstates the true silence.
+    That stretch is the longest gap between two of its blocks.
+
+    What kept firing inside that gap is worth counting. The adult and gambling
+    filter went on blocking throughout, so whatever stopped did not stop
+    everything. `sensitive_during` is how many attempts it turned away while
+    the distraction list turned away none. The log records what the phone did;
+    it does not say why one list behaved differently from the other.
+
+    The block frame is at hour resolution, so the gap is measured from the top
+    of the hour the last block landed in and slightly overstates the silence.
     """
     apps, blocks = run.apps, run.blocks
     if blocks.empty:
@@ -86,11 +93,16 @@ def filter_outage(run: Analysis) -> dict:
     stamps = sorted({(row.day, row.hour) for row in theirs.itertuples()})
     hours = [pd.Timestamp(d) + pd.Timedelta(hours=h) for d, h in stamps]
     longest, start = max((b - a, a) for a, b in zip(hours, hours[1:]))
+
+    at = pd.to_datetime(blocks["day"]) + pd.to_timedelta(blocks["hour"], "h")
+    inside = (at > start) & (at < start + longest)
+    sensitive = blocks["category"].isin(SENSITIVE)
     return {
         "leaked_days": int(theirs.groupby("day").ngroups),
         "leaked_median": float(theirs.groupby("day").size().median()),
         "outage_day": plain(start.date()),
         "outage_hours": longest.total_seconds() / 3600,
+        "sensitive_during": int((inside & sensitive).sum()),
     }
 
 
